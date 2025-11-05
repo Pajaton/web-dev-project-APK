@@ -62,15 +62,16 @@ Open the `server` and `client` in separate VSCode workspaces or open the combine
 
 ### Purpose
 
-As students are generally low on cash, but university life is full of parties, we would like to aid students increasing their university experience.
-Our solution is to provide a website providing services, such as calculating the APK (Alkohol-per-Krona) of various drinks and allowing users
-to rate and review drinks for others to see. Our system will be using Systembolaget's API to fetch the data needed.
+As students are generally low on cash and the life at university is full of parties, we would like to help students in enhancing
+their university experience. Our solution is to provide a website with services, such as calculating the APK (Alkohol-per-Krona)
+of various drinks and allowing users to rate and review drinks for others to see.
+The system will be using Systembolaget's API to fetch the data needed.
 
 ### Pages
 
 - Home:
-  - This is the landing page of the webapp.
-  - Here users are greeted with a dashboard including elements such as shortcuts and suggested drinks based on APK...?
+  - This is the landing page of the website.
+  - The user will have access to shortcuts (e.g. to the APK page) and some updates from friends such as their latest reviews.
 - APK:
   - Here the users can see the APK of a variety of drinks at Systembolaget.
   - The users can here filter drinks on different categories, such as type, character and so on.
@@ -79,7 +80,8 @@ to rate and review drinks for others to see. Our system will be using Systembola
   - The conditions are nearest to current location (phone GPS), nearest to home (user's address) and favorite systembolag.
 - Profile:
   - Each user will have their own profile, with name, profile picture and their rated and reviewed drinks.
-  - Other users visiting a specific profile will see
+  - Other users visiting a specific profile will see, besides the user's profile picture and their introduction, their
+    recommended drinks.
 
 ### Entity-Relationship (ER) Diagram
 
