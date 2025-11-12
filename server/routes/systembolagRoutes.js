@@ -33,6 +33,12 @@ router.get("/systembolag/:systembolagId/products/:productId", async (req, res) =
     // Logic to get product availability
 });
 
+// Get the location of a specific Systembolaget store
+router.get("/systembolag/:systembolagId/location", async (req, res) => {
+    // Logic to get a Systembolaget store's loction
+});
+
+
 // POST ROUTE DEFINITIONS
 
 // Add a new Systembolaget store
@@ -51,8 +57,8 @@ router.post("/systembolag/:systembolagId/products", async (req, res) => {
 });
 
 
-
 // PATCH ROUTE DEFINITIONS
+
 
 // Update details of a specific Systembolaget store
 router.patch("/systembolag/:systembolagId", async (req, res) => {

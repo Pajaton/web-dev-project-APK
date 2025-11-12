@@ -29,6 +29,18 @@ router.get("/users/:userId/favorites/systembolag", async (req, res) => {
     // Logic to get list of favorite Systembolag stores
 });
 
+router.get("/users/:userId/locations", async (req, res) => {
+    // Logic to get list of user's saved locations
+});
+
+router.get("/users/:userId/locations/:locationId", async (req, res) => {
+    // Logic to get details of a specific saved location
+});
+
+router.get("/users/:userId/drinks", async (req, res) => {
+    // Logic to get drinks a user has tried
+});
+
 
 // POST ROUTE DEFINITIONS
  
