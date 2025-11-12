@@ -31,6 +31,11 @@ router.get("/log-out-user", async (req, res) => {
 
 // POST ROUTE DEFINITIONS
 
+// Sign up a new user
+router.post("/sign-up-user", async (req, res) => {
+    // Logic to sign up user
+});
+
 // Update a user's profile
 router.post("/update-profile", async (req, res) => {
     // Logic to update user profile
@@ -64,6 +69,14 @@ router.post("/reset-password", async (req, res) => {
 // Delete a user's account
 router.post("/delete-account", async (req, res) => {
     // Logic to delete user account
+});
+
+router.post("/toggle-favorite-drink", async (req, res) => {
+    // Logic to toggle favorite drink
+});
+
+router.post("/toggle-favorite-systembolag", async (req, res) => {
+    // Logic to toggle favorite Systembolag store
 });
 
 export default router;
