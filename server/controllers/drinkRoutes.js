@@ -2,7 +2,7 @@ import { Router } from "express";
 
 const router = Router();
 
-var User=require("../Schemas/DrinkSchema");
+var Drink=require("../Schemas/DrinkSchema");
 
 // GET ROUTES DEFINITION
 
@@ -13,7 +13,7 @@ router.get("/drinks", async (req, res) => {
 router.get("/drinks/:drinkId", async (req, res) => {
     // Get specific drink logic
     const id=req.params.id;
-        const myDrink=await User.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
+        const myDrink=await Drink.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
         res.json(myDrink)
 });
 
@@ -60,16 +60,16 @@ router.patch("/drinks/:drinkId", async (req, res) => {
     // Logic to update a drink
     const id=req.params.id;
     const updatedDrink=await Drink.findById(id).catch(err=>{next(err)});
-    updatedDrink=(req.body.productNumber || updatedDrink.productNumber);
-    updatedDrink=(req.body.name || updatedDrink.name);
-    updatedDrink=(req.body.type || updatedDrink.type);
-    updatedDrink=(req.body.container || updatedDrink.container);
-    updatedDrink=(req.body.volume || updatedDrink.volume);
-    updatedDrink=(req.body.percentage || updatedDrink.percentage);
-    updatedDrink=(req.body.colour || updatedDrink.colour);
-    updatedDrink=(req.body.price || updatedDrink.price);
-    updatedDrink=(req.body.image || updatedDrink.image);
-    updatedDrink=(req.body.APK || updatedDrink.APK);
+    updatedDrink.productNumber=(req.body.productNumber || updatedDrink.productNumber);
+    updatedDrink.name=(req.body.name || updatedDrink.name);
+    updatedDrink.type=(req.body.type || updatedDrink.type);
+    updatedDrink.container=(req.body.container || updatedDrink.container);
+    updatedDrink.volume=(req.body.volume || updatedDrink.volume);
+    updatedDrink.percentage=(req.body.percentage || updatedDrink.percentage);
+    updatedDrink.colour=(req.body.colour || updatedDrink.colour);
+    updatedDrink.price=(req.body.price || updatedDrink.price);
+    updatedDrink.image=(req.body.image || updatedDrink.image);
+    updatedDrink.APK=(req.body.APK || updatedDrink.APK);
     await updatedDrink.save().catch(err=>{next(err)});
     res.json(updatedDrink);
 });
@@ -86,3 +86,5 @@ router.delete("/drinks/:drinkId", async (req, res) => {
     const deletedDrink=await User.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedDrink);
 });
+
+export default router;
