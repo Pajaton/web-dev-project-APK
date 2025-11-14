@@ -2,7 +2,7 @@ import { Router } from "express";
 
 const router = Router();
 
-var User=require("../Schemas/UserSchema");
+var User=require("../models/UserSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a user's profile
