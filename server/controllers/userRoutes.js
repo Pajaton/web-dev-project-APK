@@ -2,11 +2,15 @@ import { Router } from "express";
 
 const router = Router();
 
+var User=require("../Schemas/UserSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a user's profile
 router.get("/users/:userId", async (req, res) => {
     // Logic to get user profile
+    const id=req.params.id;
+    const myUser=await User.findById(id).catch(err=>{res.status(404).json({"message":"No user found"});});
+    res.json(myUser)
 });
 
 // Get a user's current settings
@@ -47,7 +51,16 @@ router.get("/users/:userId/drinks", async (req, res) => {
 
 // Sign up a new user
 router.post("/users", async (req, res) => {
-    // Logic to sign up user
+    // Logic to sign up user   
+    var myUser=new User({
+        "userID":req.body.userID,
+        "email": req.body.email,
+        "profilePicture": req.body.profilePicture,
+        "userName": req.body.userName
+    });
+    await myUser.save().catch(err=>{next(err)});
+
+    res.status(201).json(newUser);
 });
 
 // Create a new session (log in)
@@ -77,6 +90,14 @@ router.post("/users/:userId/favorites/systembolag/:systembolagId", async (req, r
 // Update user profile
 router.patch("/users/:userId", async (req, res) => {
     // Logic to update user profile
+    const id=req.params.id;
+    const updatedUser=await User.findById(id).catch(err=>{next(err)});
+    updatedUser.userID=(req.body.userID || updatedUser.userID);
+    updatedUser.email=(req.body.email || updatedUser.email);
+    updatedUser.profilePicture=(req.body.profilePicture || updatedUser.profilePicture);
+    updatedUser.userName=(req.body.userName || updatedUser.userName);
+    await updatedUser.save().catch(err=>{next(err)});
+    res.json(updatedUser);
 });
 
 // Update user credentials (change email/password including restore forgotten password)
@@ -116,6 +137,9 @@ router.delete("/sessions/current", async (req, res) => {
 // Delete a user's own account
 router.delete("/users/:userId", async (req, res) => {
     // Logic to delete a user's own account
+    const id=req.params.id;
+    const deletedUser=await User.findByIdAndDelete(id).catch(err=>{next(err)});
+    res.json(deletedUser);
 });
 
 export default router;
