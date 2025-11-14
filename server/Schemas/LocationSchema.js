@@ -9,12 +9,12 @@ var locationSchema = new Schema({
     "locationID": {type: String, unique: true},
     "longitude": {type: Number},
     "latitude": {type: Number},
-    "address:": [{
+    "address": {
         "postalCode": {type: Number},
         "street": {type: String},
         "streetNumber": {type: Number},
         "city": {type: String}
-    }]
+    }
 
 })
 
