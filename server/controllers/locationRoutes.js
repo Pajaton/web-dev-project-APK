@@ -2,7 +2,7 @@ import { Router } from "express";
 
 const router = Router();
 
-var Location=require("../Schemas/LocationSchema");
+var Location=require("../models/LocationSchema");
 
 // GET ROUTE DEFINITIONS
 

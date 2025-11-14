@@ -2,7 +2,7 @@ import { Router } from "express";
 
 const router = Router();
 
-var Drink=require("../Schemas/DrinkSchema");
+var Drink=require("../models/DrinkSchema");
 
 // GET ROUTES DEFINITION
 
@@ -13,8 +13,8 @@ router.get("/drinks", async (req, res) => {
 router.get("/drinks/:drinkId", async (req, res) => {
     // Get specific drink logic
     const id=req.params.id;
-        const myDrink=await Drink.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
-        res.json(myDrink)
+    const myDrink=await Drink.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
+    res.json(myDrink)
 });
 
 router.get("/drinks/:drinkId/systembolag", async (req, res) => {
