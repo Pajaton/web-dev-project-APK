@@ -17,4 +17,5 @@ var systembolagSchema = new Schema({
 })
 
 // Create a Mongoose model called "Systembolag" to interact with the "Systembolag" collection in the database
-var Systembolag = mongoose.model("Systembolag", systembolagSchema);
+//var Systembolag = mongoose.model("Systembolag", systembolagSchema);
+module.exports=mongoose.model("systembolag", systembolagSchema);

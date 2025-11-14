@@ -19,4 +19,5 @@ var locationSchema = new Schema({
 })
 
 // Create a Mongoose model called "Location" to interact with the "Location" collection in the database
-var Location = mongoose.model("Location", locationSchema);
+//var Location = mongoose.model("Location", locationSchema);
+module.exports=mongoose.model("locations", locationSchema);

@@ -13,4 +13,5 @@ var userSchema = new Schema({
 })
 
 // Create a Mongoose model called "User" to interact with the "User" collection in the database
-var User = mongoose.model("User", userSchema);
+//var User = mongoose.model("User", userSchema);
+module.exports=mongoose.model("users", userSchema);

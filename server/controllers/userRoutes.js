@@ -1,14 +1,19 @@
-import { Router } from "express";
-
-const router = Router();
+var express=require("express");
+var router=express.Router();
 
 var User=require("../models/UserSchema");
 // GET ROUTE DEFINITIONS
 
+// Get a list of users
+router.get("/users", async (req, res) => {
+    // Logic to get list of users
+    const users=await User.find();
+    res.json({"users":users});
+});
 // Get a user's profile
 router.get("/users/:userId", async (req, res) => {
     // Logic to get user profile
-    const id=req.params.id;
+    const id=req.params.userId;
     const myUser=await User.findById(id).catch(err=>{res.status(404).json({"message":"No user found"});});
     res.json(myUser)
 });
@@ -52,13 +57,13 @@ router.get("/users/:userId/drinks", async (req, res) => {
 // Sign up a new user
 router.post("/users", async (req, res) => {
     // Logic to sign up user   
-    var myUser=new User({
+    var newUser= new User({
         "userID":req.body.userID,
         "email": req.body.email,
         "profilePicture": req.body.profilePicture,
         "userName": req.body.userName
     });
-    await myUser.save().catch(err=>{next(err)});
+    await newUser.save().catch(err=>{next(err)});
 
     res.status(201).json(newUser);
 });
@@ -90,7 +95,7 @@ router.post("/users/:userId/favorites/systembolag/:systembolagId", async (req, r
 // Update user profile
 router.patch("/users/:userId", async (req, res) => {
     // Logic to update user profile
-    const id=req.params.id;
+    const id=req.params.userId;
     const updatedUser=await User.findById(id).catch(err=>{next(err)});
     updatedUser.userID=(req.body.userID || updatedUser.userID);
     updatedUser.email=(req.body.email || updatedUser.email);
@@ -137,9 +142,9 @@ router.delete("/sessions/current", async (req, res) => {
 // Delete a user's own account
 router.delete("/users/:userId", async (req, res) => {
     // Logic to delete a user's own account
-    const id=req.params.id;
+    const id=req.params.userId;
     const deletedUser=await User.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedUser);
 });
 
-export default router;
+module.exports = router;

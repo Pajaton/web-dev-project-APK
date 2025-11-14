@@ -1,6 +1,5 @@
-import { Router } from "express";
-
-const router = Router();
+var express=require("express");
+var router=express.Router();
 
 var Location=require("../models/LocationSchema");
 
@@ -9,12 +8,14 @@ var Location=require("../models/LocationSchema");
 // Get a list of locations
 router.get("/locations", async (req, res) => {
     // Logic to get list of locations
+    const locations=await Location.find();
+    res.json({"locations":locations});
 });
 
 // Get details of a specific location
 router.get("/locations/:locationId", async (req, res) => {
     // Logic to get location details
-    const id=req.params.id;
+    const id=req.params.locationId;
     const myLocation=await Location.findById(id).catch(err=>{res.status(404).json({"message":"No location found"});});
     res.json(myLocation)
 });
@@ -23,7 +24,7 @@ router.get("/locations/:locationId", async (req, res) => {
 
 router.post("/locations", async (req, res) => {
     // Logic to create a new location
-    var myLocation=new Location({
+    var newLocation=new Location({
         "locationID": req.body.LocationID,
         "longitude": req.body.longitude,
         "latitude": req.body.latitude,
@@ -32,16 +33,16 @@ router.post("/locations", async (req, res) => {
         "streetNumber": req.body.adress.streetNumber,
         "city": req.body.address.city
     });
-    await myLocation.save().catch(err=>{next(err)});
+    await newLocation.save().catch(err=>{next(err)});
 
-    res.status(201).json(myLocation);
+    res.status(201).json(newLocation);
 });
 
 // PATCH ROUTE DEFINITIONS
 
 router.patch("/locations/:locationId", async (req, res) => {
     // Logic to update location details
-    const id=req.params.id;
+    const id=req.params.locationId;
     const updatedLocation=await Location.findById(id).catch(err=>{next(err)});
     updatedLocation.locationID=(req.body.LocationID || updatedLocation.locationID);
     updatedLocation.longitude=(req.body.longitude || updatedLocation.longitude);
@@ -58,9 +59,9 @@ router.patch("/locations/:locationId", async (req, res) => {
 
 router.delete("/locations/:locationId", async (req, res) => {
     // Logic to delete a location
-    const id=req.params.id;
+    const id=req.params.locationId;
     const deletedLocation=await Location.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedLocation);
 });
 
-export default router;
+module.exports = router;

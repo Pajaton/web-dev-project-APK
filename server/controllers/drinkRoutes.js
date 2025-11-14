@@ -1,6 +1,5 @@
-import { Router } from "express";
-
-const router = Router();
+var express=require("express");
+var router=express.Router();
 
 var Drink=require("../models/DrinkSchema");
 
@@ -8,11 +7,13 @@ var Drink=require("../models/DrinkSchema");
 
 router.get("/drinks", async (req, res) => {
     // Get all drinks logic
+    const drinks=await Drink.find();
+    res.json({"drinks":drinks});
 });
 
 router.get("/drinks/:drinkId", async (req, res) => {
     // Get specific drink logic
-    const id=req.params.id;
+    const id=req.params.drinkId;
     const myDrink=await Drink.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
     res.json(myDrink)
 });
@@ -47,7 +48,7 @@ router.post("/drinks", async (req, res) => {
     });
     await newDrink.save().catch(err=>{next(err)});
 
-    res.status(201).json(newUser);
+    res.status(201).json(newDrink);
 });
 
 
@@ -56,9 +57,9 @@ router.post("/drinks", async (req, res) => {
 
 
 
-router.patch("/drinks/:drinkId", async (req, res) => {
+router.patch("/api/drinks/:drinkId", async (req, res) => {
     // Logic to update a drink
-    const id=req.params.id;
+    const id=req.params.drinkId;
     const updatedDrink=await Drink.findById(id).catch(err=>{next(err)});
     updatedDrink.productNumber=(req.body.productNumber || updatedDrink.productNumber);
     updatedDrink.name=(req.body.name || updatedDrink.name);
@@ -82,9 +83,9 @@ router.patch("/drinks/:drinkId", async (req, res) => {
 
 router.delete("/drinks/:drinkId", async (req, res) => {
     // Logic to delete a drink
-    const id=req.params.id;
+    const id=req.params.drinkId;
     const deletedDrink=await User.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedDrink);
 });
 
-export default router;
+module.exports = router;
