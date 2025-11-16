@@ -116,3 +116,29 @@ async function getStores(apiKey) {
   const data = await apiRequest(apiKey, url);
   return data.siteSearchResults;
 }
+
+//Main script structure
+(async () => {
+  try {
+    //Get key
+    const apiKey = await getApiKey();
+
+    //Get assortment
+    const products = await getFullAssortment(apiKey);
+    console.log(`\nDownloaded ${products.length} products.`);
+
+    //Get stores
+    const stores = await getStores(apiKey);
+    console.log(`Downloaded ${stores.length} stores.`);
+
+    //Save results into json-files in the same folder. Indentation 2
+    await fs.writeFile("assortment.json", JSON.stringify(products, null, 2));
+    await fs.writeFile("stores.json", JSON.stringify(stores, null, 2));
+
+    console.log("\nSaved:");
+    console.log("assortment.json");
+    console.log("stores.json\n");
+  } catch (err) {
+    console.error("\n ERROR:", err.message);
+  }
+})();
