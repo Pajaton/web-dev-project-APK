@@ -105,3 +105,14 @@ async function getFullAssortment(apiKey) {
 
   return all;
 }
+
+//Get data about the different stores
+async function getStores(apiKey) {
+  console.log("Downloading store list...");
+
+  const url = new URL("https://api-extern.systembolaget.se/sb-api-ecommerce/v1/sitesearch/site");
+  url.searchParams.set("includePredictions", "true");
+
+  const data = await apiRequest(apiKey, url);
+  return data.siteSearchResults;
+}
