@@ -67,3 +67,41 @@ async function apiRequest(apiKey, url) {
 
   return result.json();
 }
+
+//Get the full systembolaget assortment of items
+async function getFullAssortment(apiKey) {
+
+  //"page" is the current page number we are requesting. "next" is the next page number returned by the API
+  const all = [];
+  let currentPage = 1;
+  let nextPage = 1;
+
+  console.log("Downloading product assortment...");
+
+  //Iterate through the pages of the product catalog. Last page will return "0", so the loop will stop.
+  while (nextPage > 0) {
+
+    //Make url object to attach parameters to it
+    const url = new URL("https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch/search");
+
+    //Set the search parameter of the size to 30
+    url.searchParams.set("size", "30");
+
+    //Set the search parameter of our url to the value of "currentPage"
+    url.searchParams.set("page", String(currentPage));
+
+    //Run the apiRequest-function with key and url as parameters and store result
+    const data = await apiRequest(apiKey, url);
+
+    //"data" is an array of 30 products, this functions pushes each individual product into the "all"-array, separately
+    all.push(...data.products);
+
+    //The api-response contains metadata about what page to request next, so we set "nextPage" to that number
+    nextPage = data.metadata.nextPage;
+    console.log(`Fetched page ${currentPage} / next=${nextPage}, total so far=${all.length}`);
+
+    currentPage = nextPage;
+  }
+
+  return all;
+}
