@@ -1,6 +1,5 @@
-import { Router } from "express";
-
-const router = Router();
+var express=require("express");
+var router=express.Router();
 
 // GET ROUTES DEFINITION
 
@@ -49,3 +48,5 @@ router.patch("/drinks/:drinkId", async (req, res) => {
 router.delete("/drinks/:drinkId", async (req, res) => {
     // Logic to delete a drink
 });
+
+module.exports = router;
