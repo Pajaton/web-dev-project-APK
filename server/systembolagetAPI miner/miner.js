@@ -39,3 +39,31 @@ async function getApiKey() {
   console.log("Extracted API key.");
   return apiKey;
 }
+
+//Use apiKey and desired url (for products or stores etc) to make an API call.
+async function apiRequest(apiKey, url) {
+  const result = await fetch(url, {
+    //Specify headers that will be sent with our request
+    headers: {
+
+      //Set the request origin adress
+      "Origin": "https://www.systembolaget.se",
+
+      //We want the response in json format
+      "Accept": "application/json",
+
+      //Do not use cached data, forces a fresh response
+      "Cache-Control": "no-cache",
+      "Pragma": "no-cache",
+
+      //Add the API key to the request, so systemboalget accepts the request
+      "Ocp-Apim-Subscription-Key": apiKey
+    }
+  });
+
+  if (!result.ok) {
+    throw new Error(`HTTP ${result.status} - ${result.statusText}`);
+  }
+
+  return result.json();
+}
