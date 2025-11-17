@@ -38,12 +38,8 @@ router.get("/users/:userId/favorites/systembolag", async (req, res) => {
     // Logic to get list of favorite Systembolag stores
 });
 
-router.get("/users/:userId/locations", async (req, res) => {
-    // Logic to get list of user's saved locations
-});
-
-router.get("/users/:userId/locations/:locationId", async (req, res) => {
-    // Logic to get details of a specific saved location
+router.get("/users/:userId/address", async (req, res) => {
+    // Logic to get list of user's address
 });
 
 router.get("/users/:userId/drinks", async (req, res) => {
@@ -52,7 +48,7 @@ router.get("/users/:userId/drinks", async (req, res) => {
 
 
 // POST ROUTE DEFINITIONS
- 
+
 
 // Sign up a new user
 router.post("/users", async (req, res) => {
@@ -145,6 +141,11 @@ router.delete("/users/:userId", async (req, res) => {
     const id=req.params.userId;
     const deletedUser=await User.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedUser);
+});
+
+// Delete all sessions (log out from all devices)
+router.delete("/sessions", async (req, res) => {
+    // Logic to delete all sessions (log out from all devices)
 });
 
 module.exports = router;

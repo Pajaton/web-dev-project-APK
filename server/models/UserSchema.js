@@ -6,12 +6,45 @@ var Schema = mongoose.Schema;
 
 //Define the structure of the schema
 var userSchema = new Schema({
+    // Primary key
     "userID": {type: Number, unique: true},
-    "email": {type: String},
+
+    // Local attributes
+    "email": {type: String, unique: true, required: true},
     "profilePicture": {type: String},
-    "userName": {type: String}
+    "userName": {type: String},
+
+    // The composite address field from the ER diagram
+    "street": {type: String},
+    "streetNumber": {type: Number},
+    "postalCode": {type: String},
+    "city": {type: String},
+
+    // Derived attributes
+    "longitude": {type: Number},
+    "latitude": {type: Number},
+
+    // Relationships
+    "follows": [{
+        "type": Schema.Types.ObjectId,
+        "ref": "User"
+    }],
+    "favoriteSystembolag": {
+        "type": Schema.Types.ObjectId,
+        "ref": "Systembolag"
+    },
+    "triedDrinks": [{
+        "drink": {
+            "type": Schema.Types.ObjectId,
+            "ref": "Drink"
+        },
+        "favorite": {type: Boolean, default: false}
+    }],
+    "reviewsWritten": [{
+        "type": Schema.Types.ObjectId,
+        "ref": "Review"
+    }]
 })
 
 // Create a Mongoose model called "User" to interact with the "User" collection in the database
-//var User = mongoose.model("User", userSchema);
-module.exports=mongoose.model("users", userSchema);
+module.exports = mongoose.model("User", userSchema);
