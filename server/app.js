@@ -8,7 +8,6 @@ var history = require('connect-history-api-fallback');
 var usersController=require("./controllers/userRoutes");
 var drinkController=require("./controllers/drinkRoutes");
 var systembolagetController=require("./controllers/systembolagRoutes");
-var locationController=require("./controllers/locationRoutes");
 
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
@@ -42,7 +41,7 @@ app.get('/api', function(req, res) {
 app.use(drinkController);
 app.use(usersController);
 app.use(systembolagetController);
-app.use(locationController);
+
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
