@@ -16,7 +16,7 @@ router.get("/api/v1/reviews", async (req, res) => {
 router.get("/api/v1/reviews/:reviewId", async (req, res) => {
     // Logic to get a specific review
     const id=req.params.reviewId;
-    const myreview=await User.findById(id).catch(err=>{res.status(404).json({"message":"No review found"});});
+    const myreview=await Review.findById(id).catch(err=>{res.status(404).json({"message":"No review found"});});
     res.json(myreview)
 });
 
@@ -44,7 +44,9 @@ router.post("/api/v1/reviews", async (req, res, next) => {
         "userID":req.body.userID,
         "productID": req.body.productID,
         "rating": req.body.rating,
-        "comment": req.body.comment
+        "comment": req.body.comment,
+        "reviewedBy": req.body.reviewedBy,
+        "reviewOf": req.body.reviewOf
     });
     await newReview.save().catch(err=>{next(err)});
 
@@ -62,6 +64,8 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
     updatedReview.productID=(req.body.productID || updatedReview.productID);
     updatedReview.rating=(req.body.rating || updatedReview.rating);
     updatedReview.comment=(req.body.comment || updatedReview.comment);
+    updatedReview.reviewedBy=(req.body.reviewedBy || updatedReview.reviewedBy);
+    updatedReview.reviewedBy=(req.body.reviewedBy || updatedReview.reviewedBy);
     await updatedReview.save().catch(err=>{next(err)});
     res.json(updatedReview);
 });
@@ -69,9 +73,19 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // PUT ROUTE DEFINITIONS
 
 // Replace a specific review
-router.put("/api/v1/reviews/:reviewId", async (req, res) => {
+router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
     // Logic to replace a specific review
     // Enforce supply of all required fields
+        const id=req.params.reviewId;
+    const updatedReview=await Review.findById(id).catch(err=>{next(err)});
+    updatedReview.userID=req.body.userID;
+    updatedReview.productID=req.body.productID;
+    updatedReview.rating=req.body.rating;
+    updatedReview.comment=req.body.comment;
+    updatedReview.reviewedBy=req.body.reviewedBy;
+    updatedReview.reviewedBy=req.body.reviewedBy;
+    await updatedReview.save().catch(err=>{next(err)});
+    res.json(updatedReview);
 });
 
 // DELETE ROUTE DEFINITIONS
