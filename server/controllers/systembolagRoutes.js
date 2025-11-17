@@ -50,7 +50,7 @@ router.get("/api/v1/systembolag/:systembolagId", async (req, res) => {
 // POST ROUTE DEFINITIONS
 
 // Add a new Systembolaget store
-router.post("/api/v1/systembolag", async (req, res) => {
+router.post("/api/v1/systembolag", async (req, res, next) => {
     // Logic to add a new Systembolaget store
     var newSystembolag=new Systembolag({
         "SystembolagID": req.body.SystembolagID,
@@ -82,7 +82,7 @@ router.post("/api/v1/systembolag/:systembolagId/products", async (req, res) => {
 
 
 // Update details of a specific Systembolaget store
-router.patch("/api/v1/systembolag/:systembolagId", async (req, res) => {
+router.patch("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
     // Logic to update store details
     const id=req.params.systembolagId;
     const updatedSystembolag=await Systembolag.findById(id).catch(err=>{next(err)})

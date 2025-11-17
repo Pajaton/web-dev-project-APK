@@ -38,7 +38,7 @@ router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => 
 // POST ROUTE DEFINITIONS
 
 // Create a new review for a drink
-router.post("/api/v1/reviews", async (req, res) => {
+router.post("/api/v1/reviews", async (req, res, next) => {
     // Logic to create a new review for a drink
     var newReview= new Review({
         "userID":req.body.userID,
@@ -54,7 +54,7 @@ router.post("/api/v1/reviews", async (req, res) => {
 // PATCH ROUTE DEFINITIONS
 
 // Update a specific review
-router.patch("/api/v1/reviews/:reviewId", async (req, res) => {
+router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
     // Logic to update a specific review
     const id=req.params.reviewId;
     const updatedReview=await Review.findById(id).catch(err=>{next(err)});

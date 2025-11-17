@@ -32,7 +32,7 @@ router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res
 
 
 
-router.post("/api/v1/drinks", async (req, res) => {
+router.post("/api/v1/drinks", async (req, res, next) => {
     // Logic to add new drinks
     const newDrink= new Drink({
     "productNumber": req.body.productNumber,
@@ -57,7 +57,7 @@ router.post("/api/v1/drinks", async (req, res) => {
 
 
 
-router.patch("/api/v1/drinks/:drinkId", async (req, res) => {
+router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
     // Logic to update a drink
     const id=req.params.drinkId;
     const updatedDrink=await Drink.findById(id).catch(err=>{next(err)});
@@ -84,7 +84,7 @@ router.patch("/api/v1/drinks/:drinkId", async (req, res) => {
 router.delete("/api/v1/drinks/:drinkId", async (req, res) => {
     // Logic to delete a drink
     const id=req.params.drinkId;
-    const deletedDrink=await User.findByIdAndDelete(id).catch(err=>{next(err)});
+    const deletedDrink=await Drink.findByIdAndDelete(id).catch(err=>{next(err)});
     res.json(deletedDrink);
 });
 

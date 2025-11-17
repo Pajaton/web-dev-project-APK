@@ -51,7 +51,7 @@ router.get("/api/v1/users/:userId/drinks", async (req, res) => {
 
 
 // Sign up a new user
-router.post("/api/v1/users", async (req, res) => {
+router.post("/api/v1/users", async (req, res, next) => {
     // Logic to sign up user   
     var newUser= new User({
         "userID":req.body.userID,
@@ -95,7 +95,7 @@ router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async 
 
 
 // Update user profile
-router.patch("/api/v1/users/:userId", async (req, res) => {
+router.patch("/api/v1/users/:userId", async (req, res, next) => {
     // Logic to update user profile
     const id=req.params.userId;
     const updatedUser=await User.findById(id).catch(err=>{next(err)});
