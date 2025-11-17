@@ -11,7 +11,7 @@ var reviewController=require("./controllers/reviewRoutes");
 var systembolagetController=require("./controllers/systembolagRoutes");
 
 // Variables
-var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
+var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
 var port = process.env.PORT || 3000;
 
 // Connect to MongoDB

@@ -5,24 +5,24 @@ var Drink=require("../models/DrinkSchema");
 
 // GET ROUTES DEFINITION
 
-router.get("/drinks", async (req, res) => {
+router.get("/api/v1/drinks", async (req, res) => {
     // Get all drinks logic
     const drinks=await Drink.find();
     res.json({"drinks":drinks});
 });
 
-router.get("/drinks/:drinkId", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId", async (req, res) => {
     // Get specific drink logic
     const id=req.params.drinkId;
     const myDrink=await Drink.findById(id).catch(err=>{res.status(404).json({"message":"No drink found"});});
     res.json(myDrink)
 });
 
-router.get("/drinks/:drinkId/systembolag", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res) => {
     // Logic to check where a drink is in stock
 });
 
-router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
     // Logic to check if a drink is in stock at a specific systembolag
 });
 
@@ -32,7 +32,7 @@ router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
 
 
 
-router.post("/drinks", async (req, res) => {
+router.post("/api/v1/drinks", async (req, res) => {
     // Logic to add new drinks
     const newDrink= new Drink({
     "productNumber": req.body.productNumber,
@@ -57,7 +57,7 @@ router.post("/drinks", async (req, res) => {
 
 
 
-router.patch("/api/drinks/:drinkId", async (req, res) => {
+router.patch("/api/v1/drinks/:drinkId", async (req, res) => {
     // Logic to update a drink
     const id=req.params.drinkId;
     const updatedDrink=await Drink.findById(id).catch(err=>{next(err)});
@@ -81,7 +81,7 @@ router.patch("/api/drinks/:drinkId", async (req, res) => {
 
 
 
-router.delete("/drinks/:drinkId", async (req, res) => {
+router.delete("/api/v1/drinks/:drinkId", async (req, res) => {
     // Logic to delete a drink
     const id=req.params.drinkId;
     const deletedDrink=await User.findByIdAndDelete(id).catch(err=>{next(err)});

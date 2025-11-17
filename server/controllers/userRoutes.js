@@ -5,13 +5,13 @@ var User=require("../models/UserSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a list of users
-router.get("/users", async (req, res) => {
+router.get("/api/v1/users", async (req, res) => {
     // Logic to get list of users
     const users=await User.find();
     res.json({"users":users});
 });
 // Get a user's profile
-router.get("/users/:userId", async (req, res) => {
+router.get("/api/v1/users/:userId", async (req, res) => {
     // Logic to get user profile
     const id=req.params.userId;
     const myUser=await User.findById(id).catch(err=>{res.status(404).json({"message":"No user found"});});
@@ -19,30 +19,30 @@ router.get("/users/:userId", async (req, res) => {
 });
 
 // Get a user's current settings
-router.get("/users/:userId/settings", async (req, res) => {
+router.get("/api/v1/users/:userId/settings", async (req, res) => {
     // Logic to get user settings
 });
 
 // Get a list of users that a user follows
-router.get("/users/:userId/follows", async (req, res) => {
+router.get("/api/v1/users/:userId/follows", async (req, res) => {
     // Logic to get list of followed users
 });
 
 // Get a list of a user's favorite drinks
-router.get("/users/:userId/favorites/drinks", async (req, res) => {
+router.get("/api/v1/users/:userId/favorites/drinks", async (req, res) => {
     // Logic to get list of favorite drinks
 });
 
 // Get a list of a user's favorite Systembolag stores
-router.get("/users/:userId/favorites/systembolag", async (req, res) => {
+router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res) => {
     // Logic to get list of favorite Systembolag stores
 });
 
-router.get("/users/:userId/address", async (req, res) => {
+router.get("/api/v1/users/:userId/address", async (req, res) => {
     // Logic to get list of user's address
 });
 
-router.get("/users/:userId/drinks", async (req, res) => {
+router.get("/api/v1/users/:userId/drinks", async (req, res) => {
     // Logic to get drinks a user has tried
 });
 
@@ -51,7 +51,7 @@ router.get("/users/:userId/drinks", async (req, res) => {
 
 
 // Sign up a new user
-router.post("/users", async (req, res) => {
+router.post("/api/v1/users", async (req, res) => {
     // Logic to sign up user   
     var newUser= new User({
         "userID":req.body.userID,
@@ -71,22 +71,22 @@ router.post("/users", async (req, res) => {
 });
 
 // Create a new session (log in)
-router.post("/sessions", async (req, res) => {
+router.post("/api/v1/sessions", async (req, res) => {
     // Logic to create a new session (log in)
 });
 
 // Follow a user
-router.post("/users/:userId/follows/:targetUserId", async (req, res) => {
+router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
     // Logic to follow a user
 });
 
 // Favorite a drink
-router.post("/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
+router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
     // Logic to favorite a drink
 });
 
 // Favorite a Systembolag store
-router.post("/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
+router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
     // Logic to favorite a Systembolag store
 });
 
@@ -95,7 +95,7 @@ router.post("/users/:userId/favorites/systembolag/:systembolagId", async (req, r
 
 
 // Update user profile
-router.patch("/users/:userId", async (req, res) => {
+router.patch("/api/v1/users/:userId", async (req, res) => {
     // Logic to update user profile
     const id=req.params.userId;
     const updatedUser=await User.findById(id).catch(err=>{next(err)});
@@ -114,12 +114,12 @@ router.patch("/users/:userId", async (req, res) => {
 });
 
 // Update user credentials (change email/password including restore forgotten password)
-router.patch("/users/:userId/credentials", async (req, res) => {
+router.patch("/api/v1/users/:userId/credentials", async (req, res) => {
     // Logic to update user credentials
 });
 
 // Update user settings
-router.patch("/users/:userId/settings", async (req, res) => {
+router.patch("/api/v1/users/:userId/settings", async (req, res) => {
     // Logic to update user settings
 });
 
@@ -128,27 +128,27 @@ router.patch("/users/:userId/settings", async (req, res) => {
 
 
 // Unfavorite a drink
-router.delete("/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
+router.delete("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
     // Logic to delete favorite drink
 });
 
 // Unfavorite a Systembolag store
-router.delete("/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
+router.delete("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
     // Logic to delete favorite Systembolag store
 });
 
 // Unfollow a user
-router.delete("/users/:userId/follows/:targetUserId", async (req, res) => {
+router.delete("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
     // Logic to delete followed user
 });
 
 // Log out (delete current session)
-router.delete("/sessions/current", async (req, res) => {
+router.delete("/api/v1/sessions/current", async (req, res) => {
     // Logic to log out (delete current session)
 });
 
 // Delete a user's own account
-router.delete("/users/:userId", async (req, res) => {
+router.delete("/api/v1/users/:userId", async (req, res) => {
     // Logic to delete a user's own account
     const id=req.params.userId;
     const deletedUser=await User.findByIdAndDelete(id).catch(err=>{next(err)});
@@ -156,7 +156,7 @@ router.delete("/users/:userId", async (req, res) => {
 });
 
 // Delete all sessions (log out from all devices)
-router.delete("/sessions", async (req, res) => {
+router.delete("/api/v1/sessions", async (req, res) => {
     // Logic to delete all sessions (log out from all devices)
 });
 
