@@ -24,14 +24,6 @@ router.get("/systembolag/products/:productId", async (req, res) => {
     // Logic to get product details
 });
 
-// Get details of a specific Systembolaget store
-router.get("/systembolag/:systembolagId", async (req, res) => {
-    // Logic to get store details
-    const id=req.params.systembolagId;
-    const mySystembolag=await Systembolag.findById(id).catch(err=>{res.status(404).json({"message":"No systembolag found"});});
-    res.json(mySystembolag)
-});
-
 router.get("/systembolag/:systembolagId/products", async (req, res) => {
     // Logic to get list of products available at a specific store
 });
@@ -49,6 +41,9 @@ router.get("/systembolag/:systembolagId/address", async (req, res) => {
 // Get details of a specific Systembolaget store
 router.get("/systembolag/:systembolagId", async (req, res) => {
     // Logic to get details of a specific Systembolaget store
+    const id=req.params.systembolagId;
+    const mySystembolag=await Systembolag.findById(id).catch(err=>{res.status(404).json({"message":"No systembolag found"});});
+    res.json(mySystembolag)
 });
 
 
@@ -137,5 +132,4 @@ router.delete("/systembolag/:systembolagId/products/:productId", async (req, res
     // Logic to delete a product from a specific store
 });
 
-module.exports = router;
 module.exports = router;
