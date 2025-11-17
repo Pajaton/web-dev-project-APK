@@ -44,7 +44,7 @@ router.post("/drinks", async (req, res) => {
     "colour": req.body.colour,
     "price": req.body.price,
     "image": req.body.image,
-    "APK": req.body.APK
+    "apk": req.body.apk
     });
     await newDrink.save().catch(err=>{next(err)});
 
@@ -70,7 +70,7 @@ router.patch("/api/drinks/:drinkId", async (req, res) => {
     updatedDrink.colour=(req.body.colour || updatedDrink.colour);
     updatedDrink.price=(req.body.price || updatedDrink.price);
     updatedDrink.image=(req.body.image || updatedDrink.image);
-    updatedDrink.APK=(req.body.APK || updatedDrink.APK);
+    updatedDrink.apk=(req.body.apk || updatedDrink.apk);
     await updatedDrink.save().catch(err=>{next(err)});
     res.json(updatedDrink);
 });

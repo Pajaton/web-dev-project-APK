@@ -7,6 +7,7 @@ var history = require('connect-history-api-fallback');
 
 var usersController=require("./controllers/userRoutes");
 var drinkController=require("./controllers/drinkRoutes");
+var reviewController=require("./controllers/reviewRoutes");
 var systembolagetController=require("./controllers/systembolagRoutes");
 
 // Variables
@@ -40,6 +41,7 @@ app.get('/api', function(req, res) {
 
 app.use(drinkController);
 app.use(usersController);
+app.use(reviewController);
 app.use(systembolagetController);
 
 

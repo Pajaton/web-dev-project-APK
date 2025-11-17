@@ -57,7 +57,13 @@ router.post("/users", async (req, res) => {
         "userID":req.body.userID,
         "email": req.body.email,
         "profilePicture": req.body.profilePicture,
-        "userName": req.body.userName
+        "userName": req.body.userName,
+        "street": req.body.street,
+        "streetNumber": req.body.streetNumber,
+        "postalCode": req.body.postalCode,
+        "city": req.body.city,
+        "longitude": req.body.longitude,
+        "latitude": req.body.latitude,
     });
     await newUser.save().catch(err=>{next(err)});
 
@@ -97,6 +103,12 @@ router.patch("/users/:userId", async (req, res) => {
     updatedUser.email=(req.body.email || updatedUser.email);
     updatedUser.profilePicture=(req.body.profilePicture || updatedUser.profilePicture);
     updatedUser.userName=(req.body.userName || updatedUser.userName);
+    updatedUser.street=(req.body.street || updatedUser.street);
+    updatedUser.streetNumber=(req.body.streetNumber || updatedUser.streetNumber);
+    updatedUser.postalCode=(req.body.postalCode || updatedUser.postalCode);
+    updatedUser.city=(req.body.city || updatedUser.city);
+    updatedUser.longitude=(req.body.longitude || updatedUser.longitude);
+    updatedUser.latitude=(req.body.latitude || updatedUser.latitude);
     await updatedUser.save().catch(err=>{next(err)});
     res.json(updatedUser);
 });

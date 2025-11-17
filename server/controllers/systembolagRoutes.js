@@ -55,10 +55,12 @@ router.post("/systembolag", async (req, res) => {
     var newSystembolag=new Systembolag({
         "SystembolagID": req.body.SystembolagID,
         "name": req.body.name,
-        "type": req.body.location.type,
-        "ref": req.body.location.ref,
-        "unique": req.body.location.unique,
-        "required": req.body.location.require
+        "street": req.body.street,
+        "streetNumber": req.body.streetNumber,
+        "postalCode": req.body.postalCode,
+        "city": req.body.city,
+        "longitude": req.body.longitude,
+        "latitude": req.body.latitude,
     });
     await newSystembolag.save().catch(err=>{next(err)});
 
@@ -86,10 +88,12 @@ router.patch("/systembolag/:systembolagId", async (req, res) => {
     const updatedSystembolag=await Systembolag.findById(id).catch(err=>{next(err)})
     updatedSystembolag.SystembolagID=(req.body.SystembolagID || updatedSystembolag.SystembolagID);
     updatedSystembolag.name=(req.body.name || updatedSystembolag.name);
-    updatedSystembolag.type=(req.body.type || updatedSystembolag.type);
-    updatedSystembolag.ref=(req.body.ref || updatedSystembolag.ref);
-    updatedSystembolag.unique=(req.body.unique || updatedSystembolag.unique);
-    updatedSystembolag.required=(req.body.required || updatedSystembolag.required);
+    updatedSystembolag.street=(req.body.street || updatedSystembolag.street);
+    updatedSystembolag.streetNumber=(req.body.streetNumber || updatedSystembolag.streetNumber);
+    updatedSystembolag.postalCode=(req.body.postalCode || updatedSystembolag.postalCode);
+    updatedSystembolag.city=(req.body.city || updatedSystembolag.city);
+    updatedSystembolag.longitude=(req.body.longitude || updatedSystembolag.longitude);
+    updatedSystembolag.latitude=(req.body.latitude || updatedSystembolag.latitude);
     await updatedSystembolag.save().catch(err=>{next(err)});
     res.json(updatedSystembolag);
 });
