@@ -1,6 +1,6 @@
-import { Router } from "express";
+var express=require("express");
+var router=express.Router();
 
-const router = Router();
 
 // GET ROUTE DEFINITIONS
 
@@ -19,11 +19,6 @@ router.get("/systembolag/products/:productId", async (req, res) => {
     // Logic to get product details
 });
 
-// Get details of a specific Systembolaget store
-router.get("/systembolag/:systembolagId", async (req, res) => {
-    // Logic to get store details
-});
-
 router.get("/systembolag/:systembolagId/products", async (req, res) => {
     // Logic to get list of products available at a specific store
 });
@@ -34,8 +29,13 @@ router.get("/systembolag/:systembolagId/products/:productId", async (req, res) =
 });
 
 // Get the location of a specific Systembolaget store
-router.get("/systembolag/:systembolagId/location", async (req, res) => {
-    // Logic to get a Systembolaget store's loction
+router.get("/systembolag/:systembolagId/address", async (req, res) => {
+    // Logic to get a Systembolaget store's address
+});
+
+// Get details of a specific Systembolaget store
+router.get("/systembolag/:systembolagId", async (req, res) => {
+    // Logic to get details of a specific Systembolaget store
 });
 
 
@@ -75,7 +75,13 @@ router.patch("/systembolag/:systembolagId/products/:productId", async (req, res)
     // Logic to update product availability
 });
 
+// PUT ROUTE DEFINITIONS
 
+// Replace details of a specific product
+router.put("/systembolag/products/:productId", async (req, res) => {
+    // Logic to replace product details
+    // Enforce supply of all required fields
+});
 
 // DELETE ROUTE DEFINITIONS
 
@@ -94,4 +100,4 @@ router.delete("/systembolag/:systembolagId/products/:productId", async (req, res
     // Logic to delete a product from a specific store
 });
 
-export default router;
+module.exports = router;
