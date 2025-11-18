@@ -13,6 +13,11 @@ var userSchema = new Schema({
     "email": {type: String, unique: true, required: true},
     "profilePicture": {type: String},
     "userName": {type: String},
+    "settings": {
+        "darkMode": {type: Boolean, default: false},
+        "notifications": {type: Boolean, default: true},
+        "language": {type: String, default: "en"}
+    },
 
     // The composite address field from the ER diagram
     "street": {type: String},
