@@ -1,21 +1,25 @@
-var express=require("express");
-var router=express.Router();
+var express = require("express");
+var router = express.Router();
 
-var User=require("../models/UserSchema");
+var User = require("../models/UserSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a list of users
 router.get("/api/v1/users", async (req, res) => {
-    // Logic to get list of users
-    const users=await User.find();
-    res.json({"users":users});
+    const users = await User.find();
+
+    return res.json({ "users": users });
 });
 // Get a user's profile
 router.get("/api/v1/users/:userId", async (req, res) => {
-    // Logic to get user profile
-    const id=req.params.userId;
-    const myUser=await User.findById(id).catch(err=>{res.status(404).json({"message":"No user found"});});
-    res.json(myUser)
+    const id = req.params.userId;
+    const user = await User.findById(id).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    return res.json(user);
 });
 
 // Get a user's current settings
@@ -52,9 +56,8 @@ router.get("/api/v1/users/:userId/drinks", async (req, res) => {
 
 // Sign up a new user
 router.post("/api/v1/users", async (req, res, next) => {
-    // Logic to sign up user   
-    var newUser= new User({
-        "userID":req.body.userID,
+    var newUser = new User({
+        "userID": req.body.userID,
         "email": req.body.email,
         "profilePicture": req.body.profilePicture,
         "userName": req.body.userName,
@@ -65,9 +68,9 @@ router.post("/api/v1/users", async (req, res, next) => {
         "longitude": req.body.longitude,
         "latitude": req.body.latitude,
     });
-    await newUser.save().catch(err=>{next(err)});
+    await newUser.save().catch(err => { next(err) });
 
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
 });
 
 // Create a new session (log in)
@@ -96,21 +99,26 @@ router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async 
 
 // Update user profile
 router.patch("/api/v1/users/:userId", async (req, res, next) => {
-    // Logic to update user profile
-    const id=req.params.userId;
-    const updatedUser=await User.findById(id).catch(err=>{next(err)});
-    updatedUser.userID=(req.body.userID || updatedUser.userID);
-    updatedUser.email=(req.body.email || updatedUser.email);
-    updatedUser.profilePicture=(req.body.profilePicture || updatedUser.profilePicture);
-    updatedUser.userName=(req.body.userName || updatedUser.userName);
-    updatedUser.street=(req.body.street || updatedUser.street);
-    updatedUser.streetNumber=(req.body.streetNumber || updatedUser.streetNumber);
-    updatedUser.postalCode=(req.body.postalCode || updatedUser.postalCode);
-    updatedUser.city=(req.body.city || updatedUser.city);
-    updatedUser.longitude=(req.body.longitude || updatedUser.longitude);
-    updatedUser.latitude=(req.body.latitude || updatedUser.latitude);
-    await updatedUser.save().catch(err=>{next(err)});
-    res.json(updatedUser);
+    // Find the user to update
+    const id = req.params.userId;
+    const userToUpdate = await User.findById(id).catch(err => { next(err) });
+
+    // Update only the fields provided in the request body
+    userToUpdate.userID = (req.body.userID || userToUpdate.userID);
+    userToUpdate.email = (req.body.email || userToUpdate.email);
+    userToUpdate.profilePicture = (req.body.profilePicture || userToUpdate.profilePicture);
+    userToUpdate.userName = (req.body.userName || userToUpdate.userName);
+    userToUpdate.street = (req.body.street || userToUpdate.street);
+    userToUpdate.streetNumber = (req.body.streetNumber || userToUpdate.streetNumber);
+    userToUpdate.postalCode = (req.body.postalCode || userToUpdate.postalCode);
+    userToUpdate.city = (req.body.city || userToUpdate.city);
+    userToUpdate.longitude = (req.body.longitude || userToUpdate.longitude);
+    userToUpdate.latitude = (req.body.latitude || userToUpdate.latitude);
+
+    // Save the updated user to the database
+    await userToUpdate.save().catch(err => { next(err) });
+    
+    return res.json(userToUpdate);
 });
 
 // Update user credentials (change email/password including restore forgotten password)
@@ -148,11 +156,11 @@ router.delete("/api/v1/sessions/current", async (req, res) => {
 });
 
 // Delete a user's own account
-router.delete("/api/v1/users/:userId", async (req, res) => {
-    // Logic to delete a user's own account
-    const id=req.params.userId;
-    const deletedUser=await User.findByIdAndDelete(id).catch(err=>{next(err)});
-    res.json(deletedUser);
+router.delete("/api/v1/users/:userId", async (req, res, next) => {
+    const id = req.params.userId;
+    const deletedUser = await User.findByIdAndDelete(id).catch(err => { next(err) });
+
+    return res.json(deletedUser);
 });
 
 // Delete all sessions (log out from all devices)

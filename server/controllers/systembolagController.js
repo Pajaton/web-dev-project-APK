@@ -1,17 +1,17 @@
-var express=require("express");
-var router=express.Router();
-var express=require("express");
-var router=express.Router();
+var express = require("express");
+var router = express.Router();
+var express = require("express");
+var router = express.Router();
 
-var Systembolag=require("../models/SystembolagSchema");
+var Systembolag = require("../models/SystembolagSchema");
 
 // GET ROUTE DEFINITIONS
 
 // Get a list of Systembolaget stores
 router.get("/api/v1/systembolag", async (req, res) => {
-    // Logic to get list of systembolaget stores
-    const systembolag=await Systembolag.find();
-    res.json({"systembolag":systembolag});
+    const systembolag = await Systembolag.find();
+
+    return res.json({ "systembolag": systembolag });
 });
 
 // Get a list of products available at Systembolaget
@@ -40,10 +40,14 @@ router.get("/api/v1/systembolag/:systembolagId/address", async (req, res) => {
 
 // Get details of a specific Systembolaget store
 router.get("/api/v1/systembolag/:systembolagId", async (req, res) => {
-    // Logic to get details of a specific Systembolaget store
-    const id=req.params.systembolagId;
-    const mySystembolag=await Systembolag.findById(id).catch(err=>{res.status(404).json({"message":"No systembolag found"});});
-    res.json(mySystembolag)
+    const id = req.params.systembolagId;
+    const mySystembolag = await Systembolag.findById(id).catch(err => {
+        res.status(404).json({
+            "message": "No systembolag found"
+        });
+    });
+
+    return res.json(mySystembolag)
 });
 
 
@@ -51,8 +55,7 @@ router.get("/api/v1/systembolag/:systembolagId", async (req, res) => {
 
 // Add a new Systembolaget store
 router.post("/api/v1/systembolag", async (req, res, next) => {
-    // Logic to add a new Systembolaget store
-    var newSystembolag=new Systembolag({
+    var newSystembolag = new Systembolag({
         "SystembolagID": req.body.SystembolagID,
         "name": req.body.name,
         "street": req.body.street,
@@ -62,9 +65,9 @@ router.post("/api/v1/systembolag", async (req, res, next) => {
         "longitude": req.body.longitude,
         "latitude": req.body.latitude,
     });
-    await newSystembolag.save().catch(err=>{next(err)});
+    await newSystembolag.save().catch(err => { next(err) });
 
-    res.status(201).json(newSystembolag);
+    return res.status(201).json(newSystembolag);
 });
 
 // Add a new product to Systembolaget
@@ -83,19 +86,24 @@ router.post("/api/v1/systembolag/:systembolagId/products", async (req, res) => {
 
 // Update details of a specific Systembolaget store
 router.patch("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
-    // Logic to update store details
-    const id=req.params.systembolagId;
-    const updatedSystembolag=await Systembolag.findById(id).catch(err=>{next(err)})
-    updatedSystembolag.SystembolagID=(req.body.SystembolagID || updatedSystembolag.SystembolagID);
-    updatedSystembolag.name=(req.body.name || updatedSystembolag.name);
-    updatedSystembolag.street=(req.body.street || updatedSystembolag.street);
-    updatedSystembolag.streetNumber=(req.body.streetNumber || updatedSystembolag.streetNumber);
-    updatedSystembolag.postalCode=(req.body.postalCode || updatedSystembolag.postalCode);
-    updatedSystembolag.city=(req.body.city || updatedSystembolag.city);
-    updatedSystembolag.longitude=(req.body.longitude || updatedSystembolag.longitude);
-    updatedSystembolag.latitude=(req.body.latitude || updatedSystembolag.latitude);
-    await updatedSystembolag.save().catch(err=>{next(err)});
-    res.json(updatedSystembolag);
+    // Find the Systembolaget store to update
+    const id = req.params.systembolagId;
+    const updatedSystembolag = await Systembolag.findById(id).catch(err => { next(err) })
+
+    // Update only the fields provided in the request body
+    updatedSystembolag.systembolagID = (req.body.systembolagID || updatedSystembolag.systembolagID);
+    updatedSystembolag.name = (req.body.name || updatedSystembolag.name);
+    updatedSystembolag.street = (req.body.street || updatedSystembolag.street);
+    updatedSystembolag.streetNumber = (req.body.streetNumber || updatedSystembolag.streetNumber);
+    updatedSystembolag.postalCode = (req.body.postalCode || updatedSystembolag.postalCode);
+    updatedSystembolag.city = (req.body.city || updatedSystembolag.city);
+    updatedSystembolag.longitude = (req.body.longitude || updatedSystembolag.longitude);
+    updatedSystembolag.latitude = (req.body.latitude || updatedSystembolag.latitude);
+
+    // Save the updated Systembolaget store to the database
+    await updatedSystembolag.save().catch(err => { next(err) });
+
+    return res.json(updatedSystembolag);
 });
 
 // Update details of a specific product
@@ -120,10 +128,10 @@ router.put("/api/v1/systembolag/products/:productId", async (req, res) => {
 
 // Delete a specific Systembolaget store
 router.delete("/api/v1/systembolag/:systembolagId", async (req, res) => {
-    // Logic to delete a Systembolaget store
-    const id=req.params.systembolagId;
-    const deletedSystembolag=await Systembolag.findByIdAndDelete(id).catch(err=>{next(err)});
-    res.json(deletedSystembolag)
+    const id = req.params.systembolagId;
+    const deletedSystembolag = await Systembolag.findByIdAndDelete(id).catch(err => { next(err) });
+
+    return res.json(deletedSystembolag)
 });
 
 // Delete a specific product from Systembolaget
