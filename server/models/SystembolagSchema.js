@@ -12,7 +12,7 @@ var systembolagSchema = new Schema({
     // Local attributes
     "name": {type: String},
 
-    // The composite address field from the ER diagram
+    // The composite address field from the ER diasgram
     "street": {type: String},
     "streetNumber": {type: Number},
     "postalCode": {type: String},
