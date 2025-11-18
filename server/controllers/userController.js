@@ -24,30 +24,103 @@ router.get("/api/v1/users/:userId", async (req, res) => {
 
 // Get a user's current settings
 router.get("/api/v1/users/:userId/settings", async (req, res) => {
-    // Logic to get user settings
+    const id = req.params.userId;
+    const user = await User.findById(id).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+    
+    return res.json(user.settings);
 });
 
 // Get a list of users that a user follows
 router.get("/api/v1/users/:userId/follows", async (req, res) => {
-    // Logic to get list of followed users
+    const id = req.params.userId;
+    const user = await User.findById(id)
+        .populate("follows") // populate the "follows" field with user documents
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
+        });
+    const userFollows = user.follows
+        .filter(followedUser => followedUser) // null check, in case of dangling references
+        .map(followedUser => {
+            return {
+                "userID": followedUser.userID,
+                "profilePicture": followedUser.profilePicture,
+                "userName": followedUser.userName,
+            };
+        });
+
+    return res.json({ "follows": userFollows });
 });
 
 // Get a list of a user's favorite drinks
 router.get("/api/v1/users/:userId/favorites/drinks", async (req, res) => {
-    // Logic to get list of favorite drinks
+    const id = req.params.userId;
+    const user = await User.findById(id)
+        .populate("triedDrinks.drink") // populate the "drink" field
+        .catch(err => {                // within "triedDrinks"
+            res.status(404).json({
+                "message": "No user found"
+            });
+        });
+    const favoriteDrinks = user.triedDrinks
+        .filter(triedDrink => triedDrink.favorite && triedDrink.drink) // check if favorite and not null
+        .map(triedDrink => triedDrink.drink);
+
+    return res.status(200).json({ "favoriteDrinks": favoriteDrinks });
 });
 
-// Get a list of a user's favorite Systembolag stores
+// Get a user's favorite Systembolag store
 router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res) => {
-    // Logic to get list of favorite Systembolag stores
+    const id = req.params.userId;
+    const user = await User.findById(id)
+        .populate("favoriteSystembolag") // populate the "favoriteSystembolag" field
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
+        });
+
+    return res.status(200).json({ "favoriteSystembolag": user.favoriteSystembolag });
 });
 
 router.get("/api/v1/users/:userId/address", async (req, res) => {
-    // Logic to get list of user's address
+    const id = req.params.userId;
+    const user = await User.findById(id).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+    
+    const address = {
+        "street": user.street,
+        "streetNumber": user.streetNumber,
+        "postalCode": user.postalCode,
+        "city": user.city
+    };
+
+    return res.status(200).json(address);
 });
 
 router.get("/api/v1/users/:userId/drinks", async (req, res) => {
     // Logic to get drinks a user has tried
+    const id = req.params.userId;
+    const user = await User.findById(id)
+        .populate("triedDrinks.drink") // populate the "drink" field
+        .catch(err => {                // within "triedDrinks"
+            res.status(404).json({
+                "message": "No user found"
+            });
+        });
+    const triedDrinks = user.triedDrinks
+        .filter(triedDrink => triedDrink.drink) // null check in case of dangling references
+        .map(triedDrink => triedDrink.drink);
+
+    return res.status(200).json({ "triedDrinks": triedDrinks });
 });
 
 
