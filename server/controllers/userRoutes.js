@@ -90,6 +90,30 @@ router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async 
     // Logic to favorite a Systembolag store
 });
 
+router.post("/api/v1/users/:userId/alcoholConsumed", async (req, res, next) => {
+    //Could possibly add some data error fault handling in case the server receives the wrong 
+    //data type, even if the frontend enforces correct data type input
+    const userId = req.params.userId;
+    const {volume, percent} = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) 
+        return res.status(404).json({
+            message: "User not found"
+        });
+
+    user.alcoholConsumed.push({
+            volume,
+            percent
+    });
+
+    await user.save().catch(err=>{next(err)});
+
+    res.status(201).json({
+            message: "Alcohol entry added",
+            userId: user._id
+    });
+});
 
 // PATCH ROUTE DEFINITIONS
 
