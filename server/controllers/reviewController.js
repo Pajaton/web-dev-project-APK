@@ -27,16 +27,42 @@ router.get("/api/v1/reviews/:reviewId", async (req, res) => {
 // Get all reviews for a specific drink
 router.get("/api/v1/drinks/:drinkId/reviews", async (req, res) => {
     // Logic to get all reviews for a specific drink
+    const reviewForDrink = await Review.find({reviewOf: req.params.drinkId})
+    .populate("reviewOf")
+    .catch(err => {
+        return res.status(404).json({
+            "message": "No review found"
+        });
+    });
+
+    return res.json({"reviewOf": reviewForDrink.reviewOf})
 });
 
 // Get all reviews made by a specific user
 router.get("/api/v1/users/:userId/reviews", async (req, res) => {
     // Logic to get all reviews made by a specific user
+    const reviewedByUser = await Review.find({reviewedBy: req.params.userId})
+    .populate("reviewedBy")
+    .catch(err => {
+        return res.status(404).json({
+            "message": "No review found"
+        });
+    });
+    return res.json({"reviewedBy": reviewedByUser.reviewedBy})
 });
 
 // Get a specific user's review for a specific drink
 router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => {
     // Logic to get a specific user's review for a specific drink
+    const drinkReviewedByUser = await Review.find({reviewedBy: req.params.userId, reviewOf: req.params.drinkId})
+    .populate(reviewedBy)
+    .populate(reviewOf)
+    .catch(err => {
+        return res.status(404).json({
+            "message": "No review found"
+        });
+    });
+    return res.json({"reviews": drinkReviewedByUser})
 });
 
 // POST ROUTE DEFINITIONS
@@ -103,7 +129,7 @@ router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // DELETE ROUTE DEFINITIONS
 
 // Delete a specific review
-router.delete("/api/v1/reviews/:reviewId", async (req, res) => {
+router.delete("/api/v1/reviews/:reviewId", async (req, res, next) => {
     const id = req.params.reviewId;
     const reviewToDelete = await Review.findByIdAndDelete(id).catch(err => { next(err) });
 
@@ -111,8 +137,11 @@ router.delete("/api/v1/reviews/:reviewId", async (req, res) => {
 });
 
 // Delete all reviews (use with caution)
-router.delete("/api/v1/reviews", async (req, res) => {
+router.delete("/api/v1/reviews", async (req, res, next) => {
     // Logic to delete all reviews (use with caution)
+    const reviewsToDelete = await Review.deleteMany().catch(err=> {next(err) });
+
+    return res.json(reviewsToDelete);
 });
 
 module.exports = router;
