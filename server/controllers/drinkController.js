@@ -12,22 +12,49 @@ router.get("/api/v1/drinks", async (req, res) => {
 });
 
 router.get("/api/v1/drinks/:drinkId", async (req, res) => {
-    const id = req.params.drinkId;
-    const requestedDrink = await Drink.findById(id).catch(err => { 
-        res.status(404).json({
-            "message": "No drink found"
+    const requestedDrink = await Drink
+        .findById(req.params.drinkId)
+        .catch(err => { 
+            res.status(404).json({
+                "message": "No drink found"
+            });
         });
-    });
 
     return res.json(requestedDrink)
 });
 
+// Get all systembolag where a specific drink is available
 router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res) => {
-    // Logic to check where a drink is in stock
+    const drinkInStockAt = await Drink
+        .findById(req.params.drinkId)
+        .populate("availableAt")
+        .catch(err => {
+            return res.status(404).json({
+                "message": "No drink found"
+            });
+        });
+
+    return res.json({ "availableAt": drinkInStockAt.availableAt });
 });
 
 router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
     // Logic to check if a drink is in stock at a specific systembolag
+    const drinkInStockAt = await Drink
+        .findById(req.params.drinkId)
+        .populate({"availableAt": {match: {_id: req.params.systembolagId}}})
+        .catch(err => {
+            return res.status(404).json({
+                "message": "No drink found"
+            });
+        });
+
+    if (drinkInStockAt.availableAt.length === 0) {
+        return res.status(404).json({
+            "message": "Drink not available at this systembolag"
+        });
+    }
+
+    return res.json({ "availableAt": drinkInStockAt.availableAt[0] });
 });
 
 
@@ -62,8 +89,9 @@ router.post("/api/v1/drinks", async (req, res, next) => {
 // Update an existing drink
 router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
-    const id = req.params.drinkId;
-    const drinkToUpdate = await Drink.findById(id).catch(err => { next(err) });
+    const drinkToUpdate = await Drink
+        .findById(req.params.drinkId)
+        .catch(err => { next(err) });
 
     // Update the drink's fields if new values are provided
     drinkToUpdate.productNumber = (req.body.productNumber || drinkToUpdate.productNumber);
@@ -90,8 +118,9 @@ router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
 
 
 router.delete("/api/v1/drinks/:drinkId", async (req, res) => {
-    const id = req.params.drinkId;
-    const deletedDrink = await Drink.findByIdAndDelete(id).catch(err => { next(err) });
+    const deletedDrink = await Drink
+        .findByIdAndDelete(req.params.drinkId)
+        .catch(err => { next(err) });
 
     return res.json(deletedDrink);
 });
