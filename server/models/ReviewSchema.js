@@ -22,7 +22,7 @@ var reviewSchema = new Schema({
     },
     "reviewOf": {
         "type": Schema.Types.ObjectId,
-        "ref": "Drink",
+        "ref": "drinks",
         "required": true,
     }
 })

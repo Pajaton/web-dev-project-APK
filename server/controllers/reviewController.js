@@ -25,17 +25,18 @@ router.get("/api/v1/reviews/:reviewId", async (req, res) => {
 });
 
 // Get all reviews for a specific drink
-router.get("/api/v1/drinks/:drinkId/reviews", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
     // Logic to get all reviews for a specific drink
     const reviewForDrink = await Review.find({reviewOf: req.params.drinkId})
     .populate("reviewOf")
-    .catch(err => {
+    .populate("reviewedBy")
+    .catch(err => { next
         return res.status(404).json({
             "message": "No review found"
         });
     });
-
-    return res.json({"reviewOf": reviewForDrink.reviewOf})
+    const drinkReviews =reviewForDrink.reviewOf
+    return res.json({reviewForDrink})
 });
 
 // Get all reviews made by a specific user
@@ -48,15 +49,15 @@ router.get("/api/v1/users/:userId/reviews", async (req, res) => {
             "message": "No review found"
         });
     });
-    return res.json({"reviewedBy": reviewedByUser.reviewedBy})
+    return res.json({"reviewedBy": reviewedByUser})
 });
 
 // Get a specific user's review for a specific drink
 router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => {
     // Logic to get a specific user's review for a specific drink
     const drinkReviewedByUser = await Review.find({reviewedBy: req.params.userId, reviewOf: req.params.drinkId})
-    .populate(reviewedBy)
-    .populate(reviewOf)
+    .populate("reviewedBy")
+    .populate("reviewOf")
     .catch(err => {
         return res.status(404).json({
             "message": "No review found"
@@ -96,7 +97,7 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
     updatedReview.rating = (req.body.rating || updatedReview.rating);
     updatedReview.comment = (req.body.comment || updatedReview.comment);
     updatedReview.reviewedBy = (req.body.reviewedBy || updatedReview.reviewedBy);
-    updatedReview.reviewedBy = (req.body.reviewedBy || updatedReview.reviewedBy);
+    updatedReview.reviewOf = (req.body.reviewOf || updatedReview.reviewOf);
 
     // Save the updated review to the database
     await updatedReview.save().catch(err => { next(err) });
