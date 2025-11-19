@@ -14,55 +14,57 @@ router.get("/api/v1/reviews", async (req, res) => {
 
 // Get a specific review by ID
 router.get("/api/v1/reviews/:reviewId", async (req, res) => {
-    const id = req.params.reviewId;
-    const review = await Review.findById(id).catch(err => {
-        res.status(404).json({
-            "message": "No review found"
+    const review = await Review
+        .findById(req.params.reviewId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No review found"
+            });
         });
-    });
 
     return res.json(review)
 });
 
 // Get all reviews for a specific drink
 router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
-    // Logic to get all reviews for a specific drink
-    const reviewForDrink = await Review.find({reviewOf: req.params.drinkId})
-    .populate("reviewOf")
-    .populate("reviewedBy")
-    .catch(err => { next
-        return res.status(404).json({
-            "message": "No review found"
-        });
-    });
-    const drinkReviews =reviewForDrink.reviewOf
+    const reviewForDrink = await Review
+        .find({reviewOf: req.params.drinkId})
+        .populate("reviewOf")
+        .populate("reviewedBy")
+        .catch(err => { next(err) });
+
     return res.json({reviewForDrink})
 });
 
 // Get all reviews made by a specific user
 router.get("/api/v1/users/:userId/reviews", async (req, res) => {
-    // Logic to get all reviews made by a specific user
-    const reviewedByUser = await Review.find({reviewedBy: req.params.userId})
-    .populate("reviewedBy")
-    .catch(err => {
-        return res.status(404).json({
-            "message": "No review found"
+    const reviewedByUser = await Review
+        .find({reviewedBy: req.params.userId})
+        .populate("reviewedBy")
+        .catch(err => {
+            return res.status(404).json({
+                "message": "No review found"
+            });
         });
-    });
+
     return res.json({"reviewedBy": reviewedByUser})
 });
 
 // Get a specific user's review for a specific drink
 router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => {
-    // Logic to get a specific user's review for a specific drink
-    const drinkReviewedByUser = await Review.find({reviewedBy: req.params.userId, reviewOf: req.params.drinkId})
-    .populate("reviewedBy")
-    .populate("reviewOf")
-    .catch(err => {
-        return res.status(404).json({
-            "message": "No review found"
+    const drinkReviewedByUser = await Review
+        .find({
+            reviewedBy: req.params.userId,
+            reviewOf: req.params.drinkId
+        })
+        .populate("reviewedBy")
+        .populate("reviewOf")
+        .catch(err => {
+            return res.status(404).json({
+                "message": "No review found"
         });
     });
+
     return res.json({"reviews": drinkReviewedByUser})
 });
 
@@ -88,8 +90,9 @@ router.post("/api/v1/reviews", async (req, res, next) => {
 // Update a specific review
 router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
-    const id = req.params.reviewId;
-    const updatedReview = await Review.findById(id).catch(err => { next(err) });
+    const updatedReview = await Review
+        .findById(req.params.reviewId)
+        .catch(err => { next(err) });
 
     // Update the review's fields if new values are provided
     updatedReview.userID = (req.body.userID || updatedReview.userID);
@@ -110,19 +113,21 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // Replace a specific review
 router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
-    const id = req.params.reviewId;
-    const updatedReview = await Review.findById(id).catch(err => { next(err) });
+    const updatedReview = await Review
+        .findByIdAndUpdate(
+            req.params.reviewId,
+            {
+                userID: req.body.userID,
+                productID: req.body.productID,
+                rating: req.body.rating,
+                comment: req.body.comment,
+                reviewedBy: req.body.reviewedBy,
+                reviewOf: req.body.reviewOf
+            },
+            { new: true }
+        )
+        .catch(err => { next(err) });
 
-    // Replace all fields of the review
-    updatedReview.userID = req.body.userID;
-    updatedReview.productID = req.body.productID;
-    updatedReview.rating = req.body.rating;
-    updatedReview.comment = req.body.comment;
-    updatedReview.reviewedBy = req.body.reviewedBy;
-    updatedReview.reviewedBy = req.body.reviewedBy;
-
-    // Save the updated review to the database
-    await updatedReview.save().catch(err => { next(err) });
 
     return res.json(updatedReview);
 });
@@ -131,16 +136,18 @@ router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
 
 // Delete a specific review
 router.delete("/api/v1/reviews/:reviewId", async (req, res, next) => {
-    const id = req.params.reviewId;
-    const reviewToDelete = await Review.findByIdAndDelete(id).catch(err => { next(err) });
+    const reviewToDelete = await Review
+        .findByIdAndDelete(req.params.reviewId)
+        .catch(err => { next(err) });
 
     return res.json(reviewToDelete);
 });
 
 // Delete all reviews (use with caution)
 router.delete("/api/v1/reviews", async (req, res, next) => {
-    // Logic to delete all reviews (use with caution)
-    const reviewsToDelete = await Review.deleteMany().catch(err=> {next(err) });
+    const reviewsToDelete = await Review
+        .deleteMany()
+        .catch(err=> {next(err) });
 
     return res.json(reviewsToDelete);
 });
