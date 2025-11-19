@@ -46,6 +46,20 @@ router.get("/api/v1/users/:userId/drinks", async (req, res) => {
     // Logic to get drinks a user has tried
 });
 
+router.get("/api/v1/users/:userId/alcoholConsumed", async (req, res) => {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId).catch(err=>{
+        res.status(404).json({"message":"No user found"});
+    });
+    if (!user) {return;}
+
+    res.json({
+        userId: user.userID,
+        alcoholConsumed: user.alcoholConsumed
+    });
+});
+
 
 // POST ROUTE DEFINITIONS
 
