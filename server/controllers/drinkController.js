@@ -38,23 +38,20 @@ router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res) => {
 });
 
 router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
-    // Logic to check if a drink is in stock at a specific systembolag
     const drinkInStockAt = await Drink
         .findById(req.params.drinkId)
-        .populate({"availableAt": {match: {_id: req.params.systembolagId}}})
+        .populate({"availableAt": {
+            match: {
+                _id: req.params.systembolagId
+            }}
+        })
         .catch(err => {
             return res.status(404).json({
                 "message": "No drink found"
             });
         });
 
-    if (drinkInStockAt.availableAt.length === 0) {
-        return res.status(404).json({
-            "message": "Drink not available at this systembolag"
-        });
-    }
-
-    return res.json({ "availableAt": drinkInStockAt.availableAt[0] });
+    return res.json({ "availableAt": drinkInStockAt.availableAt });
 });
 
 
@@ -107,6 +104,35 @@ router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
     
     // Save the updated drink to the database
     await drinkToUpdate.save().catch(err => { next(err) });
+
+    return res.json(drinkToUpdate);
+});
+
+
+
+// PUT ROUTES DEFINITION
+
+
+
+// Replace an existing drink
+router.put("/api/v1/drinks/:drinkId", async (req, res, next) => {
+    // Find the drink to update
+    const drinkToUpdate = await Drink
+        .findByIdAndUpdate(
+            req.params.drinkId,
+            { "productNumber": req.body.productNumber,
+              "name": req.body.name,
+              "type": req.body.type,
+              "container": req.body.container,
+              "volume": req.body.volume,
+              "percentage": req.body.percentage,
+              "colour": req.body.colour,
+              "price": req.body.price,
+              "image": req.body.image,
+              "apk": req.body.apk },
+            { new: true }  // return the updated document
+        )
+        .catch(err => { next(err) });
 
     return res.json(drinkToUpdate);
 });
