@@ -5,10 +5,10 @@ var path = require('path');
 var cors = require('cors');
 var history = require('connect-history-api-fallback');
 
-var usersController=require("./controllers/userRoutes");
-var drinkController=require("./controllers/drinkRoutes");
-var reviewController=require("./controllers/reviewRoutes");
-var systembolagetController=require("./controllers/systembolagRoutes");
+var usersController=require("./controllers/userController");
+var drinkController=require("./controllers/drinkController");
+var reviewController=require("./controllers/reviewController");
+var systembolagetController=require("./controllers/systembolagController");
 
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';

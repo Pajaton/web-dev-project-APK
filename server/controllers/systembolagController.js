@@ -56,7 +56,7 @@ router.get("/api/v1/systembolag/:systembolagId", async (req, res) => {
 // Add a new Systembolaget store
 router.post("/api/v1/systembolag", async (req, res, next) => {
     var newSystembolag = new Systembolag({
-        "SystembolagID": req.body.SystembolagID,
+        "systembolagID": req.body.systembolagID,
         "name": req.body.name,
         "street": req.body.street,
         "streetNumber": req.body.streetNumber,

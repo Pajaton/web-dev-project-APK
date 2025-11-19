@@ -22,7 +22,7 @@ var userSchema = new Schema({
     // The composite address field from the ER diagram
     "street": {type: String},
     "streetNumber": {type: Number},
-    "postalCode": {type: String},
+    "postalCode": {type: Number},
     "city": {type: String},
 
     // Derived attributes
