@@ -30,7 +30,7 @@ router.get("/api/v1/users/:userId/settings", async (req, res) => {
             "message": "No user found"
         });
     });
-    
+
     return res.json(user.settings);
 });
 
@@ -62,8 +62,8 @@ router.get("/api/v1/users/:userId/favorites/drinks", async (req, res) => {
     const id = req.params.userId;
     const user = await User.findById(id)
         .populate("triedDrinks.drink") // populate the "drink" field
-        .catch(err => {                // within "triedDrinks"
-            res.status(404).json({
+        .catch(err => {                // within "triedDrinks" with the drink documents
+            res.status(404).json({     // based on the references
                 "message": "No user found"
             });
         });
@@ -95,7 +95,7 @@ router.get("/api/v1/users/:userId/address", async (req, res) => {
             "message": "No user found"
         });
     });
-    
+
     const address = {
         "street": user.street,
         "streetNumber": user.streetNumber,
@@ -148,17 +148,64 @@ router.post("/api/v1/users", async (req, res, next) => {
 
 // Create a new session (log in)
 router.post("/api/v1/sessions", async (req, res) => {
-    // Logic to create a new session (log in)
+    // TEMPORARY AUTHENTICATION LOGIC FOR DEMO PURPOSES ONLY
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+        return res.status(401).json({
+            "message": "Authentication failed"
+        });
+    }
+
+    return res.status(201).json({
+        "message": "Logged in successfully",
+        "user": user,
+    });
 });
 
 // Follow a user
 router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
-    // Logic to follow a user
+    const targetId = req.params.targetUserId;
+
+    const user = await User.findById(req.params.userId).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    // Avoid duplicate follows
+    if (!user.follows.includes(targetId)) {
+        user.follows.push(targetId);
+
+        await user.save().catch(err => { next(err) });
+    }
+
+    return res.status(200).json(user);
 });
 
 // Favorite a drink
 router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
-    // Logic to favorite a drink
+    const user = await User.findById(req.params.userId).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    // Check if the drink is already in triedDrinks
+    const existingEntry = user.triedDrinks.find(entry => entry.drink.toString() === req.params.drinkId);
+
+    if (existingEntry) {
+        existingEntry.favorite = true;
+    } else {
+        user.triedDrinks.push({
+            drink: req.params.drinkId,
+            favorite: true
+        });
+    }
+
+    await user.save().catch(err => { next(err) });
+
+    return res.status(200).json(user);
 });
 
 // Favorite a Systembolag store
@@ -190,18 +237,40 @@ router.patch("/api/v1/users/:userId", async (req, res, next) => {
 
     // Save the updated user to the database
     await userToUpdate.save().catch(err => { next(err) });
-    
+
     return res.json(userToUpdate);
 });
 
-// Update user credentials (change email/password including restore forgotten password)
+// Update user credentials (change email)
 router.patch("/api/v1/users/:userId/credentials", async (req, res) => {
-    // Logic to update user credentials
+    const userToUpdate = await User.findById(req.params.userId).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    userToUpdate.email = (req.body.email || userToUpdate.email);
+
+    await userToUpdate.save().catch(err => { next(err) });
+
+    return res.json(userToUpdate);
 });
 
 // Update user settings
 router.patch("/api/v1/users/:userId/settings", async (req, res) => {
-    // Logic to update user settings
+    const userToUpdate = await User.findById(req.params.userId).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    userToUpdate.settings.darkMode = (req.body.darkMode !== undefined) ? req.body.darkMode : userToUpdate.settings.darkMode;
+    userToUpdate.settings.notifications = (req.body.notifications !== undefined) ? req.body.notifications : userToUpdate.settings.notifications;
+    userToUpdate.settings.language = (req.body.language || userToUpdate.settings.language);
+
+    await userToUpdate.save().catch(err => { next(err) });
+
+    return res.status(200).json(userToUpdate.settings);
 });
 
 
@@ -210,22 +279,56 @@ router.patch("/api/v1/users/:userId/settings", async (req, res) => {
 
 // Unfavorite a drink
 router.delete("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
-    // Logic to delete favorite drink
+    const user = await User.findById(
+        req.params.userId,
+        { $pull: { triedDrinks: { drink: req.params.drinkId } } }, // remove the drink from triedDrinks array
+        { new: true } // return the updated document
+    ).catch(err => {
+        return res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    return res.status(200).json(user);
 });
 
 // Unfavorite a Systembolag store
 router.delete("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
-    // Logic to delete favorite Systembolag store
+    const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { $set: { favoriteSystembolag: null } }, // set to null to indicate no favorite
+        { new: true } // return the updated document
+    ).catch(err => {
+        return res.status(404).json({ "message": "No user found" });
+    });
+
+    return res.status(200).json(user);
 });
 
 // Unfollow a user
 router.delete("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
-    // Logic to delete followed user
+    const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { $pull: { follows: req.params.targetUserId } }, // remove the targetUserId from follows array
+        { new: true } // return the updated document
+    ).catch(err => {
+        return res.status(404).json({ "message": "No user found" });
+    });
+
+    return res.status(200).json(user);
 });
 
 // Log out (delete current session)
 router.delete("/api/v1/sessions/current", async (req, res) => {
-    // Logic to log out (delete current session)
+    const user = await User.findById(req.params.userId).catch(err => {
+        res.status(404).json({
+            "message": "No user found"
+        });
+    });
+
+    return res.status(200).json({
+        "message": "Logged out successfully"
+    });
 });
 
 // Delete a user's own account
@@ -238,7 +341,9 @@ router.delete("/api/v1/users/:userId", async (req, res, next) => {
 
 // Delete all sessions (log out from all devices)
 router.delete("/api/v1/sessions", async (req, res) => {
-    // Logic to delete all sessions (log out from all devices)
+    return res.status(200).json({
+        "message": "Logged out from all devices successfully"
+    });
 });
 
 module.exports = router;
