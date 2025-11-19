@@ -787,6 +787,42 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "CreateNewAlcConsumed",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{userID}}",
+						"alcoholConsumed"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
