@@ -11,33 +11,25 @@ router.get("/api/v1/drinks", async (req, res) => {
     return res.json({ "drinks": drinks });
 });
 
-router.get("/api/v1/drinks/:drinkId", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId", async (req, res, next) => {
     const requestedDrink = await Drink
         .findById(req.params.drinkId)
-        .catch(err => { 
-            res.status(404).json({
-                "message": "No drink found"
-            });
-        });
+        .catch(err => { next(err) });
 
     return res.json(requestedDrink)
 });
 
 // Get all systembolag where a specific drink is available
-router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res, next) => {
     const drinkInStockAt = await Drink
         .findById(req.params.drinkId)
         .populate("availableAt")
-        .catch(err => {
-            return res.status(404).json({
-                "message": "No drink found"
-            });
-        });
+        .catch(err => { next(err) });
 
     return res.json({ "availableAt": drinkInStockAt.availableAt });
 });
 
-router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res) => {
+router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
     const drinkInStockAt = await Drink
         .findById(req.params.drinkId)
         .populate({"availableAt": {
@@ -45,20 +37,12 @@ router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res
                 _id: req.params.systembolagId
             }}
         })
-        .catch(err => {
-            return res.status(404).json({
-                "message": "No drink found"
-            });
-        });
+        .catch(err => { next(err) });
 
     return res.json({ "availableAt": drinkInStockAt.availableAt });
 });
 
-
-
 // POST ROUTES DEFINITION
-
-
 
 router.post("/api/v1/drinks", async (req, res, next) => {
     const newDrink = new Drink({
@@ -143,9 +127,9 @@ router.put("/api/v1/drinks/:drinkId", async (req, res, next) => {
 
 
 
-router.delete("/api/v1/drinks/:drinkId", async (req, res) => {
+router.delete("/api/v1/drinks/:drinkId", async (req, res, next) => {
     const deletedDrink = await Drink
-        .findByIdAndDelete(req.params.drinkId)
+        .findByIdAndDelete(req.params.drinkId) 
         .catch(err => { next(err) });
 
     return res.json(deletedDrink);

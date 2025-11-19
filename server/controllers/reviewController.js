@@ -6,21 +6,19 @@ var Review = require("../models/ReviewSchema");
 // GET ROUTE DEFINITIONS
 
 // Get all reviews
-router.get("/api/v1/reviews", async (req, res) => {
-    const review = await Review.find();
+router.get("/api/v1/reviews", async (req, res, next) => {
+    const review = await Review
+        .find()
+        .catch(err => { next(err) });
 
     return res.json({ "review": review });
 });
 
 // Get a specific review by ID
-router.get("/api/v1/reviews/:reviewId", async (req, res) => {
+router.get("/api/v1/reviews/:reviewId", async (req, res, next) => {
     const review = await Review
         .findById(req.params.reviewId)
-        .catch(err => {
-            res.status(404).json({
-                "message": "No review found"
-            });
-        });
+        .catch(err => { next(err) });
 
     return res.json(review)
 });
@@ -37,21 +35,17 @@ router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
 });
 
 // Get all reviews made by a specific user
-router.get("/api/v1/users/:userId/reviews", async (req, res) => {
+router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
     const reviewedByUser = await Review
         .find({reviewedBy: req.params.userId})
         .populate("reviewedBy")
-        .catch(err => {
-            return res.status(404).json({
-                "message": "No review found"
-            });
-        });
+        .catch(err => { next(err) });
 
     return res.json({"reviewedBy": reviewedByUser})
 });
 
 // Get a specific user's review for a specific drink
-router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => {
+router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
     const drinkReviewedByUser = await Review
         .find({
             reviewedBy: req.params.userId,
@@ -59,11 +53,7 @@ router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res) => 
         })
         .populate("reviewedBy")
         .populate("reviewOf")
-        .catch(err => {
-            return res.status(404).json({
-                "message": "No review found"
-        });
-    });
+        .catch(err => { next(err) });
 
     return res.json({"reviews": drinkReviewedByUser})
 });
