@@ -8,30 +8,33 @@ var User = require("../models/UserSchema");
 router.get("/api/v1/users", async (req, res) => {
     const users = await User.find();
 
-    return res.json({ "users": users });
+    return res.status(200).json({ "users": users });
 });
+
 // Get a user's profile
 router.get("/api/v1/users/:userId", async (req, res) => {
-    const id = req.params.userId;
-    const user = await User.findById(id).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const user = await User
+        .findById(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
-    return res.json(user);
+    return res.status(200).json(user);
 });
 
 // Get a user's current settings
 router.get("/api/v1/users/:userId/settings", async (req, res) => {
-    const id = req.params.userId;
-    const user = await User.findById(id).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const user = await User
+        .findById(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
-    return res.json(user.settings);
+    return res.status(200).json(user.settings);
 });
 
 // Get a list of users that a user follows
@@ -44,8 +47,9 @@ router.get("/api/v1/users/:userId/follows", async (req, res) => {
                 "message": "No user found"
             });
         });
+
     const userFollows = user.follows
-        .filter(followedUser => followedUser) // null check, in case of dangling references
+        .filter(followedUser => followedUser)
         .map(followedUser => {
             return {
                 "userID": followedUser.userID,
@@ -54,21 +58,22 @@ router.get("/api/v1/users/:userId/follows", async (req, res) => {
             };
         });
 
-    return res.json({ "follows": userFollows });
+    return res.status(200).json({ "follows": userFollows });
 });
 
 // Get a list of a user's favorite drinks
 router.get("/api/v1/users/:userId/favorites/drinks", async (req, res) => {
-    const id = req.params.userId;
-    const user = await User.findById(id)
+    const user = await User
+        .findById(req.params.userId)
         .populate("triedDrinks.drink") // populate the "drink" field
         .catch(err => {                // within "triedDrinks" with the drink documents
             res.status(404).json({     // based on the references
                 "message": "No user found"
             });
         });
+
     const favoriteDrinks = user.triedDrinks
-        .filter(triedDrink => triedDrink.favorite && triedDrink.drink) // check if favorite and not null
+        .filter(triedDrink => triedDrink.favorite)
         .map(triedDrink => triedDrink.drink);
 
     return res.status(200).json({ "favoriteDrinks": favoriteDrinks });
@@ -76,8 +81,8 @@ router.get("/api/v1/users/:userId/favorites/drinks", async (req, res) => {
 
 // Get a user's favorite Systembolag store
 router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res) => {
-    const id = req.params.userId;
-    const user = await User.findById(id)
+    const user = await User
+        .findById(req.params.userId)
         .populate("favoriteSystembolag") // populate the "favoriteSystembolag" field
         .catch(err => {
             res.status(404).json({
@@ -89,38 +94,33 @@ router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res) => {
 });
 
 router.get("/api/v1/users/:userId/address", async (req, res) => {
-    const id = req.params.userId;
-    const user = await User.findById(id).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const user = await User
+        .findById(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
-    const address = {
+    return res.status(200).json({
         "street": user.street,
         "streetNumber": user.streetNumber,
         "postalCode": user.postalCode,
         "city": user.city
-    };
-
-    return res.status(200).json(address);
+    });
 });
 
 router.get("/api/v1/users/:userId/drinks", async (req, res) => {
-    // Logic to get drinks a user has tried
-    const id = req.params.userId;
-    const user = await User.findById(id)
+    const user = await User
+        .findById(req.params.userId)
         .populate("triedDrinks.drink") // populate the "drink" field
         .catch(err => {                // within "triedDrinks"
             res.status(404).json({
                 "message": "No user found"
             });
         });
-    const triedDrinks = user.triedDrinks
-        .filter(triedDrink => triedDrink.drink) // null check in case of dangling references
-        .map(triedDrink => triedDrink.drink);
 
-    return res.status(200).json({ "triedDrinks": triedDrinks });
+    return res.status(200).json({ "triedDrinks": user.triedDrinks });
 });
 
 
@@ -141,6 +141,7 @@ router.post("/api/v1/users", async (req, res, next) => {
         "longitude": req.body.longitude,
         "latitude": req.body.latitude,
     });
+
     await newUser.save().catch(err => { next(err) });
 
     return res.status(201).json(newUser);
@@ -165,34 +166,33 @@ router.post("/api/v1/sessions", async (req, res) => {
 
 // Follow a user
 router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
-    const targetId = req.params.targetUserId;
-
-    const user = await User.findById(req.params.userId).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const user = await User
+        .findByIdAndUpdate(
+            req.params.userId,
+            { $addToSet: { follows: req.params.targetUserId } },
+            { new: true }) // return the updated document
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
-
-    // Avoid duplicate follows
-    if (!user.follows.includes(targetId)) {
-        user.follows.push(targetId);
-
-        await user.save().catch(err => { next(err) });
-    }
 
     return res.status(200).json(user);
 });
 
 // Favorite a drink
 router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
-    const user = await User.findById(req.params.userId).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const user = await User
+        .findByIdAndUpdate(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
     // Check if the drink is already in triedDrinks
-    const existingEntry = user.triedDrinks.find(entry => entry.drink.toString() === req.params.drinkId);
+    const existingEntry = user.triedDrinks
+        .find(entry => entry.drink.toString() === req.params.drinkId);
 
     if (existingEntry) {
         existingEntry.favorite = true;
@@ -210,7 +210,18 @@ router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) 
 
 // Favorite a Systembolag store
 router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res) => {
-    // Logic to favorite a Systembolag store
+    const user = await User
+        .findByIdAndUpdate(
+            req.params.userId,
+            { $set: { favoriteSystembolag: req.params.systembolagId } }, // set the favoriteSystembolag field
+            { new: true })
+        .catch(err => {
+            return res.status(404).json({
+                "message": "No user found"
+            });
+        });
+
+    return res.status(200).json(user);
 });
 
 
@@ -220,8 +231,9 @@ router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async 
 // Update user profile
 router.patch("/api/v1/users/:userId", async (req, res, next) => {
     // Find the user to update
-    const id = req.params.userId;
-    const userToUpdate = await User.findById(id).catch(err => { next(err) });
+    const userToUpdate = await User
+        .findById(req.params.userId)
+        .catch(err => { next(err) });
 
     // Update only the fields provided in the request body
     userToUpdate.userID = (req.body.userID || userToUpdate.userID);
@@ -243,26 +255,29 @@ router.patch("/api/v1/users/:userId", async (req, res, next) => {
 
 // Update user credentials (change email)
 router.patch("/api/v1/users/:userId/credentials", async (req, res) => {
-    const userToUpdate = await User.findById(req.params.userId).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const userToUpdate = await User
+        .findByIdAndUpdate(
+            req.params.userId,
+            { "email": req.body.email },
+            { new: true }) // return the updated document
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
-
-    userToUpdate.email = (req.body.email || userToUpdate.email);
-
-    await userToUpdate.save().catch(err => { next(err) });
 
     return res.json(userToUpdate);
 });
 
 // Update user settings
 router.patch("/api/v1/users/:userId/settings", async (req, res) => {
-    const userToUpdate = await User.findById(req.params.userId).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    const userToUpdate = await User
+        .findById(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
     userToUpdate.settings.darkMode = (req.body.darkMode !== undefined) ? req.body.darkMode : userToUpdate.settings.darkMode;
     userToUpdate.settings.notifications = (req.body.notifications !== undefined) ? req.body.notifications : userToUpdate.settings.notifications;
@@ -279,11 +294,14 @@ router.patch("/api/v1/users/:userId/settings", async (req, res) => {
 
 // Unfavorite a drink
 router.delete("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res) => {
-    const user = await User.findById(
+    const user = await User.findByIdAndUpdate(
         req.params.userId,
-        { $pull: { triedDrinks: { drink: req.params.drinkId } } }, // remove the drink from triedDrinks array
-        { new: true } // return the updated document
-    ).catch(err => {
+        { $pull: {
+            triedDrinks: {
+                drink: req.params.drinkId
+            }}}, // remove the drink from triedDrinks array
+        { new: true }) // return the updated document
+    .catch(err => {
         return res.status(404).json({
             "message": "No user found"
         });
@@ -307,24 +325,28 @@ router.delete("/api/v1/users/:userId/favorites/systembolag/:systembolagId", asyn
 
 // Unfollow a user
 router.delete("/api/v1/users/:userId/follows/:targetUserId", async (req, res) => {
-    const user = await User.findByIdAndUpdate(
-        req.params.userId,
-        { $pull: { follows: req.params.targetUserId } }, // remove the targetUserId from follows array
-        { new: true } // return the updated document
-    ).catch(err => {
-        return res.status(404).json({ "message": "No user found" });
-    });
+    const user = await User
+        .findByIdAndUpdate(
+            req.params.userId,
+            { $pull: { follows: req.params.targetUserId } }, // remove the targetUserId from follows array
+            { new: true })
+        .catch(err => {
+            return res.status(404).json({ "message": "No user found" });
+        });
 
     return res.status(200).json(user);
 });
 
 // Log out (delete current session)
 router.delete("/api/v1/sessions/current", async (req, res) => {
-    const user = await User.findById(req.params.userId).catch(err => {
-        res.status(404).json({
-            "message": "No user found"
+    // TEMPORARY LOGOUT LOGIC FOR DEMO PURPOSES ONLY
+    const user = await User
+        .findById(req.params.userId)
+        .catch(err => {
+            res.status(404).json({
+                "message": "No user found"
+            });
         });
-    });
 
     return res.status(200).json({
         "message": "Logged out successfully"
@@ -333,8 +355,9 @@ router.delete("/api/v1/sessions/current", async (req, res) => {
 
 // Delete a user's own account
 router.delete("/api/v1/users/:userId", async (req, res, next) => {
-    const id = req.params.userId;
-    const deletedUser = await User.findByIdAndDelete(id).catch(err => { next(err) });
+    const deletedUser = await User
+        .findByIdAndDelete(req.params.userId)
+        .catch(err => { next(err) });
 
     return res.json(deletedUser);
 });
