@@ -26,9 +26,10 @@ router.get("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // Get all reviews for a specific drink
 router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
     const reviewForDrink = await Review
-        .find({reviewOf: req.params.drinkId})
-        .populate("reviewOf")
-        .populate("reviewedBy")
+        .find({"productID": req.params.drinkId})
+        .populate("userID", "userName")
+        .populate("productID", "name")
+        .select("-__v")
         .catch(err => { next(err) });
 
     return res.json({reviewForDrink})
@@ -37,8 +38,7 @@ router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
 // Get all reviews made by a specific user
 router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
     const reviewedByUser = await Review
-        .find({reviewedBy: req.params.userId})
-        .populate("reviewedBy")
+        .find({"userID": req.params.userId})
         .catch(err => { next(err) });
 
     return res.json({"reviewedBy": reviewedByUser})
@@ -48,11 +48,11 @@ router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
 router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
     const drinkReviewedByUser = await Review
         .find({
-            reviewedBy: req.params.userId,
-            reviewOf: req.params.drinkId
+            "userID": req.params.userId,
+            "productID": req.params.drinkId
         })
-        .populate("reviewedBy")
-        .populate("reviewOf")
+        .populate("userID")
+        .populate("productID")
         .catch(err => { next(err) });
 
     return res.json({"reviews": drinkReviewedByUser})
@@ -67,8 +67,6 @@ router.post("/api/v1/reviews", async (req, res, next) => {
         "productID": req.body.productID,
         "rating": req.body.rating,
         "comment": req.body.comment,
-        "reviewedBy": req.body.reviewedBy,
-        "reviewOf": req.body.reviewOf
     });
     await newReview.save().catch(err => { next(err) });
 
@@ -89,8 +87,6 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
     updatedReview.productID = (req.body.productID || updatedReview.productID);
     updatedReview.rating = (req.body.rating || updatedReview.rating);
     updatedReview.comment = (req.body.comment || updatedReview.comment);
-    updatedReview.reviewedBy = (req.body.reviewedBy || updatedReview.reviewedBy);
-    updatedReview.reviewOf = (req.body.reviewOf || updatedReview.reviewOf);
 
     // Save the updated review to the database
     await updatedReview.save().catch(err => { next(err) });
@@ -111,8 +107,6 @@ router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
                 productID: req.body.productID,
                 rating: req.body.rating,
                 comment: req.body.comment,
-                reviewedBy: req.body.reviewedBy,
-                reviewOf: req.body.reviewOf
             },
             { new: true }
         )
