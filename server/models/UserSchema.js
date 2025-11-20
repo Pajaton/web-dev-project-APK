@@ -41,7 +41,7 @@ var userSchema = new Schema({
     "triedDrinks": [{
         "drink": {
             "type": Schema.Types.ObjectId,
-            "ref": "Drink"
+            "ref": "drinks"
         },
         "favorite": {type: Boolean, default: false}
     }],

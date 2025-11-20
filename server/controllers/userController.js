@@ -54,14 +54,11 @@ router.get("/api/v1/users/:userId/follows", async (req, res, next) => {
 router.get("/api/v1/users/:userId/favorites/drinks", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
+        .where("triedDrinks.favorite").equals(true)
         .populate("triedDrinks.drink") // populate the "drink" field
         .catch(err => { next(err) });
 
-    const favoriteDrinks = user.triedDrinks
-        .filter(triedDrink => triedDrink.favorite)
-        .map(triedDrink => triedDrink.drink);
-
-    return res.json({ "favoriteDrinks": favoriteDrinks });
+    return res.json(user);
 });
 
 // Get a user's favorite Systembolag store
@@ -71,20 +68,22 @@ router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res, next)
         .populate("favoriteSystembolag") // populate the "favoriteSystembolag" field
         .catch(err => { next(err) });
 
+    if (!user.favoriteSystembolag) {
+        return res.status(404).json({ "favoriteSystembolag": null });
+    }
+
     return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
 });
 
 router.get("/api/v1/users/:userId/address", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
+    const userAddress = await User
+        .findById(
+            req.params.userId,
+            "street streetNumber postalCode city"
+        )
         .catch(err => { next(err) });
 
-    return res.json({
-        "street": user.street,
-        "streetNumber": user.streetNumber,
-        "postalCode": user.postalCode,
-        "city": user.city
-    });
+    return res.json({ "address": userAddress });
 });
 
 router.get("/api/v1/users/:userId/drinks", async (req, res, next) => {
@@ -139,10 +138,32 @@ router.post("/api/v1/sessions", async (req, res) => {
 
 // Follow a user
 router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next) => {
+    if (req.params.userId === req.params.targetUserId) {
+        return res.status(400).json({
+            "message": "Users cannot follow themselves"
+        });
+    }
+    
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
             { $addToSet: { follows: req.params.targetUserId } },
+            { new: true }) // return the updated document
+        .catch(err => { next(err) });
+
+    return res.json(user);
+});
+
+// Add a tried drink to a user's profile
+router.post("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => {
+    const user = await User
+        .findByIdAndUpdate(
+            req.params.userId,
+            { $addToSet: {
+                triedDrinks: {
+                    drink: req.params.drinkId,
+                    favorite: false
+                }}},
             { new: true }) // return the updated document
         .catch(err => { next(err) });
 
