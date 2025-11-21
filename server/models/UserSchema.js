@@ -6,9 +6,7 @@ var Schema = mongoose.Schema;
 
 //Define the structure of the schema
 var userSchema = new Schema({
-    // Primary key
     "userID": {type: Number, unique: true},
-
     // Local attributes
     "email": {type: String, unique: true, required: true},
     "profilePicture": {type: String},

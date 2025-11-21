@@ -5,7 +5,7 @@ var User = require("../models/UserSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a list of users
-router.get("/api/v1/users", async (req, res, next) => {
+router.get("/users", async (req, res, next) => {
     const users = await User
         .find()
         .catch(err => { next(err) });
@@ -14,7 +14,7 @@ router.get("/api/v1/users", async (req, res, next) => {
 });
 
 // Get a user's profile
-router.get("/api/v1/users/:userId", async (req, res, next) => {
+router.get("/users/:userId", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
         .catch(err => { next(err) });
@@ -22,17 +22,8 @@ router.get("/api/v1/users/:userId", async (req, res, next) => {
     return res.json(user);
 });
 
-// Get a user's current settings
-router.get("/api/v1/users/:userId/settings", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .catch(err => { next(err) });
-
-    return res.json(user.settings);
-});
-
 // Get a list of users that a user follows
-router.get("/api/v1/users/:userId/follows", async (req, res, next) => {
+router.get("/users/:userId/follows", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
         .populate("follows") // populate the "follows" field with user documents
@@ -51,7 +42,7 @@ router.get("/api/v1/users/:userId/follows", async (req, res, next) => {
 });
 
 // Get a list of a user's favorite drinks
-router.get("/api/v1/users/:userId/favorites/drinks", async (req, res, next) => {
+router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
         .where("triedDrinks.favorite").equals(true)
@@ -65,7 +56,7 @@ router.get("/api/v1/users/:userId/favorites/drinks", async (req, res, next) => {
 });
 
 // Get a user's favorite Systembolag store
-router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res, next) => {
+router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
         .populate("favoriteSystembolag") // populate the "favoriteSystembolag" field
@@ -78,18 +69,7 @@ router.get("/api/v1/users/:userId/favorites/systembolag", async (req, res, next)
     return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
 });
 
-router.get("/api/v1/users/:userId/address", async (req, res, next) => {
-    const userAddress = await User
-        .findById(
-            req.params.userId,
-            "street streetNumber postalCode city"
-        )
-        .catch(err => { next(err) });
-
-    return res.json({ "address": userAddress });
-});
-
-router.get("/api/v1/users/:userId/drinks", async (req, res, next) => {
+router.get("/users/:userId/drinks", async (req, res, next) => {
     const user = await User
         .findById(req.params.userId)
         .populate("triedDrinks.drink") // populate the "drink" field
@@ -103,7 +83,7 @@ router.get("/api/v1/users/:userId/drinks", async (req, res, next) => {
 
 
 // Sign up a new user
-router.post("/api/v1/users", async (req, res, next) => {
+router.post("/users", async (req, res, next) => {
     var newUser = new User({
         "userID": req.body.userID,
         "email": req.body.email,
@@ -123,7 +103,7 @@ router.post("/api/v1/users", async (req, res, next) => {
 });
 
 // Create a new session (log in)
-router.post("/api/v1/sessions", async (req, res) => {
+router.post("/sessions", async (req, res) => {
     // TEMPORARY AUTHENTICATION LOGIC FOR DEMO PURPOSES ONLY
     const user = await User.findOne({ email: req.body.email });
 
@@ -142,7 +122,7 @@ router.post("/api/v1/sessions", async (req, res) => {
 // PATCH ROUTE DEFINITIONS
 
 // Follow a user
-router.patch("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next) => {
+router.patch("/users/:userId/follows/:targetUserId", async (req, res, next) => {
     if (req.params.userId === req.params.targetUserId) {
         return res.status(400).json({
             "message": "Users cannot follow themselves"
@@ -160,7 +140,7 @@ router.patch("/api/v1/users/:userId/follows/:targetUserId", async (req, res, nex
 });
 
 // Add a tried drink to a user's profile
-router.patch("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => {
+router.patch("/users/:userId/drinks/:drinkId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -176,7 +156,7 @@ router.patch("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => 
 });
 
 // Favorite a drink
-router.patch("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
+router.patch("/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(req.params.userId)
         .catch(err => { next(err) });
@@ -209,7 +189,7 @@ router.patch("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res,
 });
 
 // Favorite a Systembolag store
-router.patch("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
+router.patch("/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -221,7 +201,7 @@ router.patch("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async
 });
 
 // Update user profile
-router.patch("/api/v1/users/:userId", async (req, res, next) => {
+router.patch("/users/:userId", async (req, res, next) => {
     // Find the user to update
     const userToUpdate = await User
         .findById(req.params.userId)
@@ -239,26 +219,16 @@ router.patch("/api/v1/users/:userId", async (req, res, next) => {
     userToUpdate.longitude = (req.body.longitude || userToUpdate.longitude);
     userToUpdate.latitude = (req.body.latitude || userToUpdate.latitude);
 
+    userToUpdate.settings = (req.body.settings || userToUpdate.settings);
+
     // Save the updated user to the database
     await userToUpdate.save().catch(err => { next(err) });
 
     return res.json(userToUpdate);
 });
 
-// Update user credentials (change email)
-router.patch("/api/v1/users/:userId/credentials", async (req, res, next) => {
-    const userToUpdate = await User
-        .findByIdAndUpdate(
-            req.params.userId,
-            { "email": req.body.email },
-            { new: true }) // return the updated document
-        .catch(err => { next(err) });
-
-    return res.json(userToUpdate);
-});
-
 // Update user settings
-router.patch("/api/v1/users/:userId/settings", async (req, res, next) => {
+router.patch("/users/:userId/settings", async (req, res, next) => {
     const userToUpdate = await User
         .findById(req.params.userId)
         .catch(err => { next(err) });
@@ -277,7 +247,7 @@ router.patch("/api/v1/users/:userId/settings", async (req, res, next) => {
 
 
 // Unfavorite a drink
-router.delete("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
+router.delete("/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -292,7 +262,7 @@ router.delete("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res
 });
 
 // Unfavorite a Systembolag store
-router.delete("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
+router.delete("/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -305,7 +275,7 @@ router.delete("/api/v1/users/:userId/favorites/systembolag/:systembolagId", asyn
 });
 
 // Unfollow a user
-router.delete("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next) => {
+router.delete("/users/:userId/follows/:targetUserId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -317,19 +287,20 @@ router.delete("/api/v1/users/:userId/follows/:targetUserId", async (req, res, ne
 });
 
 // Log out (delete current session)
-router.delete("/api/v1/sessions/current", async (req, res, next) => {
+router.delete("/sessions/:userId", async (req, res, next) => {
     // TEMPORARY LOGOUT LOGIC FOR DEMO PURPOSES ONLY
     const user = await User
         .findById(req.params.userId)
         .catch(err => { next(err) });
 
     return res.json({
-        "message": "Logged out successfully"
+        "message": "Logged out successfully",
+        "user": user
     });
 });
 
 // Delete a user's own account
-router.delete("/api/v1/users/:userId", async (req, res, next) => {
+router.delete("/users/:userId", async (req, res, next) => {
     const deletedUser = await User
         .findByIdAndDelete(req.params.userId)
         .catch(err => { next(err) });
@@ -338,7 +309,7 @@ router.delete("/api/v1/users/:userId", async (req, res, next) => {
 });
 
 // Delete all sessions (log out from all devices)
-router.delete("/api/v1/sessions", async (req, res) => {
+router.delete("/sessions", async (req, res) => {
     return res.json({
         "message": "Logged out from all devices successfully"
     });
