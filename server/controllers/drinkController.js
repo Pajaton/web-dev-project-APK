@@ -5,13 +5,13 @@ var Drink = require("../models/DrinkSchema");
 
 // GET ROUTES DEFINITION
 
-router.get("/api/v1/drinks", async (req, res) => {
+router.get("/drinks", async (req, res) => {
     const drinks = await Drink.find();
 
     return res.json({ "drinks": drinks });
 });
 
-router.get("/api/v1/drinks/:drinkId", async (req, res, next) => {
+router.get("/drinks/:drinkId", async (req, res, next) => {
     try {
         const requestedDrink = await Drink
             .findById(req.params.drinkId);
@@ -23,7 +23,7 @@ router.get("/api/v1/drinks/:drinkId", async (req, res, next) => {
 });
 
 // Get all systembolag where a specific drink is available
-router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res, next) => {
+router.get("/drinks/:drinkId/systembolag", async (req, res, next) => {
     try {
         const drinkInStockAt = await Drink
             .findById(req.params.drinkId)
@@ -35,7 +35,7 @@ router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res, next) => {
     } catch(err) {next(err)};
 });
 
-router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
+router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
     try {
         const drinkInStockAt = await Drink
             .findById(req.params.drinkId)
@@ -53,7 +53,7 @@ router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res
 
 // POST ROUTES DEFINITION
 
-router.post("/api/v1/drinks", async (req, res, next) => {
+router.post("/drinks", async (req, res, next) => {
     const newDrink = new Drink({
         "productNumber": req.body.productNumber,
         "name": req.body.name,
@@ -77,7 +77,7 @@ router.post("/api/v1/drinks", async (req, res, next) => {
 
 
 // Update an existing drink
-router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
+router.patch("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
     const drinkToUpdate = await Drink
         .findById(req.params.drinkId)
@@ -108,7 +108,7 @@ router.patch("/api/v1/drinks/:drinkId", async (req, res, next) => {
 
 
 // Replace an existing drink
-router.put("/api/v1/drinks/:drinkId", async (req, res, next) => {
+router.put("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
     const drinkToUpdate = await Drink
         .findByIdAndUpdate(
@@ -136,7 +136,7 @@ router.put("/api/v1/drinks/:drinkId", async (req, res, next) => {
 
 
 
-router.delete("/api/v1/drinks/:drinkId", async (req, res, next) => {
+router.delete("/drinks/:drinkId", async (req, res, next) => {
     const deletedDrink = await Drink
         .findByIdAndDelete(req.params.drinkId) 
         .catch(err => { next(err) });

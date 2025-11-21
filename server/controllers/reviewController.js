@@ -6,7 +6,7 @@ var Review = require("../models/ReviewSchema");
 // GET ROUTE DEFINITIONS
 
 // Get all reviews
-router.get("/api/v1/reviews", async (req, res, next) => {
+router.get("/reviews", async (req, res, next) => {
     const review = await Review
         .find()
         .catch(err => { next(err) });
@@ -15,7 +15,7 @@ router.get("/api/v1/reviews", async (req, res, next) => {
 });
 
 // Get a specific review by ID
-router.get("/api/v1/reviews/:reviewId", async (req, res, next) => {
+router.get("/reviews/:reviewId", async (req, res, next) => {
     try {
         const review = await Review
             .findById(req.params.reviewId);
@@ -27,7 +27,7 @@ router.get("/api/v1/reviews/:reviewId", async (req, res, next) => {
 });
 
 // Get all reviews for a specific drink
-router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
+router.get("/drinks/:drinkId/reviews", async (req, res, next) => {
     try {
         const reviewForDrink = await Review
             .find({"productID": req.params.drinkId})
@@ -42,7 +42,7 @@ router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
 });
 
 // Get all reviews made by a specific user
-router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
+router.get("/users/:userId/reviews", async (req, res, next) => {
     try {
         const reviewedByUser = await Review
             .find({"userID": req.params.userId});
@@ -54,7 +54,7 @@ router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
 });
 
 // Get a specific user's review for a specific drink
-router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
+router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
     try {
         const drinkReviewedByUser = await Review
             .find({
@@ -73,7 +73,7 @@ router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res, nex
 // POST ROUTE DEFINITIONS
 
 // Create a new review for a drink
-router.post("/api/v1/reviews", async (req, res, next) => {
+router.post("/reviews", async (req, res, next) => {
     var newReview = new Review({
         "userID": req.body.userID,
         "productID": req.body.productID,
@@ -88,7 +88,7 @@ router.post("/api/v1/reviews", async (req, res, next) => {
 // PATCH ROUTE DEFINITIONS
 
 // Update a specific review
-router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
+router.patch("/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
     const updatedReview = await Review
         .findById(req.params.reviewId)
@@ -109,7 +109,7 @@ router.patch("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // PUT ROUTE DEFINITIONS
 
 // Replace a specific review
-router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
+router.put("/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
     const updatedReview = await Review
         .findByIdAndUpdate(
@@ -131,7 +131,7 @@ router.put("/api/v1/reviews/:reviewId", async (req, res, next) => {
 // DELETE ROUTE DEFINITIONS
 
 // Delete a specific review
-router.delete("/api/v1/reviews/:reviewId", async (req, res, next) => {
+router.delete("/reviews/:reviewId", async (req, res, next) => {
     const reviewToDelete = await Review
         .findByIdAndDelete(req.params.reviewId)
         .catch(err => { next(err) });
@@ -140,7 +140,7 @@ router.delete("/api/v1/reviews/:reviewId", async (req, res, next) => {
 });
 
 // Delete all reviews (use with caution)
-router.delete("/api/v1/reviews", async (req, res, next) => {
+router.delete("/reviews", async (req, res, next) => {
     const reviewsToDelete = await Review
         .deleteMany()
         .catch(err=> {next(err) });

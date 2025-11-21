@@ -6,7 +6,7 @@ var Systembolag = require("../models/SystembolagSchema");
 // GET ROUTE DEFINITIONS
 
 // Get a list of Systembolaget stores
-router.get("/api/v1/systembolag", async (req, res, next) => {
+router.get("/systembolag", async (req, res, next) => {
     const systembolag = await Systembolag
         .find()
         .catch(err => { next(err) });
@@ -15,7 +15,7 @@ router.get("/api/v1/systembolag", async (req, res, next) => {
 });
 
 // Get a list of products available at Systembolaget
-router.get("/api/v1/systembolag/products", async (req, res, next) => {
+router.get("/systembolag/products", async (req, res, next) => {
     const products = await Systembolag
         .find()
         .select("hasStockOf")
@@ -25,7 +25,7 @@ router.get("/api/v1/systembolag/products", async (req, res, next) => {
 });
 
 // Get list of products available at a specific systembolag
-router.get("/api/v1/systembolag/:systembolagId/products", async (req, res, next) => {
+router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
     // Logic to get list of products available at a specific store
     const drinksAtASystembolag = await Systembolag
         .findById(req.params.systembolagId)
@@ -36,7 +36,7 @@ router.get("/api/v1/systembolag/:systembolagId/products", async (req, res, next)
 });
 
 // Get product availability at a specific systembolag
-router.get("/api/v1/systembolag/:systembolagId/products/:productId", async (req, res, next) => {
+router.get("/systembolag/:systembolagId/products/:productId", async (req, res, next) => {
     const drinksInStockAtASystembolag = await Systembolag
         .findById(req.params.systembolagId)
         .populate({
@@ -52,7 +52,7 @@ router.get("/api/v1/systembolag/:systembolagId/products/:productId", async (req,
 });
 
 // Get the location of a specific Systembolaget store
-router.get("/api/v1/systembolag/:systembolagId/address", async (req, res, next) => {
+router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
     // Logic to get a Systembolaget store's address
     const systembolagAddress = await Systembolag
         .findById(req.params.systembolagId)
@@ -63,7 +63,7 @@ router.get("/api/v1/systembolag/:systembolagId/address", async (req, res, next) 
 });
 
 // Get details of a specific Systembolaget store
-router.get("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
+router.get("/systembolag/:systembolagId", async (req, res, next) => {
     const mySystembolag = await Systembolag
         .findById(req.params.systembolagId)
         .catch(err => { next(err) });
@@ -75,7 +75,7 @@ router.get("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
 // POST ROUTE DEFINITIONS
 
 // Add a new Systembolaget store
-router.post("/api/v1/systembolag", async (req, res, next) => {
+router.post("/systembolag", async (req, res, next) => {
     var newSystembolag = new Systembolag({
         "systembolagID": req.body.systembolagID,
         "name": req.body.name,
@@ -92,7 +92,7 @@ router.post("/api/v1/systembolag", async (req, res, next) => {
 });
 
 // Add a new product to a specific Systembolaget store
-router.post("/api/v1/systembolag/:systembolagId/products", async (req, res, next) => {
+router.post("/systembolag/:systembolagId/products", async (req, res, next) => {
     const systembolag = await Systembolag.findByIdAndUpdate(
         req.params.systembolagId,
         {
@@ -111,7 +111,7 @@ router.post("/api/v1/systembolag/:systembolagId/products", async (req, res, next
 
 
 // Update details of a specific Systembolaget store
-router.patch("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
+router.patch("/systembolag/:systembolagId", async (req, res, next) => {
     const updatedSystembolag = await Systembolag
         .findById(req.params.systembolagId)
         .catch(err => { next(err) })
@@ -135,7 +135,7 @@ router.patch("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
 // DELETE ROUTE DEFINITIONS
 
 // Delete a specific Systembolaget store
-router.delete("/api/v1/systembolag/:systembolagId", async (req, res, next) => {
+router.delete("/systembolag/:systembolagId", async (req, res, next) => {
     const deletedSystembolag = await Systembolag
         .findByIdAndDelete(req.params.systembolagId)
         .catch(err => { next(err) });
