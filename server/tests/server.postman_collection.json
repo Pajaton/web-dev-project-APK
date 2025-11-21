@@ -509,6 +509,65 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "CreateNewAlcConsumed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test.skip(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"correct JSON\", function () {\r",
+									"    pm.expect(500).to.eq(json.volume);\r",
+									"    pm.expect(5).to.eq(json.percent);\r",
+									"\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"alcoholConsumed"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -816,7 +875,7 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -836,6 +895,67 @@
 								"{{userID}}",
 								"follows",
 								"{{targetID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AttemptToFollowSelf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", () => {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"User unsuccessfully follows themselves.\", () => {",
+									"    pm.expect(json.message).to.eql(\"Users cannot follow themselves\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows",
+								"{{userID}}"
 							]
 						}
 					},
@@ -896,67 +1016,6 @@
 					"response": []
 				},
 				{
-					"name": "AttemptToFollowSelf",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var json = pm.response.json();",
-									"",
-									"pm.test(\"Status code is 400\", () => {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									"pm.test(\"User unsuccessfully follows themselves.\", () => {",
-									"    pm.expect(json.message).to.eql(\"Users cannot follow themselves\");",
-									"});",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{userID}}",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"{{userID}}",
-								"follows",
-								"{{userID}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "UserTriesADrink",
 					"event": [
 						{
@@ -996,7 +1055,7 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1127,7 +1186,7 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1259,7 +1318,7 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1455,7 +1514,7 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1539,6 +1598,76 @@
 								"{{userID}}",
 								"favorites",
 								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserAlcConsumed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test.skip(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"User has consumed drinks attribute\", () => {\r",
+									"    pm.expect(json).to.have.property(\"alcoholConsumed\");\r",
+									"    pm.expect(json.alcoholConsumed).to.be.an(\"object\");\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"User alcoholConsumed has correct fields\", () => {\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"volume\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"percent\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"_id\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"The fields have the correct types\", () => {\r",
+									"    pm.expect(json.alcoholConsumed.volume).to.be.a(\"number\");\r",
+									"    pm.expect(json.alcoholConsumed.percent).to.be.a(\"number\");\r",
+									"    pm.expect(json.alcoholConsumed._id).to.be.a(\"string\");\r",
+									"    pm.expect(json.alcoholConsumed.timestamp).to.be.a(\"string\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"alcoholConsumed"
 							]
 						}
 					},

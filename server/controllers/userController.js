@@ -139,8 +139,10 @@ router.post("/api/v1/sessions", async (req, res) => {
     });
 });
 
+// PATCH ROUTE DEFINITIONS
+
 // Follow a user
-router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next) => {
+router.patch("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next) => {
     if (req.params.userId === req.params.targetUserId) {
         return res.status(400).json({
             "message": "Users cannot follow themselves"
@@ -158,7 +160,7 @@ router.post("/api/v1/users/:userId/follows/:targetUserId", async (req, res, next
 });
 
 // Add a tried drink to a user's profile
-router.post("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => {
+router.patch("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -174,7 +176,7 @@ router.post("/api/v1/users/:userId/drinks/:drinkId", async (req, res, next) => {
 });
 
 // Favorite a drink
-router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
+router.patch("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(req.params.userId)
         .catch(err => { next(err) });
@@ -207,7 +209,7 @@ router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, 
 });
 
 // Favorite a Systembolag store
-router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
+router.patch("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
     const user = await User
         .findByIdAndUpdate(
             req.params.userId,
@@ -217,10 +219,6 @@ router.post("/api/v1/users/:userId/favorites/systembolag/:systembolagId", async 
 
     return res.json(user);
 });
-
-
-// PATCH ROUTE DEFINITIONS
-
 
 // Update user profile
 router.patch("/api/v1/users/:userId", async (req, res, next) => {
