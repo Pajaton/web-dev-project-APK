@@ -509,42 +509,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "CreateNewAlcConsumed",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"{{userID}}",
-								"alcoholConsumed"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -1131,17 +1095,24 @@
 							"script": {
 								"exec": [
 									"var json = pm.response.json();",
+									"var favDrinks = [];",
 									"",
 									"pm.test(\"Status code is 200\", () => {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
 									"pm.test(\"User successfully favorites a drink\", () => {",
+									"    for (i = 0; i < json.triedDrinks.length; i++) {",
+									"        if (json.triedDrinks[i].favorite) {",
+									"            favDrinks.push(json.triedDrinks[i]);",
+									"        }",
+									"    }",
 									"    pm.expect(json.triedDrinks).to.be.an(\"array\");",
-									"    pm.expect(json.triedDrinks[1].drink).to.be.a(\"string\");",
-									"    pm.expect(json.triedDrinks[1].drink).to.eq(pm.globals.get(\"drinkID\"));",
-									"    pm.expect(json.triedDrinks.length).to.eq(1);",
-									"    pm.expect(json.triedDrinks[1].favorite).to.be.true;",
+									"    pm.expect(favDrinks[0].drink).to.be.a(\"string\");",
+									"    pm.expect(favDrinks[0].drink).to.eq(pm.globals.get(\"drinkID\"));",
+									"",
+									"    pm.expect(favDrinks.length).to.eq(1);",
+									"    pm.expect(favDrinks[0].favorite).to.be.true;",
 									"});",
 									""
 								],
@@ -1197,7 +1168,6 @@
 							"script": {
 								"exec": [
 									"var json = pm.response.json();\r",
-									"const drink = json.favoriteDrinks[1].drink;\r",
 									"\r",
 									"pm.test(\"Status code is 200\", () => {\r",
 									"    pm.response.to.have.status(200);\r",
@@ -1205,22 +1175,22 @@
 									"\r",
 									"pm.test(\"Correctly fetches user's favorite drinks\", () => {\r",
 									"    pm.expect(json.favoriteDrinks).to.be.an('array');\r",
-									"    pm.expect(json.favoriteDrinks.length).to.be.eq(2);\r",
+									"    pm.expect(json.favoriteDrinks.length).to.be.eq(1);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
-									"    pm.expect(drink.name).to.eq('Laphroaig 10 Years');\r",
-									"    pm.expect(drink.type).to.eq('Maltwhisky');\r",
-									"    pm.expect(drink.container).to.eq('Flaska');\r",
-									"    pm.expect(drink.volume).to.eq(700);\r",
-									"    pm.expect(drink.percentage).to.eq(40);\r",
-									"    pm.expect(drink.colour).to.eq('Mörk, gyllengul färg');\r",
-									"    pm.expect(drink.price).to.eq(519);\r",
-									"    pm.expect(drink.image).to.eq('bottle.jpg');\r",
-									"    pm.expect(drink.apk).to.eq(66);\r",
-									"    pm.expect(drink.hasReviews).to.be.empty;\r",
-									"    pm.expect(drink.availableAt).to.be.empty;\r",
-									"    pm.expect(drink.triedBy).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].name).to.eq('Laphroaig 10 Years');\r",
+									"    pm.expect(json.favoriteDrinks[0].type).to.eq('Maltwhisky');\r",
+									"    pm.expect(json.favoriteDrinks[0].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[0].volume).to.eq(700);\r",
+									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(40);\r",
+									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Mörk, gyllengul färg');\r",
+									"    pm.expect(json.favoriteDrinks[0].price).to.eq(519);\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(66);\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
 									"});\r",
 									""
 								],
@@ -1330,7 +1300,7 @@
 							"script": {
 								"exec": [
 									"var json = pm.response.json();\r",
-									"const drink = json.favoriteDrinks[1].drink;\r",
+									"const drink = json.favoriteDrinks[1];\r",
 									"\r",
 									"pm.test(\"Status code is 200\", () => {\r",
 									"    pm.response.to.have.status(200);\r",
@@ -1342,19 +1312,34 @@
 									"});\r",
 									"\r",
 									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
-									"    pm.expect(drink.name).to.eq('Laphroaig 10 Years');\r",
-									"    pm.expect(drink.type).to.eq('Maltwhisky');\r",
-									"    pm.expect(drink.container).to.eq('Flaska');\r",
-									"    pm.expect(drink.volume).to.eq(700);\r",
-									"    pm.expect(drink.percentage).to.eq(40);\r",
-									"    pm.expect(drink.colour).to.eq('Mörk, gyllengul färg');\r",
-									"    pm.expect(drink.price).to.eq(519);\r",
-									"    pm.expect(drink.image).to.eq('bottle.jpg');\r",
-									"    pm.expect(drink.apk).to.eq(66);\r",
-									"    pm.expect(drink.hasReviews).to.be.empty;\r",
-									"    pm.expect(drink.availableAt).to.be.empty;\r",
-									"    pm.expect(drink.triedBy).to.be.empty;\r",
-									"})\r",
+									"    pm.expect(json.favoriteDrinks[0].name).to.eq('Festis Kaktus Lime');\r",
+									"    pm.expect(json.favoriteDrinks[0].type).to.eq('Saft');\r",
+									"    pm.expect(json.favoriteDrinks[0].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[0].volume).to.eq(500);\r",
+									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(0);\r",
+									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Shrek-grön');\r",
+									"    pm.expect(json.favoriteDrinks[0].price).to.eq(25);\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(0);\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
+									"    pm.expect(json.favoriteDrinks[1].name).to.eq('Laphroaig 10 Years');\r",
+									"    pm.expect(json.favoriteDrinks[1].type).to.eq('Maltwhisky');\r",
+									"    pm.expect(json.favoriteDrinks[1].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[1].volume).to.eq(700);\r",
+									"    pm.expect(json.favoriteDrinks[1].percentage).to.eq(40);\r",
+									"    pm.expect(json.favoriteDrinks[1].colour).to.eq('Mörk, gyllengul färg');\r",
+									"    pm.expect(json.favoriteDrinks[1].price).to.eq(519);\r",
+									"    pm.expect(json.favoriteDrinks[1].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[1].apk).to.eq(66);\r",
+									"    pm.expect(json.favoriteDrinks[1].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[1].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[1].triedBy).to.be.empty;\r",
+									"});\r",
 									""
 								],
 								"type": "text/javascript",
