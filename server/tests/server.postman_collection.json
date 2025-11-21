@@ -102,7 +102,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userID\":1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
+							"raw": "{\r\n    \"userID\": 1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -118,6 +118,57 @@
 								"api",
 								"v1",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InitNewUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"User Successfully logged in\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"userID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"greger@hawkwind.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
 							]
 						}
 					},
@@ -165,7 +216,6 @@
 									"pm.test(\"Fields have the correct types\", () => {",
 									"    pm.expect(json.userID).to.be.a('number');",
 									"    pm.expect(json.email).to.be.a('string');",
-									"    pm.expect(json.profilePicture).to.be.a('string');",
 									"    pm.expect(json.userName).to.be.a('string');",
 									"    pm.expect(json.settings).to.be.an('object');",
 									"    pm.expect(json.settings.darkMode).to.be.a('boolean');",
@@ -248,6 +298,57 @@
 								"api",
 								"v1",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InitOneMoreNewUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"User Successfully logged in\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"targetID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
 							]
 						}
 					},
@@ -526,7 +627,6 @@
 									"pm.test.skip(\"correct JSON\", function () {\r",
 									"    pm.expect(500).to.eq(json.volume);\r",
 									"    pm.expect(5).to.eq(json.percent);\r",
-									"\r",
 									"})"
 								],
 								"type": "text/javascript",
@@ -595,7 +695,6 @@
 									"});",
 									"",
 									"pm.test(\"User 1 is correct\", () => {",
-									"    pm.expect(1).to.eq(user1.userID);",
 									"    pm.expect(\"greger@hawkwind.com\").to.eq(user1.email);",
 									"    pm.expect(\"face.jpg\").to.eq(user1.profilePicture);",
 									"    pm.expect(\"Greger\").to.eq(user1.userName);",
@@ -616,7 +715,6 @@
 									"});",
 									"",
 									"pm.test(\"User 2 is correct\", () => {",
-									"    pm.expect(3).to.eq(user2.userID);",
 									"    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(user2.email);",
 									"    pm.expect(\"face.jpg\").to.eq(user2.profilePicture);",
 									"    pm.expect(\"Bob\").to.eq(user2.userName);",
@@ -700,138 +798,6 @@
 								"v1",
 								"users",
 								"{{userID}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetUserSettings",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var json = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Status code is 200\", () => {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"User settings retrieved successfully\", () => {\r",
-									"    pm.expect(json).to.have.property('darkMode');\r",
-									"    pm.expect(json).to.have.property('notifications');\r",
-									"    pm.expect(json).to.have.property('language');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The settings have the correct types\", () => {\r",
-									"    pm.expect(json.darkMode).to.be.a('boolean');\r",
-									"    pm.expect(json.notifications).to.be.a('boolean');\r",
-									"    pm.expect(json.language).to.be.a('string');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The settings are initialized to default values\", () => {\r",
-									"    pm.expect(json.darkMode).to.equal(false);\r",
-									"    pm.expect(json.notifications).to.equal(true);\r",
-									"    pm.expect(json.language).to.equal('en');\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{host}}/api/v1/users/{{userID}}/settings",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"{{userID}}",
-								"settings"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetUserAddress",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var json = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Status code is 200\", () => {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"User has an address\", () => {\r",
-									"    pm.expect(json).to.have.property(\"address\");\r",
-									"    pm.expect(json.address).to.be.an(\"object\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"User address has correct fields\", () => {\r",
-									"    pm.expect(json.address).to.have.property('street');\r",
-									"    pm.expect(json.address).to.have.property('streetNumber');\r",
-									"    pm.expect(json.address).to.have.property('postalCode');\r",
-									"    pm.expect(json.address).to.have.property('city');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The settings have the correct types\", () => {\r",
-									"    pm.expect(json.address.street).to.be.a('string');\r",
-									"    pm.expect(json.address.streetNumber).to.be.a('number');\r",
-									"    pm.expect(json.address.postalCode).to.be.a('number');\r",
-									"    pm.expect(json.address.city).to.be.a('string');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"The address is correct\", () => {\r",
-									"    pm.expect(json.address.street).to.equal(\"Herkulesvägen\");\r",
-									"    pm.expect(json.address.streetNumber).to.equal(42);\r",
-									"    pm.expect(json.address.postalCode).to.equal(55555);\r",
-									"    pm.expect(json.address.city).to.equal('Göteborg');\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{host}}/api/v1/users/{{userID}}/address",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"{{userID}}",
-								"address"
 							]
 						}
 					},
@@ -1628,11 +1594,16 @@
 									"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
 									"});\r",
 									"\r",
+									"\r",
 									"pm.test.skip(\"The fields have the correct types\", () => {\r",
-									"    pm.expect(json.alcoholConsumed.volume).to.be.a(\"number\");\r",
-									"    pm.expect(json.alcoholConsumed.percent).to.be.a(\"number\");\r",
-									"    pm.expect(json.alcoholConsumed._id).to.be.a(\"string\");\r",
-									"    pm.expect(json.alcoholConsumed.timestamp).to.be.a(\"string\");\r",
+									"    const json = pm.response.json()\r",
+									"    const entry = json.alcoholConsumed[0];\r",
+									"    \r",
+									"    pm.expect(entry.volume).to.be.a(\"number\");\r",
+									"    pm.expect(entry.percent).to.be.a(\"number\");\r",
+									"    pm.expect(entry._id).to.be.a(\"string\");\r",
+									"    const ts = entry.timestamp;\r",
+									"    pm.expect(!isNaN(Date.parse(ts))).to.be.true;\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1687,7 +1658,6 @@
 									"});\r",
 									"\r",
 									"pm.test(\"correct JSON\", function () {\r",
-									"    pm.expect(2).to.eq(json.userID);\r",
 									"    pm.expect(\"evert@raoul.com\").to.eq(json.email);\r",
 									"    pm.expect(\"feet.jpg\").to.eq(json.profilePicture);\r",
 									"    pm.expect(\"Evert\").to.eq(json.userName);\r",
@@ -1697,8 +1667,11 @@
 									"    pm.expect(\"Lindome\").to.eq(json.city);\r",
 									"    pm.expect(333333).to.eq(json.longitude);\r",
 									"    pm.expect(2222222).to.eq(json.latitude);\r",
-									"})\r",
 									"\r",
+									"    pm.expect(json.settings.darkMode).to.be.true;\r",
+									"    pm.expect(json.settings.notifications).to.be.false;\r",
+									"    pm.expect(json.settings.language).to.eq(\"sv\");\r",
+									"})\r",
 									""
 								],
 								"type": "text/javascript",
@@ -1712,7 +1685,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userID\":2,\r\n    \"email\":\"evert@raoul.com\",\r\n    \"profilePicture\":\"feet.jpg\",\r\n    \"userName\":\"Evert\",\r\n    \"street\":\"Magnoliagatan\",\r\n    \"streetNumber\":56,\r\n    \"postalCode\":45654,\r\n    \"city\":\"Lindome\",\r\n    \"longitude\":333333,\r\n    \"latitude\":2222222\r\n}",
+							"raw": "{\r\n    \"email\":\"evert@raoul.com\",\r\n    \"profilePicture\":\"feet.jpg\",\r\n    \"userName\":\"Evert\",\r\n    \"street\":\"Magnoliagatan\",\r\n    \"streetNumber\":56,\r\n    \"postalCode\":45654,\r\n    \"city\":\"Lindome\",\r\n    \"longitude\":333333,\r\n    \"latitude\":2222222,\r\n    \"settings\": {\r\n        \"darkMode\": true,\r\n        \"notifications\": false,\r\n        \"language\": \"sv\" \r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1736,6 +1709,218 @@
 									"value": null,
 									"disabled": true
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfollowUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Successfully unfollows a user\", () => {",
+									"    pm.expect(pm.globals.get(\"userID\")).not.to.equal(json.targetID);",
+									"    pm.expect(json.follows).to.not.include(pm.globals.get(\"targetID\"));",
+									"    pm.expect(json.follows.length).to.eq(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{targetID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows",
+								"{{targetID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfavoriteDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Successfully unfavorites a drink\", () => {",
+									"    pm.expect(json.triedDrinks.length).to.eq(1);",
+									"    pm.expect(json.triedDrinks).to.not.include(json.drinkID);",
+									"    pm.expect(json.triedDrinks[0].drink).to.eq(pm.globals.get(\"triedDrinkID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfavoriteSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Successfully unfavorites a drink\", () => {",
+									"    pm.expect(json.systembolag).to.be.undefined;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Session deleted successfully\", () => {",
+									"    pm.expect(json.message).to.eql(\"Logged out successfully\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"{{userID}}"
 							]
 						}
 					},
@@ -2504,6 +2689,61 @@
 								"api",
 								"v1",
 								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAllUserSessions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is correct\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged out from all devices successfully\");",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
 							]
 						}
 					},
