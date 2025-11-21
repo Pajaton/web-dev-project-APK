@@ -16,46 +16,58 @@ router.get("/api/v1/reviews", async (req, res, next) => {
 
 // Get a specific review by ID
 router.get("/api/v1/reviews/:reviewId", async (req, res, next) => {
-    const review = await Review
-        .findById(req.params.reviewId)
-        .catch(err => { next(err) });
-
-    return res.json(review)
+    try {
+        const review = await Review
+            .findById(req.params.reviewId);
+        if (!review) {
+            return res.status(404).json({"message": "Review not found"});
+        }
+        return res.json(review)
+    } catch(er) { next(err) };
 });
 
 // Get all reviews for a specific drink
 router.get("/api/v1/drinks/:drinkId/reviews", async (req, res, next) => {
-    const reviewForDrink = await Review
-        .find({"productID": req.params.drinkId})
-        .populate("userID", "userName")
-        .populate("productID", "name")
-        .select("-__v")
-        .catch(err => { next(err) });
-
-    return res.json({reviewForDrink})
+    try {
+        const reviewForDrink = await Review
+            .find({"productID": req.params.drinkId})
+            .populate("userID", "userName")
+            .populate("productID", "name")
+            .select("-__v");
+        if (!reviewForDrink) {
+            return res.status(404).json({"message": "Review not found"});
+        }
+        return res.json({reviewForDrink})
+    } catch(err) { next(err) };
 });
 
 // Get all reviews made by a specific user
 router.get("/api/v1/users/:userId/reviews", async (req, res, next) => {
-    const reviewedByUser = await Review
-        .find({"userID": req.params.userId})
-        .catch(err => { next(err) });
-
-    return res.json({"reviewedBy": reviewedByUser})
+    try {
+        const reviewedByUser = await Review
+            .find({"userID": req.params.userId});
+        if(!reviewedByUser) {
+            return res.status(404).json({"message": "User has not made any reviews"});
+        }
+        return res.json({"reviewedBy": reviewedByUser})
+    } catch(err) { next(err) };
 });
 
 // Get a specific user's review for a specific drink
 router.get("/api/v1/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
-    const drinkReviewedByUser = await Review
-        .find({
-            "userID": req.params.userId,
-            "productID": req.params.drinkId
-        })
-        .populate("userID")
-        .populate("productID")
-        .catch(err => { next(err) });
-
-    return res.json({"reviews": drinkReviewedByUser})
+    try {
+        const drinkReviewedByUser = await Review
+            .find({
+                "userID": req.params.userId,
+                "productID": req.params.drinkId
+            })
+            .populate("userID")
+            .populate("productID");
+        if (!drinkReviewedByUser) {
+            return res.status(404).json({"message": "User has not reviewed this drink"});
+        }
+        return res.json({"reviews": drinkReviewedByUser})
+    } catch(err) { next(err) };
 });
 
 // POST ROUTE DEFINITIONS
