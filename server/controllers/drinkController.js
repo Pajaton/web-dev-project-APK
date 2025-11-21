@@ -12,34 +12,43 @@ router.get("/api/v1/drinks", async (req, res) => {
 });
 
 router.get("/api/v1/drinks/:drinkId", async (req, res, next) => {
-    const requestedDrink = await Drink
-        .findById(req.params.drinkId)
-        .catch(err => { next(err) });
-
-    return res.json(requestedDrink)
+    try {
+        const requestedDrink = await Drink
+            .findById(req.params.drinkId);
+        if (!requestedDrink) {
+            return res.status(404).json({"message": "Drink not found"});
+        }
+        return res.json(requestedDrink)
+    } catch(err) {next(err)};
 });
 
 // Get all systembolag where a specific drink is available
 router.get("/api/v1/drinks/:drinkId/systembolag", async (req, res, next) => {
-    const drinkInStockAt = await Drink
-        .findById(req.params.drinkId)
-        .populate("availableAt")
-        .catch(err => { next(err) });
-
-    return res.json({ "availableAt": drinkInStockAt.availableAt });
+    try {
+        const drinkInStockAt = await Drink
+            .findById(req.params.drinkId)
+            .populate("availableAt");
+        if (!drinkInStockAt) {
+            return res.status(404).json({"message": "No Systembolag with drink in stock"});
+        }
+        return res.json({"availableAt": drinkInStockAt.availableAt})
+    } catch(err) {next(err)};
 });
 
 router.get("/api/v1/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
-    const drinkInStockAt = await Drink
-        .findById(req.params.drinkId)
-        .populate({"availableAt": {
-            match: {
-                _id: req.params.systembolagId
-            }}
-        })
-        .catch(err => { next(err) });
-
-    return res.json({ "availableAt": drinkInStockAt.availableAt });
+    try {
+        const drinkInStockAt = await Drink
+            .findById(req.params.drinkId)
+            .populate({"availableAt": {
+                match: {
+                    _id: req.params.systembolagId
+                }}
+            });
+            if (!drinkInStockAt) {
+                return res.status(404).json({"message": "The drink is not in stock at this Systembolag"});
+            }
+            return res.json({ "availableAt": drinkInStockAt.availableAt });
+        } catch(err) { next(err) };
 });
 
 // POST ROUTES DEFINITION
