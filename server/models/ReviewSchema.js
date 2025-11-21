@@ -8,7 +8,7 @@ var Schema = mongoose.Schema;
 var reviewSchema = new Schema({
     // Composite primary key
     "userID": {type: Schema.Types.ObjectId, ref: "User"},
-    "productID": {type: Schema.Types.ObjectId, ref: "drinks"},
+    "productID": {type: Schema.Types.ObjectId, ref: "Drink"},
 
     // Local attributes
     "rating": {type: Number, min: 1, max: 5},
