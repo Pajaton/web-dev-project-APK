@@ -57,8 +57,11 @@ router.get("/api/v1/users/:userId/favorites/drinks", async (req, res, next) => {
         .where("triedDrinks.favorite").equals(true)
         .populate("triedDrinks.drink") // populate the "drink" field
         .catch(err => { next(err) });
+    const favoriteDrinks = user.triedDrinks
+        .filter(entry => entry.favorite)
+        .map(entry => entry.drink);
 
-    return res.json(user);
+    return res.json({ "favoriteDrinks": favoriteDrinks });
 });
 
 // Get a user's favorite Systembolag store
@@ -189,9 +192,18 @@ router.post("/api/v1/users/:userId/favorites/drinks/:drinkId", async (req, res, 
         });
     }
 
+    const favoriteEntries = user.triedDrinks
+        .filter(entry => entry.favorite)
+        .map(entry => {
+            return {
+                "drink": entry.drink,
+                "favorite": entry.favorite
+            };
+        });
+
     await user.save().catch(err => { next(err) });
 
-    return res.json(user);
+    return res.json({ "favoriteDrinks": favoriteEntries });
 });
 
 // Favorite a Systembolag store

@@ -1,0 +1,1481 @@
+{
+  "info": {
+    "_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
+    "name": "server",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50199247",
+    "_collection_link": "https://pajaton-8204655.postman.co/workspace/2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50199247"
+  },
+  "item": [
+    {
+      "name": "CreatePosts",
+      "item": [
+        {
+          "name": "CreateNewUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function (){\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(1).to.eq(json.userID);\r",
+                  "    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
+                  "    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
+                  "    pm.expect(\"Greger\").to.eq(json.userName);\r",
+                  "    pm.expect(\"Herkulesvägen\").to.eq(json.street);\r",
+                  "    pm.expect(42).to.eq(json.streetNumber);\r",
+                  "    pm.expect(55555).to.eq(json.postalCode);\r",
+                  "    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+                  "    pm.expect(654654).to.eq(json.longitude);\r",
+                  "    pm.expect(123123).to.eq(json.latitude);\r",
+                  "})\r",
+                  "\r",
+                  "pm.globals.set(\"userID\",json._id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "edb28080-904c-478d-b085-6347e9e37eab"
+              }
+            }
+          ],
+          "id": "cf6be490-7d24-4123-83d1-42d6243f69da",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userID\":1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/users",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateOneMoreNewUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function (){",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"correct JSON\", function () {",
+                  "    pm.expect(2).to.eq(json.userID);",
+                  "    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(json.email);",
+                  "    pm.expect(\"face.jpg\").to.eq(json.profilePicture);",
+                  "    pm.expect(\"Bob\").to.eq(json.userName);",
+                  "    pm.expect(\"Gatans väg\").to.eq(json.street);",
+                  "    pm.expect(1337).to.eq(json.streetNumber);",
+                  "    pm.expect(66655).to.eq(json.postalCode);",
+                  "    pm.expect(\"Göteborg\").to.eq(json.city);",
+                  "    pm.expect(654652).to.eq(json.longitude);",
+                  "    pm.expect(123124).to.eq(json.latitude);",
+                  "})",
+                  "",
+                  "pm.globals.set(\"targetID\",json._id);",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "4d2b7ef9-c55f-4587-abd8-289cfe21a5f3"
+              }
+            }
+          ],
+          "id": "7f482c26-4400-4f64-a1a2-7133e97f290e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"userID\": 2,\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/users",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateNewDrink",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function (){\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(\"Laphroaig 10 Years\").to.eq(json.name);\r",
+                  "    pm.expect(\"Maltwhisky\").to.eq(json.type);\r",
+                  "    pm.expect(\"Flaska\").to.eq(json.container);\r",
+                  "    pm.expect(700).to.eq(json.volume);\r",
+                  "    pm.expect(40).to.eq(json.percentage);\r",
+                  "    pm.expect(\"Mörk, gyllengul färg\").to.eq(json.colour);\r",
+                  "    pm.expect(519).to.eq(json.price);\r",
+                  "    pm.expect(\"bottle.jpg\").to.eq(json.image);\r",
+                  "    pm.expect(66).to.eq(json.apk);\r",
+                  "})\r",
+                  "\r",
+                  "pm.globals.set(\"drinkID\",json._id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "0d64f9f9-77c1-415e-8b38-bc8e35401219"
+              }
+            }
+          ],
+          "id": "b08b5d17-d72a-40c3-bae1-164856c9e7a6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Laphroaig 10 Years\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 40,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 519,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 66\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/drinks",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drinks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateNewSystembolag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function (){\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(1).to.eq(json.systembolagID);\r",
+                  "    pm.expect(\"Nordstan\").to.eq(json.name);\r",
+                  "    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
+                  "    pm.expect(75).to.eq(json.streetNumber);\r",
+                  "    pm.expect(45687).to.eq(json.postalCode);\r",
+                  "    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+                  "    pm.expect(654987).to.eq(json.longitude);\r",
+                  "    pm.expect(465132).to.eq(json.latitude);\r",
+                  "})\r",
+                  "\r",
+                  "pm.globals.set(\"systembolagID\",json._id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "a8ba040d-1379-438c-a37f-1e72a040d753"
+              }
+            }
+          ],
+          "id": "006e82ff-c8cb-4cb9-9f06-cd4f1907258b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"systembolagID\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"longitude\": 654987,\r\n    \"latitude\": 465132\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/systembolag",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "systembolag"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateNewReview",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function (){\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.userID);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.productID);\r",
+                  "    pm.expect(5).to.eq(json.rating);\r",
+                  "    pm.expect(\"Very good gummi snodd\").to.eq(json.comment);\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.reviewedBy);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.reviewOf);\r",
+                  "})\r",
+                  "\r",
+                  "\r",
+                  "pm.globals.set(\"reviewID\",json._id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "e72e91dc-0218-4b70-b905-7aceab659f68"
+              }
+            }
+          ],
+          "id": "f293c4c9-5835-4538-bea8-7e1bcccfffca",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 5,\r\n    \"comment\": \"Very good gummi snodd\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/reviews",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateNewAlcConsumed",
+          "id": "36d5555a-1eb7-4e99-b487-557aa42f5293",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}",
+                "alcoholConsumed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AddUserFollower",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d366cd69-166f-4f6c-992c-bd847a31a7bc",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function (){",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User successfully follows a user.\", function () {",
+                  "    pm.expect(json.follows).to.be.an('array');",
+                  "    pm.expect(json.follows.length).to.equal(1);",
+                  "});",
+                  "",
+                  "pm.test(\"Followed user is not the same as the follower.\", function () {",
+                  "    console.log(json.userID + \" \" + json.targetID);",
+                  "    pm.expect(json.userID).to.not.equal(pm.globals.get(targetID));",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "83d0b439-7f44-4782-a521-d7fabd4da65f",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "72c487f9-df50-406d-8b60-b18e97514272",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}/follows/{{targetID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}",
+                "follows",
+                "{{targetID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "217d9eba-ea69-4732-9d3a-8433ddbe8576"
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GetAllUsers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function (){",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Fetched all users.\", function() { ",
+                  "    pm.expect(json.users.length).to.eq(2);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "b506ecf0-f514-4462-9973-dd5a4cf9853e"
+              }
+            }
+          ],
+          "id": "2597c42b-8bae-44f9-8650-205bd974af95",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/v1/users",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetUserByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "ccb76bad-e4db-4435-8eea-16a81c23b025"
+              }
+            }
+          ],
+          "id": "108919f6-25fd-4a60-9d0f-0d2ce570cf4e",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetUserSettings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"User settings retrieved successfully\", () => {\r",
+                  "    pm.expect(json).to.have.property('darkMode');\r",
+                  "    pm.expect(json).to.have.property('notifications');\r",
+                  "    pm.expect(json).to.have.property('language');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "24af6c2a-df4b-4c1c-ac1b-89db3023130e"
+              }
+            }
+          ],
+          "id": "8e597e7e-81ba-42d4-8e56-1e4912c48b7f",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}/settings",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}",
+                "settings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateUserByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(2).to.eq(json.userID);\r",
+                  "    pm.expect(\"evert@raoul.com\").to.eq(json.email);\r",
+                  "    pm.expect(\"feet.jpg\").to.eq(json.profilePicture);\r",
+                  "    pm.expect(\"Evert\").to.eq(json.userName);\r",
+                  "    pm.expect(\"Magnoliagatan\").to.eq(json.street);\r",
+                  "    pm.expect(56).to.eq(json.streetNumber);\r",
+                  "    pm.expect(45654).to.eq(json.postalCode);\r",
+                  "    pm.expect(\"Lindome\").to.eq(json.city);\r",
+                  "    pm.expect(333333).to.eq(json.longitude);\r",
+                  "    pm.expect(2222222).to.eq(json.latitude);\r",
+                  "})\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "e98bdab1-c95b-4088-99e1-32ad9245363c"
+              }
+            }
+          ],
+          "id": "2b8e2518-5263-486b-9ff6-540fb26b25f4",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userID\":2,\r\n    \"email\":\"evert@raoul.com\",\r\n    \"profilePicture\":\"feet.jpg\",\r\n    \"userName\":\"Evert\",\r\n    \"street\":\"Magnoliagatan\",\r\n    \"streetNumber\":56,\r\n    \"postalCode\":45654,\r\n    \"city\":\"Lindome\",\r\n    \"longitude\":333333,\r\n    \"latitude\":2222222\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "012de9c7-b0d7-4695-8c12-c76bffdd31ab"
+    },
+    {
+      "name": "Systembolag",
+      "item": [
+        {
+          "name": "GetSystembolagByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "3e35e35f-bc99-4395-b2da-0faa799531f2"
+              }
+            }
+          ],
+          "id": "ff808a11-80b7-4636-bbdd-803060f6d0c3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "systembolag",
+                "{{systembolagID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateSystembolagByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(5).to.eq(json.systembolagID);\r",
+                  "    pm.expect(\"Krogen Skogen\").to.eq(json.name);\r",
+                  "    pm.expect(\"Stigen\").to.eq(json.street);\r",
+                  "    pm.expect(2).to.eq(json.streetNumber);\r",
+                  "    pm.expect(12354).to.eq(json.postalCode);\r",
+                  "    pm.expect(\"Hisingen\").to.eq(json.city);\r",
+                  "    pm.expect(631321).to.eq(json.longitude);\r",
+                  "    pm.expect(411558).to.eq(json.latitude);\r",
+                  "})\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "6abe9a35-7bd5-4d65-b365-8b4ba979c47f"
+              }
+            }
+          ],
+          "id": "adea4c6a-5db7-43a5-b599-f6c1610a7d30",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"systembolagID\": 5,\r\n    \"name\": \"Krogen Skogen\",\r\n    \"street\": \"Stigen\",\r\n    \"streetNumber\": 2,\r\n    \"postalCode\": 12354,\r\n    \"city\": \"Hisingen\",\r\n    \"longitude\": 631321,\r\n    \"latitude\": 411558\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "systembolag",
+                "{{systembolagID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a47a2144-3082-48a8-9c36-5315448e20fd"
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "GetAllReviews",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "3ecd80b4-ac30-4eaf-b7a7-40e343e997a1"
+              }
+            }
+          ],
+          "id": "4eaa25c5-f420-4185-8ad2-acf01297e7c9",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/reviews/",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetReviewByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "6cf8d27f-6cd5-45b3-bc9f-b8e5dbeb4b23"
+              }
+            }
+          ],
+          "id": "01ed82bd-f851-4461-be87-0ba1a7db61ba",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "{{reviewID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetReviewsForDrinkByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "66ffe1a2-4679-4d97-94b5-4719c0bdb0b2"
+              }
+            }
+          ],
+          "id": "1359109a-5d0b-4b2d-84ca-694ec2c2dd74",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/drinks/{{drinkID}}/reviews",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drinks",
+                "{{drinkID}}",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetReviewsByUserID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "36194766-b46e-45a1-aac3-60a1956a4db0"
+              }
+            }
+          ],
+          "id": "dcd08a9b-6004-4355-865f-fabb4063e56c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}/reviews",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetReviewForDrinkByUserID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "365edcf9-f149-4c15-a41b-795ce4dd2c51"
+              }
+            }
+          ],
+          "id": "c4e323f9-3c20-47ea-af74-df71feeca666",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}/drinks/{{drinkID}}/reviews",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}",
+                "drinks",
+                "{{drinkID}}",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateReviewByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.userID);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.productID);\r",
+                  "    pm.expect(1).to.eq(json.rating);\r",
+                  "    pm.expect(\"Wasn´t nice, taste like bajs\").to.eq(json.comment);\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.reviewedBy);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.reviewOf);\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "3dd72ea0-ceda-4207-b962-2c7adff58539"
+              }
+            }
+          ],
+          "id": "b82bef33-7bfb-472a-b472-febdcf6601a0",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 1,\r\n    \"comment\": \"Wasn´t nice, taste like bajs\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "{{reviewID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateReviewByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.userID);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.productID);\r",
+                  "    pm.expect(3).to.eq(json.rating);\r",
+                  "    pm.expect(\"It´s okey, by the way\").to.eq(json.comment);\r",
+                  "    pm.expect(pm.globals.get(\"userID\")).to.eq(json.reviewedBy);\r",
+                  "    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.reviewOf);\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "f3d0cd1d-cfab-4b72-9932-343c38dc39a8"
+              }
+            }
+          ],
+          "id": "595ed227-5ff6-442c-8f7d-fbaa0d4a8e62",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 3,\r\n    \"comment\": \"It´s okey, by the way\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "{{reviewID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "b8b3d0b4-5a88-4150-a9b8-d823ed78b0e0"
+    },
+    {
+      "name": "Drinks",
+      "item": [
+        {
+          "name": "GetDrinkByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "d47f29c3-4ad1-4802-9d31-b6839371e861"
+              }
+            }
+          ],
+          "id": "8c1fad92-1ee1-4bc6-ad42-51c0e25cd15a",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drinks",
+                "{{drinkID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateDrinkByID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"correct JSON\", function () {\r",
+                  "    pm.expect(\"Laphroaig Elements 2.0\").to.eq(json.name);\r",
+                  "    pm.expect(\"Maltwhisky\").to.eq(json.type);\r",
+                  "    pm.expect(\"Flaska\").to.eq(json.container);\r",
+                  "    pm.expect(700).to.eq(json.volume);\r",
+                  "    pm.expect(59.6).to.eq(json.percentage);\r",
+                  "    pm.expect(\"Mörk, gyllengul färg\").to.eq(json.colour);\r",
+                  "    pm.expect(1899).to.eq(json.price);\r",
+                  "    pm.expect(\"bottle34.jpg\").to.eq(json.image);\r",
+                  "    pm.expect(32).to.eq(json.apk);\r",
+                  "})\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "0931b057-b736-46f2-8351-6939eeaec5e6"
+              }
+            }
+          ],
+          "id": "51b40db6-d087-47e2-8b0a-11da64f60106",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Laphroaig Elements 2.0\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 59.6,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 1899,\r\n    \"image\": \"bottle34.jpg\",\r\n    \"apk\": 32\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drinks",
+                "{{drinkID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "5e3a9b75-a4bb-474e-bad8-01e204854278"
+    },
+    {
+      "name": "DeletePosts",
+      "item": [
+        {
+          "name": "DeleteUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "7dd9bffa-9d2e-474f-af1d-68628cc9a2e4"
+              }
+            }
+          ],
+          "id": "2392861d-19b7-4327-a9dd-4e3d7d6ab3e2",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/v1/users/{{userID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteDrink",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "8a641492-d31b-40d7-9dc2-7311c8e24dc0"
+              }
+            }
+          ],
+          "id": "62b17b86-5fda-41fc-a439-b878cc13d8bc",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drinks",
+                "{{drinkID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteSystembolag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "07885538-918f-4478-816b-f8255efefe56"
+              }
+            }
+          ],
+          "id": "17159ba2-5a97-47f3-b97d-208b17890de9",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "systembolag",
+                "{{systembolagID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteReview",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "eb4cb8d8-29a7-45f9-9b93-381ecd8aa9ec"
+              }
+            }
+          ],
+          "id": "367ebf18-5c72-451b-9e4a-042211e1c29e",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "{{reviewID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteAllReviews",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function (){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "id": "152282cd-de4d-430b-9991-19d5af42e386"
+              }
+            }
+          ],
+          "id": "0ac31eb8-6c6b-4474-bde8-280bc54c2d59",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/v1/reviews",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "5a8fe56d-a3b1-44eb-afaf-dfb3ca9c2933"
+    },
+    {
+      "name": "GET /api",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "id": "fe1141ac-163e-4925-93d6-b138dda8b0ca"
+          }
+        }
+      ],
+      "id": "44621e52-efa9-4cc0-81fd-12e6374ab908",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/api",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ],
+        "id": "42740d2d-978c-4260-9f0d-abd121e66bd6"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ],
+        "id": "7908ab5e-ecd4-488f-b644-f94e198c38ac"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "85d3ac77-7e41-489f-bce1-a45233922f70",
+      "key": "host",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
