@@ -43,7 +43,7 @@ router.get("/users/:userId/follows", async (req, res, next) => {
                     "userName": followedUser.userName,
                 };
             });
-        if (!userFollows) {
+        if (userFollows.length === 0) {
             return res.status(404).json({"message": "User does not follow any other users"});
         }
         return res.json({ "follows": userFollows });
@@ -55,7 +55,7 @@ router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
     try{
         const user = await User
             .findById(req.params.userId)
-            .where("triedDrinks.favorite").equals(true)
+            .where("triedDrinks.favorite")
             .populate("triedDrinks.drink") // populate the "drink" field
         if (!user) {
             return res.status(404).json({"message": "User was not found"})
@@ -63,7 +63,7 @@ router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
         const favoriteDrinks = user.triedDrinks
             .filter(entry => entry.favorite)
             .map(entry => entry.drink);
-        if (!favoriteDrinks) {
+        if (favoriteDrinks.length === 0) {
             return res.status(404).json({"message": "User has no favorite drinks"});
         }
         return res.json({ "favoriteDrinks": favoriteDrinks });
@@ -78,7 +78,7 @@ router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
         .catch(err => { next(err) });
 
     if (!user.favoriteSystembolag) {
-        return res.status(404).json({ "favoriteSystembolag": null });
+        return res.status(404).json({ "favoriteSystembolag": undefined });
     }
     return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
 });
@@ -88,7 +88,7 @@ router.get("/users/:userId/drinks", async (req, res, next) => {
         const user = await User
             .findById(req.params.userId)
             .populate("triedDrinks.drink"); // populate the "drink" field
-        if (!user.triedDrinks) {
+        if (user.triedDrinks.length === 0) {
             return res.status(404).json({"message": "User has not tried any drinks"});
         } 
         return res.json({ "triedDrinks": user.triedDrinks });

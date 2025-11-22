@@ -769,9 +769,66 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
 									"pm.test(\"Status code is 200\", function (){\r",
 									"    pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test(\"All fields are included\", () => {\r",
+									"    pm.expect(json).to.have.property('userID');\r",
+									"    pm.expect(json).to.have.property('email');\r",
+									"    pm.expect(json).to.have.property('profilePicture');\r",
+									"    pm.expect(json).to.have.property('userName');\r",
+									"    pm.expect(json).to.have.property('settings');\r",
+									"    pm.expect(json.settings).to.have.property('darkMode');\r",
+									"    pm.expect(json.settings).to.have.property('notifications');\r",
+									"    pm.expect(json.settings).to.have.property('language');\r",
+									"    pm.expect(json).to.have.property('street');\r",
+									"    pm.expect(json).to.have.property('streetNumber');\r",
+									"    pm.expect(json).to.have.property('postalCode');\r",
+									"    pm.expect(json).to.have.property('city');\r",
+									"    pm.expect(json).to.have.property('longitude');\r",
+									"    pm.expect(json).to.have.property('latitude');\r",
+									"    pm.expect(json).to.have.property('follows');\r",
+									"    pm.expect(json).to.have.property('triedDrinks');\r",
+									"    pm.expect(json).to.have.property('reviewsWritten');\r",
+									"    pm.expect(json).to.not.have.property('favoriteSystembolag');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields have the correct types\", () => {\r",
+									"    pm.expect(json.userID).to.be.a('number');\r",
+									"    pm.expect(json.email).to.be.a('string');\r",
+									"    pm.expect(json.profilePicture).to.be.a('string');\r",
+									"    pm.expect(json.userName).to.be.a('string');\r",
+									"    pm.expect(json.settings).to.be.an('object');\r",
+									"    pm.expect(json.settings.darkMode).to.be.a('boolean');\r",
+									"    pm.expect(json.settings.notifications).to.be.a('boolean');\r",
+									"    pm.expect(json.settings.language).to.be.a('string');\r",
+									"    pm.expect(json.street).to.be.a('string');\r",
+									"    pm.expect(json.streetNumber).to.be.a('number');\r",
+									"    pm.expect(json.postalCode).to.be.a('number');\r",
+									"    pm.expect(json.city).to.be.a('string');\r",
+									"    pm.expect(json.longitude).to.be.a('number');\r",
+									"    pm.expect(json.latitude).to.be.a('number');\r",
+									"    pm.expect(json.follows).to.be.an('array');\r",
+									"    pm.expect(json.triedDrinks).to.be.an('array');\r",
+									"    pm.expect(json.reviewsWritten).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fetched correct user info\", () => {\r",
+									"    pm.expect(1).to.eq(json.userID);\r",
+									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
+									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
+									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
+									"    pm.expect(\"Herkulesvägen\").to.eq(json.street);\r",
+									"    pm.expect(42).to.eq(json.streetNumber);\r",
+									"    pm.expect(55555).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654654).to.eq(json.longitude);\r",
+									"    pm.expect(123123).to.eq(json.latitude);\r",
+									"});\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -798,6 +855,56 @@
 								"v1",
 								"users",
 								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmptyUserFollows",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User does not follow any other users\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows"
 							]
 						}
 					},
@@ -982,6 +1089,107 @@
 					"response": []
 				},
 				{
+					"name": "GetEmptyUserTriedDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches message for no drinks tried\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.equal(\"User has not tried any drinks\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmptyUserFavoriteDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches message for no favorite drinks\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.equal(\"User has no favorite drinks\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "UserTriesADrink",
 					"event": [
 						{
@@ -1060,12 +1268,12 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Correctly fetches user's favorite drinks\", () => {\r",
+									"pm.test(\"Correctly fetches user's tried drinks\", () => {\r",
 									"    pm.expect(json.triedDrinks).to.be.an('array');\r",
 									"    pm.expect(json.triedDrinks.length).to.be.eq(1);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
+									"pm.test(\"Fields of user's tried drinks are correct\", () => {\r",
 									"    pm.expect(drink.name).to.eq('Festis Kaktus Lime');\r",
 									"    pm.expect(drink.type).to.eq('Saft');\r",
 									"    pm.expect(drink.container).to.eq('Flaska');\r",
@@ -1406,7 +1614,7 @@
 									"});\r",
 									"\r",
 									"pm.test(\"Unable to fetch user's favorite systembolag\", () => {\r",
-									"    pm.expect(json.favoriteSystembolag).to.be.null;\r",
+									"    pm.expect(json.favoriteSystembolag).to.be.undefined;\r",
 									"});\r",
 									""
 								],
@@ -2744,6 +2952,160 @@
 								"api",
 								"v1",
 								"sessions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "404Tests",
+			"item": [
+				{
+					"name": "GetMissingUserByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct response is received\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingUserFollows",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingUserFavDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
 							]
 						}
 					},
