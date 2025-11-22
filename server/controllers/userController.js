@@ -15,44 +15,59 @@ router.get("/users", async (req, res, next) => {
 
 // Get a user's profile
 router.get("/users/:userId", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .catch(err => { next(err) });
-
-    return res.json(user);
+    try {
+        const user = await User
+            .findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({"message": "User was not found"});
+        }
+        return res.json(user);
+    } catch(err) { next(err) };
 });
 
 // Get a list of users that a user follows
 router.get("/users/:userId/follows", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .populate("follows") // populate the "follows" field with user documents
-        .catch(err => { next(err) });
-    const userFollows = user.follows
-        .filter(followedUser => followedUser)
-        .map(followedUser => {
-            return {
-                "userID": followedUser.userID,
-                "profilePicture": followedUser.profilePicture,
-                "userName": followedUser.userName,
-            };
-        });
-
-    return res.json({ "follows": userFollows });
+    try {
+        const user = await User
+            .findById(req.params.userId)
+            .populate("follows"); // populate the "follows" field with user documents
+        if (!user) {
+            return res.status(404).json({"message": "User was not found"})
+        }
+        const userFollows = user.follows
+            .filter(followedUser => followedUser)
+            .map(followedUser => {
+                return {
+                    "userID": followedUser.userID,
+                    "profilePicture": followedUser.profilePicture,
+                    "userName": followedUser.userName,
+                };
+            });
+        if (!userFollows) {
+            return res.status(404).json({"message": "User does not follow any other users"});
+        }
+        return res.json({ "follows": userFollows });
+    } catch(err) { next(err) };
 });
 
 // Get a list of a user's favorite drinks
 router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .where("triedDrinks.favorite").equals(true)
-        .populate("triedDrinks.drink") // populate the "drink" field
-        .catch(err => { next(err) });
-    const favoriteDrinks = user.triedDrinks
-        .filter(entry => entry.favorite)
-        .map(entry => entry.drink);
-
-    return res.json({ "favoriteDrinks": favoriteDrinks });
+    try{
+        const user = await User
+            .findById(req.params.userId)
+            .where("triedDrinks.favorite").equals(true)
+            .populate("triedDrinks.drink") // populate the "drink" field
+        if (!user) {
+            return res.status(404).json({"message": "User was not found"})
+        }
+        const favoriteDrinks = user.triedDrinks
+            .filter(entry => entry.favorite)
+            .map(entry => entry.drink);
+        if (!favoriteDrinks) {
+            return res.status(404).json({"message": "User has no favorite drinks"});
+        }
+        return res.json({ "favoriteDrinks": favoriteDrinks });
+    } catch(err) { next(err) };
 });
 
 // Get a user's favorite Systembolag store
@@ -65,17 +80,19 @@ router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
     if (!user.favoriteSystembolag) {
         return res.status(404).json({ "favoriteSystembolag": null });
     }
-
     return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
 });
 
 router.get("/users/:userId/drinks", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .populate("triedDrinks.drink") // populate the "drink" field
-        .catch(err => { next(err) });
-
-    return res.json({ "triedDrinks": user.triedDrinks });
+    try {
+        const user = await User
+            .findById(req.params.userId)
+            .populate("triedDrinks.drink"); // populate the "drink" field
+        if (!user.triedDrinks) {
+            return res.status(404).json({"message": "User has not tried any drinks"});
+        } 
+        return res.json({ "triedDrinks": user.triedDrinks });
+    } catch(err) { next(err) };
 });
 
 
