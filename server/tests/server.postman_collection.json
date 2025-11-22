@@ -499,6 +499,32 @@
 									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
+									"pm.test(\"All fields are present\", () => {\r",
+									"    pm.expect(json).to.have.property(\"systembolagID\");\r",
+									"    pm.expect(json).to.have.property(\"name\");\r",
+									"    pm.expect(json).to.have.property(\"street\");\r",
+									"    pm.expect(json).to.have.property(\"streetNumber\");\r",
+									"    pm.expect(json).to.have.property(\"postalCode\");\r",
+									"    pm.expect(json).to.have.property(\"city\");\r",
+									"    pm.expect(json).to.have.property(\"latitude\");\r",
+									"    pm.expect(json).to.have.property(\"longitude\");\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json).to.have.property(\"isFavoriteOf\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields are of correct type\", () => {\r",
+									"    pm.expect(json.systembolagID).to.be.a(\"number\");\r",
+									"    pm.expect(json.name).to.be.a(\"string\");\r",
+									"    pm.expect(json.street).to.be.a(\"string\");\r",
+									"    pm.expect(json.streetNumber).to.be.a(\"number\");\r",
+									"    pm.expect(json.postalCode).to.be.a(\"number\");\r",
+									"    pm.expect(json.city).to.be.a(\"string\");\r",
+									"    pm.expect(json.latitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.longitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.isFavoriteOf).to.be.an(\"array\");\r",
+									"})\r",
+									"\r",
 									"pm.test(\"correct JSON\", function () {\r",
 									"    pm.expect(1).to.eq(json.systembolagID);\r",
 									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
@@ -530,6 +556,96 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"systembolagID\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"longitude\": 654987,\r\n    \"latitude\": 465132\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAnotherNewSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All fields are present\", () => {\r",
+									"    pm.expect(json).to.have.property(\"systembolagID\");\r",
+									"    pm.expect(json).to.have.property(\"name\");\r",
+									"    pm.expect(json).to.have.property(\"street\");\r",
+									"    pm.expect(json).to.have.property(\"streetNumber\");\r",
+									"    pm.expect(json).to.have.property(\"postalCode\");\r",
+									"    pm.expect(json).to.have.property(\"city\");\r",
+									"    pm.expect(json).to.have.property(\"latitude\");\r",
+									"    pm.expect(json).to.have.property(\"longitude\");\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json).to.have.property(\"isFavoriteOf\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields are of correct type\", () => {\r",
+									"    pm.expect(json.systembolagID).to.be.a(\"number\");\r",
+									"    pm.expect(json.name).to.be.a(\"string\");\r",
+									"    pm.expect(json.street).to.be.a(\"string\");\r",
+									"    pm.expect(json.streetNumber).to.be.a(\"number\");\r",
+									"    pm.expect(json.postalCode).to.be.a(\"number\");\r",
+									"    pm.expect(json.city).to.be.a(\"string\");\r",
+									"    pm.expect(json.latitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.longitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.isFavoriteOf).to.be.an(\"array\");\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(2).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Sydbyn\").to.eq(json.name);\r",
+									"    pm.expect(\"Suedegatan\").to.eq(json.street);\r",
+									"    pm.expect(57).to.eq(json.streetNumber);\r",
+									"    pm.expect(78654).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Bötegorg\").to.eq(json.city);\r",
+									"    pm.expect(465132).to.eq(json.longitude);\r",
+									"    pm.expect(654987).to.eq(json.latitude);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"anotherSystembolagID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagID\": 2,\r\n    \"name\": \"Sydbyn\",\r\n    \"street\": \"Suedegatan\",\r\n    \"streetNumber\": 57,\r\n    \"postalCode\": 78654,\r\n    \"city\": \"Bötegorg\",\r\n    \"longitude\": 465132,\r\n    \"latitude\": 654987\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2140,14 +2256,71 @@
 			"name": "Systembolag",
 			"item": [
 				{
+					"name": "GetAllSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched all systembolag\", () => {\r",
+									"    pm.expect(json).to.have.property(\"systembolag\");\r",
+									"    pm.expect(json.systembolag).to.be.an(\"array\");\r",
+									"    pm.expect(json.systembolag.length).to.be.eq(2);\r",
+									"    pm.expect(json.systembolag[0]._id).to.eq(pm.globals.get(\"systembolagID\"));\r",
+									"    pm.expect(json.systembolag[1]._id).to.eq(pm.globals.get(\"anotherSystembolagID\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetSystembolagByID",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
 									"pm.test(\"Status code is 200\", function (){\r",
 									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag\", () => {\r",
+									"    pm.expect(1).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
+									"    pm.expect(75).to.eq(json.streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654987).to.eq(json.longitude);\r",
+									"    pm.expect(465132).to.eq(json.latitude); \r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -2169,6 +2342,153 @@
 								"v1",
 								"systembolag",
 								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSystembolagsAddress",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolags address\", () => {\r",
+									"    pm.expect(json).to.have.property(\"address\");\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.address.street);\r",
+									"    pm.expect(75).to.eq(json.address.streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.address.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.address.city);\r",
+									"    pm.expect(654987).to.eq(json.address.longitude);\r",
+									"    pm.expect(465132).to.eq(json.address.latitude); \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/address",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"address"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddProductToSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 201\", () => {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag's stock\", () => {\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock.length).to.be.above(0, \"hasInStock shouldn't be empty here\");\r",
+									"    pm.expect(json.hasInStock[0]).to.be.eq(pm.globals.get(\"drinkID\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{drinkID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProductsAtSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag's stock\", () => {\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock.length).to.be.eq(1);\r",
+									"    pm.expect(json.hasInStock[0]._id).to.be.eq(pm.globals.get(\"drinkID\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"products"
 							]
 						}
 					},
@@ -2828,6 +3148,41 @@
 								"v1",
 								"systembolag",
 								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAnotherSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{anotherSystembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{anotherSystembolagID}}"
 							]
 						}
 					},
