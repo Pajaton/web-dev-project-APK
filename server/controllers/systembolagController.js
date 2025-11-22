@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 var Systembolag = require("../models/SystembolagSchema");
+const { json } = require("body-parser");
 
 // GET ROUTE DEFINITIONS
 
@@ -16,59 +17,75 @@ router.get("/systembolag", async (req, res, next) => {
 
 // Get a list of products available at Systembolaget
 router.get("/systembolag/products", async (req, res, next) => {
-    const products = await Systembolag
-        .find()
-        .select("hasStockOf")
-        .catch(err => { next(err) });
-
-    return res.json({ "products": products });
+    try{
+        const products = await Systembolag
+            .find()
+            .select("hasStockOf");
+        if (!products) {
+            return res.status(404).json({"message": "No products found"});
+        }
+        return res.json({ "products": products });
+    } catch(err){ next(err) };
 });
 
 // Get list of products available at a specific systembolag
 router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
     // Logic to get list of products available at a specific store
-    const drinksAtASystembolag = await Systembolag
-        .findById(req.params.systembolagId)
-        .populate("hasInStock") // Removes dangling references by default
-        .catch(err => { next(err) });
-
-    return res.status(200).json({ "hasInStock": drinksAtASystembolag.hasInStock });
+    try {
+        const drinksAtASystembolag = await Systembolag
+            .findById(req.params.systembolagId)
+            .populate("hasInStock"); // Removes dangling references by default
+        if (!drinksAtASystembolag) {
+            return res.status(404).json({"message": "No products found at this store"});
+        } 
+        return res.status(200).json({ "hasInStock": drinksAtASystembolag.hasInStock });        
+    }catch(err) { next(err) };
 });
 
 // Get product availability at a specific systembolag
 router.get("/systembolag/:systembolagId/products/:productId", async (req, res, next) => {
-    const drinksInStockAtASystembolag = await Systembolag
-        .findById(req.params.systembolagId)
-        .populate({
-            "hasInStock": {
-                match: {
-                    _id: req.params.productId
+    try {
+        const drinksInStockAtASystembolag = await Systembolag
+            .findById(req.params.systembolagId)
+            .populate({
+                "hasInStock": {
+                    match: {
+                        _id: req.params.productId
+                    }
                 }
-            }
-        })
-        .catch(err => { next(err) });
-
-    return res.json({ "hasInStock": drinksInStockAtASystembolag.hasInStock[0] });
+            });
+        if (!drinksInStockAtASystembolag) {
+            return res.status(404).json({"message": "The product is not available at this systembolag"});
+        }
+        return res.json({ "hasInStock": drinksInStockAtASystembolag.hasInStock[0] });
+    } catch(err) { next(err) };
 });
 
 // Get the location of a specific Systembolaget store
 router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
     // Logic to get a Systembolaget store's address
-    const systembolagAddress = await Systembolag
-        .findById(req.params.systembolagId)
-        .select("street streetNumber postalCode city longitude latitude")
-        .catch(err => { next(err) });
+    try {
+        const systembolagAddress = await Systembolag
+            .findById(req.params.systembolagId)
+            .select("street streetNumber postalCode city longitude latitude");
+        if(!systembolagAddress) {
+            return res.status(404).json({"message": "No adress found for this systembolag"});
+        }
+        return res.json({ "address": systembolagAddress });        
+     } catch(err) { next(err) };
 
-    return res.json({ "address": systembolagAddress });
 });
 
 // Get details of a specific Systembolaget store
 router.get("/systembolag/:systembolagId", async (req, res, next) => {
-    const mySystembolag = await Systembolag
-        .findById(req.params.systembolagId)
-        .catch(err => { next(err) });
-
-    return res.json(mySystembolag)
+    try{
+        const mySystembolag = await Systembolag
+            .findById(req.params.systembolagId);
+        if (!mySystembolag) {
+            return res.status(404).json({"message": "The systembolag was not found"});
+        }
+            return res.json(mySystembolag);
+    } catch(err) { next(err) };
 });
 
 
