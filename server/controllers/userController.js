@@ -27,7 +27,22 @@ router.get("/users/:userId", async (req, res, next) => {
         if (!user) {
             return res.status(404).json({"message": "User was not found"});
         }
-        return res.json(user);
+
+        // Convert Mongoose document to plain object for addition of "_links"
+        const userObject = user.toObject();
+
+        userObject._links = {
+            self: `/users/${userObject.userID}`,
+            update: { url: `/users/${userObject.userID}`, method: "PATCH" },
+            delete: { url: `/users/${userObject.userID}`, method: "DELETE" },
+            follows: `/users/${userObject.userID}/follows`,
+            favoritesDrinks: `/users/${userObject.userID}/favorites/drinks`,
+            favoritesSystembolag: `/users/${userObject.userID}/favorites/systembolag`,
+            settings: `/users/${userObject.userID}/settings`,
+            drinks: `/users/${userObject.userID}/drinks`
+        };
+
+        return res.json(userObject);
     } catch(err) { next(err) };
 });
 
