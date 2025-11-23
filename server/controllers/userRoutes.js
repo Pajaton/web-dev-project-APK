@@ -57,7 +57,6 @@ router.get("/api/v1/users/:userId/alcoholConsumed", async (req, res) => {
     res.json({
         userId: user.userID,
         alcoholConsumed: user.alcoholConsumed,
-        timestamp: user.timstamp
     });
 });
 
