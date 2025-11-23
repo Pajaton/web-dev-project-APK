@@ -71,6 +71,10 @@ app.use(function(err, req, res, next) {
         // Return sensitive stack trace only in dev mode
         err_res['error'] = err.stack;
     }
+    if (err.name === "ValidationError") {
+        const errors = Object.keys(err.errors).map( key => err.errors[key].message);
+        return res.status(400).json({"message": `Validation error: ${errors}`});
+    }
     res.status(err.status || 500);
     res.json(err_res);
 });
