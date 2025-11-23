@@ -55,7 +55,6 @@ router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
     try{
         const user = await User
             .findById(req.params.userId)
-            .where("triedDrinks.favorite")
             .populate("triedDrinks.drink") // populate the "drink" field
         if (!user) {
             return res.status(404).json({"message": "User was not found"})
