@@ -642,6 +642,140 @@
 			},
 			"response": []
 		},
+				{
+			"name": "CreateNewAlcConsumed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function (){\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"correct JSON\", function () {\r",
+							"    pm.expect(500).to.eq(json.volume);\r",
+							"    pm.expect(5).to.eq(json.percent);\r",
+							"\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{userID}}",
+						"alcoholConsumed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserAlcConsumed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var json = pm.response.json();\r",
+							"\r",
+							"pm.test.skip(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test.skip(\"User has consumed drinks attribute\", () => {\r",
+							"    pm.expect(json).to.have.property(\"alcoholConsumed\");\r",
+							"    pm.expect(json.alcoholConsumed).to.be.an(\"object\");\r",
+							"});\r",
+							"\r",
+							"pm.test.skip(\"User alcoholConsumed has correct fields\", () => {\r",
+							"    pm.expect(json.alcoholConsumed).to.have.property(\"volume\");\r",
+							"    pm.expect(json.alcoholConsumed).to.have.property(\"percent\");\r",
+							"    pm.expect(json.alcoholConsumed).to.have.property(\"_id\");\r",
+							"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test.skip(\"The fields have the correct types\", () => {\r",
+							"    const json = pm.response.json()\r",
+							"    const entry = json.alcoholConsumed[0];\r",
+							"    \r",
+							"    pm.expect(entry.volume).to.be.a(\"number\");\r",
+							"    pm.expect(entry.percent).to.be.a(\"number\");\r",
+							"    pm.expect(entry._id).to.be.a(\"string\");\r",
+							"    const ts = entry.timestamp;\r",
+							"    pm.expect(!isNaN(Date.parse(ts))).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{userID}}",
+						"alcoholConsumed"
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "DeleteUser",
 			"event": [
@@ -783,140 +917,6 @@
 						"v1",
 						"reviews",
 						"{{reviewID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateNewAlcConsumed",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var json = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"correct JSON\", function () {\r",
-							"    pm.expect(500).to.eq(json.volume);\r",
-							"    pm.expect(5).to.eq(json.percent);\r",
-							"\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}",
-						"alcoholConsumed"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetUserAlcConsumed",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var json = pm.response.json();\r",
-							"\r",
-							"pm.test.skip(\"Status code is 200\", () => {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"pm.test.skip(\"User has consumed drinks attribute\", () => {\r",
-							"    pm.expect(json).to.have.property(\"alcoholConsumed\");\r",
-							"    pm.expect(json.alcoholConsumed).to.be.an(\"object\");\r",
-							"});\r",
-							"\r",
-							"pm.test.skip(\"User alcoholConsumed has correct fields\", () => {\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"volume\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"percent\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"_id\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test.skip(\"The fields have the correct types\", () => {\r",
-							"    const json = pm.response.json()\r",
-							"    const entry = json.alcoholConsumed[0];\r",
-							"    \r",
-							"    pm.expect(entry.volume).to.be.a(\"number\");\r",
-							"    pm.expect(entry.percent).to.be.a(\"number\");\r",
-							"    pm.expect(entry._id).to.be.a(\"string\");\r",
-							"    const ts = entry.timestamp;\r",
-							"    pm.expect(!isNaN(Date.parse(ts))).to.be.true;\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}",
-						"alcoholConsumed"
 					]
 				}
 			},
