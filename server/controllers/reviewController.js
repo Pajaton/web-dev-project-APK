@@ -97,18 +97,19 @@ router.patch("/reviews/:reviewId", async (req, res, next) => {
         if (!updatedReview) {
             return res.status(404).json({"message": "Review not found"});
         } 
+    
+
+        // Update the review's fields if new values are provided
+        updatedReview.userID = (req.body.userID || updatedReview.userID);
+        updatedReview.productID = (req.body.productID || updatedReview.productID);
+        updatedReview.rating = (req.body.rating || updatedReview.rating);
+        updatedReview.comment = (req.body.comment || updatedReview.comment);
+
+        // Save the updated review to the database
+        await updatedReview.save().catch(err => { next(err) });
+
+        return res.json(updatedReview);
     } catch(err) { next(err) };
-
-    // Update the review's fields if new values are provided
-    updatedReview.userID = (req.body.userID || updatedReview.userID);
-    updatedReview.productID = (req.body.productID || updatedReview.productID);
-    updatedReview.rating = (req.body.rating || updatedReview.rating);
-    updatedReview.comment = (req.body.comment || updatedReview.comment);
-
-    // Save the updated review to the database
-    await updatedReview.save().catch(err => { next(err) });
-
-    return res.json(updatedReview);
 });
 
 // PUT ROUTE DEFINITIONS
