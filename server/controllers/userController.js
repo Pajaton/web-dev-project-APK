@@ -10,7 +10,13 @@ router.get("/users", async (req, res, next) => {
         .find()
         .catch(err => { next(err) });
 
-    return res.json({ "users": users });
+    return res.json({ 
+        "users": users,
+        "_links": {
+            "self": "/users",
+            "create": { "url": "/users", "method": "POST" }
+        }
+    });
 });
 
 // Get a user's profile
