@@ -23,7 +23,7 @@ router.get("/reviews/:reviewId", async (req, res, next) => {
             return res.status(404).json({"message": "Review not found"});
         }
         return res.json(review)
-    } catch(er) { next(err) };
+    } catch(err) { next(err) };
 });
 
 // Get all reviews for a specific drink
@@ -74,15 +74,16 @@ router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
 
 // Create a new review for a drink
 router.post("/reviews", async (req, res, next) => {
-    var newReview = new Review({
-        "userID": req.body.userID,
-        "productID": req.body.productID,
-        "rating": req.body.rating,
-        "comment": req.body.comment,
-    });
-    await newReview.save().catch(err => { next(err) });
-
-    return res.status(201).json(newReview);
+    try {
+        var newReview = new Review({
+            "userID": req.body.userID,
+            "productID": req.body.productID,
+            "rating": req.body.rating,
+            "comment": req.body.comment,
+        });
+        await newReview.save();
+        return res.status(201).json(newReview);
+    } catch(err) { next(err) };
 });
 
 // PATCH ROUTE DEFINITIONS
@@ -90,9 +91,13 @@ router.post("/reviews", async (req, res, next) => {
 // Update a specific review
 router.patch("/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
-    const updatedReview = await Review
-        .findById(req.params.reviewId)
-        .catch(err => { next(err) });
+    try {
+        const updatedReview = await Review
+            .findById(req.params.reviewId);
+        if (!updatedReview) {
+            return res.status(404).json({"message": "Review not found"});
+        } 
+    } catch(err) { next(err) };
 
     // Update the review's fields if new values are provided
     updatedReview.userID = (req.body.userID || updatedReview.userID);
@@ -111,41 +116,46 @@ router.patch("/reviews/:reviewId", async (req, res, next) => {
 // Replace a specific review
 router.put("/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
-    const updatedReview = await Review
-        .findByIdAndUpdate(
-            req.params.reviewId,
-            {
-                userID: req.body.userID,
-                productID: req.body.productID,
-                rating: req.body.rating,
-                comment: req.body.comment,
-            },
-            { new: true }
-        )
-        .catch(err => { next(err) });
-
-
-    return res.json(updatedReview);
+    try {
+        const updatedReview = await Review
+            .findByIdAndUpdate(
+                req.params.reviewId,
+                {
+                    userID: req.body.userID,
+                    productID: req.body.productID,
+                    rating: req.body.rating,
+                    comment: req.body.comment,
+                },
+                { new: true }
+            );
+        if (!updatedReview) {
+            return res.status(404).json({"message": "Review not found"});
+        } return res.json(updatedReview);
+    } catch(err) { next(err) };
 });
 
 // DELETE ROUTE DEFINITIONS
 
 // Delete a specific review
 router.delete("/reviews/:reviewId", async (req, res, next) => {
-    const reviewToDelete = await Review
-        .findByIdAndDelete(req.params.reviewId)
-        .catch(err => { next(err) });
-
-    return res.json(reviewToDelete);
+    try {
+        const reviewToDelete = await Review
+            .findByIdAndDelete(req.params.reviewId)
+        if (!reviewToDelete) {
+            return res.status(404).json({"message": "Review not found"})
+        } return res.json(reviewToDelete);
+    } catch(err) { next(err) };
 });
 
 // Delete all reviews (use with caution)
 router.delete("/reviews", async (req, res, next) => {
-    const reviewsToDelete = await Review
-        .deleteMany()
-        .catch(err=> {next(err) });
-
-    return res.json(reviewsToDelete);
+    try {
+        const reviewsToDelete = await Review
+            .deleteMany()
+        if (reviewsToDelete.deletedCount == 0) {
+            return res.status(404).json({"message": "No reviews found"})
+        } return res.json(reviewsToDelete);
+    } catch(err) {next(err) };
 });
 
 module.exports = router;
