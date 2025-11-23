@@ -123,10 +123,10 @@ router.post("/api/v1/users/:userId/alcoholConsumed", async (req, res, next) => {
 
     await user.save().catch(err=>{next(err)});
 
-    res.status(201).json({
-            message: "Alcohol entry added",
-            userId: user._id
-    });
+    //fetch the latest consumed entry
+    const createdEntry = user.alcoholConsumed[user.alcoholConsumed.length - 1];
+
+    res.status(201).json(createdEntry);
 });
 
 // PATCH ROUTE DEFINITIONS
