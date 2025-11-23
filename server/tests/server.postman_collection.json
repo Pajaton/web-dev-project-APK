@@ -839,7 +839,7 @@
 									"    pm.expect(user2.reviewsWritten.length).to.eq(0);",
 									"});",
 									"",
-									"pm.test.skip(\"HATEOAS links exist\", () => {",
+									"pm.test(\"HATEOAS links exist\", () => {",
 									"    pm.expect(json).to.have.property(\"_links\");",
 									"    pm.expect(json._links).to.have.property(\"self\");",
 									"    pm.expect(json._links.self).to.eql(\"/users\");",
@@ -919,7 +919,7 @@
 									"    pm.expect(123123).to.eq(json.latitude);\r",
 									"});\r",
 									"\r",
-									"pm.test.skip(\"HATEOAS links exist\", () => {\r",
+									"pm.test(\"HATEOAS links exist\", () => {\r",
 									"    pm.expect(json).to.have.property('_links');\r",
 									"    \r",
 									"    pm.expect(json._links).to.have.property('self');\r",
@@ -3905,7 +3905,7 @@
 		},
 		{
 			"key": "userSchema",
-			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userID\":{\"type\":\"number\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"userID\":{\"type\":\"number\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"userID\",\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"userID\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":false}"
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userID\":{\"type\":\"number\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"userID\":{\"type\":\"number\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"userID\",\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"userID\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
 		},
 		{
 			"key": "reviewSchema",
