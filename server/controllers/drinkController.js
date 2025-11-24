@@ -54,21 +54,22 @@ router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next)
 // POST ROUTES DEFINITION
 
 router.post("/drinks", async (req, res, next) => {
-    const newDrink = new Drink({
-        "productNumber": req.body.productNumber,
-        "name": req.body.name,
-        "type": req.body.type,
-        "container": req.body.container,
-        "volume": req.body.volume,
-        "percentage": req.body.percentage,
-        "colour": req.body.colour,
-        "price": req.body.price,
-        "image": req.body.image,
-        "apk": req.body.apk
-    });
-    await newDrink.save().catch(err => { next(err) });
-
-    return res.status(201).json(newDrink);
+    try{
+        const newDrink = new Drink({
+            "productNumber": req.body.productNumber,
+            "name": req.body.name,
+            "type": req.body.type,
+            "container": req.body.container,
+            "volume": req.body.volume,
+            "percentage": req.body.percentage,
+            "colour": req.body.colour,
+            "price": req.body.price,
+            "image": req.body.image,
+            "apk": req.body.apk
+        });
+        await newDrink.save();
+        return res.status(201).json(newDrink);
+    } catch(err) {next(err) };
 });
 
 
@@ -79,26 +80,30 @@ router.post("/drinks", async (req, res, next) => {
 // Update an existing drink
 router.patch("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
-    const drinkToUpdate = await Drink
-        .findById(req.params.drinkId)
-        .catch(err => { next(err) });
-
-    // Update the drink's fields if new values are provided
-    drinkToUpdate.productNumber = (req.body.productNumber || drinkToUpdate.productNumber);
-    drinkToUpdate.name = (req.body.name || drinkToUpdate.name);
-    drinkToUpdate.type = (req.body.type || drinkToUpdate.type);
-    drinkToUpdate.container = (req.body.container || drinkToUpdate.container);
-    drinkToUpdate.volume = (req.body.volume || drinkToUpdate.volume);
-    drinkToUpdate.percentage = (req.body.percentage || drinkToUpdate.percentage);
-    drinkToUpdate.colour = (req.body.colour || drinkToUpdate.colour);
-    drinkToUpdate.price = (req.body.price || drinkToUpdate.price);
-    drinkToUpdate.image = (req.body.image || drinkToUpdate.image);
-    drinkToUpdate.apk = (req.body.apk || drinkToUpdate.apk);
-    
-    // Save the updated drink to the database
-    await drinkToUpdate.save().catch(err => { next(err) });
-
-    return res.json(drinkToUpdate);
+    try {
+        const drinkToUpdate = await Drink
+            .findById(req.params.drinkId);
+        if (!drinkToUpdate) {
+            return res.status(404).json({"message": "Drink was not found"});
+        }
+        
+        // Update the drink's fields if new values are provided
+        drinkToUpdate.productNumber = (req.body.productNumber || drinkToUpdate.productNumber);
+        drinkToUpdate.name = (req.body.name || drinkToUpdate.name);
+        drinkToUpdate.type = (req.body.type || drinkToUpdate.type);
+        drinkToUpdate.container = (req.body.container || drinkToUpdate.container);
+        drinkToUpdate.volume = (req.body.volume || drinkToUpdate.volume);
+        drinkToUpdate.percentage = (req.body.percentage || drinkToUpdate.percentage);
+        drinkToUpdate.colour = (req.body.colour || drinkToUpdate.colour);
+        drinkToUpdate.price = (req.body.price || drinkToUpdate.price);
+        drinkToUpdate.image = (req.body.image || drinkToUpdate.image);
+        drinkToUpdate.apk = (req.body.apk || drinkToUpdate.apk);
+        
+        // Save the updated drink to the database
+        await drinkToUpdate.save().catch(err => { next(err) });
+        
+        return res.json(drinkToUpdate);
+    } catch (err) { next(err) };
 });
 
 
@@ -110,24 +115,26 @@ router.patch("/drinks/:drinkId", async (req, res, next) => {
 // Replace an existing drink
 router.put("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
-    const drinkToUpdate = await Drink
-        .findByIdAndUpdate(
-            req.params.drinkId,
-            { "productNumber": req.body.productNumber,
-              "name": req.body.name,
-              "type": req.body.type,
-              "container": req.body.container,
-              "volume": req.body.volume,
-              "percentage": req.body.percentage,
-              "colour": req.body.colour,
-              "price": req.body.price,
-              "image": req.body.image,
-              "apk": req.body.apk },
-            { new: true }  // return the updated document
-        )
-        .catch(err => { next(err) });
-
-    return res.json(drinkToUpdate);
+    try {
+        const drinkToUpdate = await Drink
+            .findByIdAndUpdate(
+                req.params.drinkId,
+                { "productNumber": req.body.productNumber,
+                  "name": req.body.name,
+                  "type": req.body.type,
+                  "container": req.body.container,
+                  "volume": req.body.volume,
+                  "percentage": req.body.percentage,
+                  "colour": req.body.colour,
+                  "price": req.body.price,
+                  "image": req.body.image,
+                  "apk": req.body.apk },
+                { new: true }  // return the updated document
+            );
+            if (!drinkToUpdate) {
+                return res.status(404).json({"message": "Drink was not found"});
+            } return res.json(drinkToUpdate);
+        } catch(err) { next(err) };
 });
 
 
@@ -137,11 +144,13 @@ router.put("/drinks/:drinkId", async (req, res, next) => {
 
 
 router.delete("/drinks/:drinkId", async (req, res, next) => {
-    const deletedDrink = await Drink
-        .findByIdAndDelete(req.params.drinkId) 
-        .catch(err => { next(err) });
-
-    return res.json(deletedDrink);
+    try {
+        const deletedDrink = await Drink
+            .findByIdAndDelete(req.params.drinkId);
+        if (!deletedDrink) {
+            return res.status(404).json({"message": "Drink was not found"})
+        } return res.json(deletedDrink);
+    } catch(err) { next(err) };
 });
 
 module.exports = router;
