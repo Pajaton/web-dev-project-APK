@@ -16,6 +16,11 @@ var userSchema = new Schema({
         "notifications": {type: Boolean, default: true},
         "language": {type: String, default: "en"}
     },
+    "alcoholConsumed": [{
+        "volume": {type: Number},
+        "percent": {type: Number},
+        "timestamp": {type: Date, default: Date.now}
+    }],
 
     // The composite address field from the ER diagram
     "street": {type: String},
