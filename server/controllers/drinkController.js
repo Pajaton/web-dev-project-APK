@@ -5,19 +5,30 @@ var Drink = require("../models/DrinkSchema");
 
 // GET ROUTES DEFINITION
 // Sort by adding ?sort=price to sort by price for example http://localhost:3000/api/v1/drinks?sort=colour
+// Filter by adding ?type=Beer to filter by type for example http://localhost:3000/api/v1/drinks?type=Beer
+// Combine sorting and filtering, e.g., ?sort=price&type=Beer
 router.get("/drinks", async (req, res, next) => {
     try {
+        let {sort: sortQuery, ...filterQuery} = req.query;
         const existingAttributes = ["productNumber", "name", "type", "container", "volume", "percentage", "colour", "price", "apk"];
-        let sortQuery = req.query.sort;
+        const allowedFilters = ["type", "percentage", "price", "apk"];
+        const filters = {};
+
+        allowedFilters.forEach(filter => {
+            if (filterQuery[filter]) {
+                filters[filter] = filterQuery[filter];
+            }
+        });
 
         if (!sortQuery) {
             sortQuery = "apk";
-        }
-        else if (!existingAttributes.includes(sortQuery)) {
+        } else if (!existingAttributes.includes(sortQuery)) {
             return res.status(400).json({"message": `You can't sort drinks by ${sortQuery}`})
         }
 
-        const drinks = await Drink.find().sort({[sortQuery]: 1}); // -1 descending, 1 ascending
+        const drinks = await Drink
+            .find(filters)
+            .sort({[sortQuery]: 1}); // -1 descending, 1 ascending
 
         return res.json({ "drinks": drinks });
     } catch(err) {next(err)};
