@@ -50,7 +50,7 @@ if (jsonDate > oldDate) {
                             "colour": newDrink.colour,
                             "price": newDrink.price,
                             "image": newDrink.image,
-                            "apk": (newDrink.percentage * newDrink.volume) / newDrink.price
+                            "apk": ((newDrink.percentage / 100) * newDrink.volume) / newDrink.price
                         })
                     });
                 }
@@ -72,7 +72,7 @@ if (jsonDate > oldDate) {
                         "colour": newDrink.colour,
                         "price": newDrink.price,
                         "image": newDrink.image,
-                        "apk": (newDrink.percentage * newDrink.volume) / newDrink.price
+                        "apk": ((newDrink.percentage / 100) * newDrink.volume) / newDrink.price
                     })
                 });
             }
