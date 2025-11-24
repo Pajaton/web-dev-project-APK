@@ -96,15 +96,16 @@ router.get("/users/:userId/favorites/drinks", async (req, res, next) => {
 
 // Get a user's favorite Systembolag store
 router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
-    const user = await User
-        .findById(req.params.userId)
-        .populate("favoriteSystembolag") // populate the "favoriteSystembolag" field
-        .catch(err => { next(err) });
+    try {
+        const user = await User
+            .findById(req.params.userId)
+            .populate("favoriteSystembolag"); // populate the "favoriteSystembolag" field
 
-    if (!user.favoriteSystembolag) {
-        return res.status(404).json({ "favoriteSystembolag": undefined });
-    }
-    return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
+        if (!user.favoriteSystembolag) {
+            return res.status(404).json({ "favoriteSystembolag": undefined });
+        }
+        return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
+    } catch(err) { next(err) };
 });
 
 router.get("/users/:userId/drinks", async (req, res, next) => {
@@ -119,6 +120,22 @@ router.get("/users/:userId/drinks", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
+router.get("/users/:userId/alcoholConsumed", async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({"message":"No user found"});
+        }
+
+        res.json({
+            userId: user.userID,
+            alcoholConsumed: user.alcoholConsumed,
+            timestamp: user.timstamp
+        });
+    } catch(err) { next(err) };
+});
 
 // POST ROUTE DEFINITIONS
 
@@ -158,6 +175,32 @@ router.post("/sessions", async (req, res) => {
         return res.status(201).json({
             "message": "Logged in successfully",
             "user": user,
+        });
+    } catch(err) { next(err) };
+});
+
+router.post("/users/:userId/alcoholConsumed", async (req, res, next) => {
+    try {
+        //Could possibly add some data error fault handling in case the server receives the wrong 
+        //data type, even if the frontend enforces correct data type input
+        const userId = req.params.userId;
+        const {volume, percent} = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({"message":"No user found"});
+            }
+
+        user.alcoholConsumed.push({
+                volume,
+                percent
+        });
+
+        await user.save().catch(err=>{next(err)});
+
+        res.status(201).json({
+                volume: volume,
+                percent: percent
         });
     } catch(err) { next(err) };
 });
