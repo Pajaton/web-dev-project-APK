@@ -1,12 +1,4634 @@
 {
 	"info": {
-		"_postman_id": "5e775558-820e-43b9-b570-49eaf6d03b02",
+		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50127910",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50127910-5e775558-820e-43b9-b570-49eaf6d03b02?action=share&source=collection_link&creator=50127910"
+		"_exporter_id": "50199247",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50199247"
 	},
 	"item": [
+		{
+			"name": "CreatePosts",
+			"item": [
+				{
+					"name": "CreateNewUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(1).to.eq(json.userID);\r",
+									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
+									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
+									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
+									"    pm.expect(\"Herkulesvägen\").to.eq(json.street);\r",
+									"    pm.expect(42).to.eq(json.streetNumber);\r",
+									"    pm.expect(55555).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654654).to.eq(json.longitude);\r",
+									"    pm.expect(123123).to.eq(json.latitude);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"userID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": 1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InitNewUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response follows schema\", () => {",
+									"    pm.expect(json.user).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"User Successfully logged in\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"userID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"greger@hawkwind.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateOneMoreNewUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 201\", function (){",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"Correct user info\", () => {",
+									"    pm.expect(3).to.eq(json.userID);",
+									"    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(json.email);",
+									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);",
+									"    pm.expect(\"Bob\").to.eq(json.userName);",
+									"});",
+									"",
+									"pm.test(\"Correct user address\", () => {",
+									"    pm.expect(\"Gatans väg\").to.eq(json.street);",
+									"    pm.expect(1337).to.eq(json.streetNumber);",
+									"    pm.expect(66655).to.eq(json.postalCode);",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);",
+									"    pm.expect(654652).to.eq(json.longitude);",
+									"    pm.expect(123124).to.eq(json.latitude);",
+									"});",
+									"",
+									"pm.test(\"User has correctly initialized the 1:N or M:N relationships\", () => {",
+									"    // Check if the 'follows' relationship is empty and is an array.",
+									"    pm.expect(json.follows).to.be.an('array');",
+									"    pm.expect(json.follows.length).to.eq(0);",
+									"",
+									"    // Check if the 'triedDrinks' relationship is empty and is an array.",
+									"    pm.expect(json.triedDrinks).to.be.an('array');",
+									"    pm.expect(json.triedDrinks.length).to.eq(0);",
+									"",
+									"    // Check if the 'reviewsWritten' relationship is empty and is an array.",
+									"    pm.expect(json.reviewsWritten).to.be.an('array');",
+									"    pm.expect(json.reviewsWritten.length).to.eq(0);",
+									"})",
+									"",
+									"pm.globals.set(\"targetID\", json._id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userID\": 3,\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InitOneMoreNewUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response follows schema\", () => {",
+									"    pm.expect(json.user).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"User Successfully logged in\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"targetID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateNewDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Laphroaig 10 Years\").to.eq(json.name);\r",
+									"    pm.expect(\"Maltwhisky\").to.eq(json.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(json.container);\r",
+									"    pm.expect(700).to.eq(json.volume);\r",
+									"    pm.expect(40).to.eq(json.percentage);\r",
+									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(json.colour);\r",
+									"    pm.expect(519).to.eq(json.price);\r",
+									"    pm.expect(\"bottle.jpg\").to.eq(json.image);\r",
+									"    pm.expect(66).to.eq(json.apk);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"drinkID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productNumber\": \"some number\",\r\n    \"name\":\"Laphroaig 10 Years\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 40,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 519,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 66\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAnotherNewDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Festis Kaktus Lime\").to.eq(json.name);\r",
+									"    pm.expect(\"Saft\").to.eq(json.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(json.container);\r",
+									"    pm.expect(500).to.eq(json.volume);\r",
+									"    pm.expect(0).to.eq(json.percentage);\r",
+									"    pm.expect(\"Shrek-grön\").to.eq(json.colour);\r",
+									"    pm.expect(25).to.eq(json.price);\r",
+									"    pm.expect(\"bottle.jpg\").to.eq(json.image);\r",
+									"    pm.expect(0).to.eq(json.apk);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"triedDrinkID\", json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productNumber\": \"Festis\",\r\n    \"name\":\"Festis Kaktus Lime\",\r\n    \"type\": \"Saft\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 500,\r\n    \"percentage\": 0,\r\n    \"colour\": \"Shrek-grön\",\r\n    \"price\": 25,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateNewSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(systembolagSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(1).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
+									"    pm.expect(75).to.eq(json.streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654987).to.eq(json.longitude);\r",
+									"    pm.expect(465132).to.eq(json.latitude);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"systembolagID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagID\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"longitude\": 654987,\r\n    \"latitude\": 465132\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAnotherNewSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(systembolagSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All fields are present\", () => {\r",
+									"    pm.expect(json).to.have.property(\"systembolagID\");\r",
+									"    pm.expect(json).to.have.property(\"name\");\r",
+									"    pm.expect(json).to.have.property(\"street\");\r",
+									"    pm.expect(json).to.have.property(\"streetNumber\");\r",
+									"    pm.expect(json).to.have.property(\"postalCode\");\r",
+									"    pm.expect(json).to.have.property(\"city\");\r",
+									"    pm.expect(json).to.have.property(\"latitude\");\r",
+									"    pm.expect(json).to.have.property(\"longitude\");\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json).to.have.property(\"isFavoriteOf\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields are of correct type\", () => {\r",
+									"    pm.expect(json.systembolagID).to.be.a(\"number\");\r",
+									"    pm.expect(json.name).to.be.a(\"string\");\r",
+									"    pm.expect(json.street).to.be.a(\"string\");\r",
+									"    pm.expect(json.streetNumber).to.be.a(\"number\");\r",
+									"    pm.expect(json.postalCode).to.be.a(\"number\");\r",
+									"    pm.expect(json.city).to.be.a(\"string\");\r",
+									"    pm.expect(json.latitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.longitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.isFavoriteOf).to.be.an(\"array\");\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(2).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Sydbyn\").to.eq(json.name);\r",
+									"    pm.expect(\"Suedegatan\").to.eq(json.street);\r",
+									"    pm.expect(57).to.eq(json.streetNumber);\r",
+									"    pm.expect(78654).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Bötegorg\").to.eq(json.city);\r",
+									"    pm.expect(465132).to.eq(json.longitude);\r",
+									"    pm.expect(654987).to.eq(json.latitude);\r",
+									"})\r",
+									"\r",
+									"pm.globals.set(\"anotherSystembolagID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagID\": 2,\r\n    \"name\": \"Sydbyn\",\r\n    \"street\": \"Suedegatan\",\r\n    \"streetNumber\": 57,\r\n    \"postalCode\": 78654,\r\n    \"city\": \"Bötegorg\",\r\n    \"longitude\": 465132,\r\n    \"latitude\": 654987\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateNewReview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(reviewSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(pm.globals.get(\"userID\")).to.eq(json.userID);\r",
+									"    pm.expect(pm.globals.get(\"drinkID\")).to.eq(json.productID);\r",
+									"    pm.expect(5).to.eq(json.rating);\r",
+									"    pm.expect(\"Very good gummi snodd\").to.eq(json.comment);\r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"reviewID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 5,\r\n    \"comment\": \"Very good gummi snodd\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAnotherNewReview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(reviewSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(pm.globals.get(\"userID\")).to.eq(json.userID);\r",
+									"    pm.expect(pm.globals.get(\"triedDrinkID\")).to.eq(json.productID);\r",
+									"    pm.expect(5).to.eq(json.rating);\r",
+									"    pm.expect(\"Makabert\").to.eq(json.comment);\r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"reviewID\",json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{triedDrinkID}}\",\r\n    \"rating\": 5,\r\n    \"comment\": \"Makabert\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{triedDrinkID}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateNewAlcConsumed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test.skip(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"correct JSON\", function () {\r",
+									"    pm.expect(500).to.eq(json.volume);\r",
+									"    pm.expect(5).to.eq(json.percent);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"alcoholConsumed"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GetAllUsers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"const user1 = json.users[0];",
+									"const user2 = json.users[1];",
+									"",
+									"pm.test(\"Status code is 200\", function (){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Fetched all users.\", function() { ",
+									"    pm.expect(json.users.length).to.eq(2);",
+									"    pm.expect(json.users[0]).to.not.eq(json.users[1]);",
+									"});",
+									"",
+									"pm.test(\"Users follow schema\", () => {",
+									"    json.users.forEach(user => {",
+									"        pm.expect(user).to.have.jsonSchema(userSchema);",
+									"    })",
+									"})",
+									"",
+									"pm.test(\"User 1 is correct\", () => {",
+									"    pm.expect(\"greger@hawkwind.com\").to.eq(user1.email);",
+									"    pm.expect(\"face.jpg\").to.eq(user1.profilePicture);",
+									"    pm.expect(\"Greger\").to.eq(user1.userName);",
+									"    pm.expect(\"Herkulesvägen\").to.eq(user1.street);",
+									"    pm.expect(42).to.eq(user1.streetNumber);",
+									"    pm.expect(55555).to.eq(user1.postalCode);",
+									"    pm.expect(\"Göteborg\").to.eq(user1.city);",
+									"    pm.expect(654654).to.eq(user1.longitude);",
+									"    pm.expect(123123).to.eq(user1.latitude);",
+									"    pm.expect(user1.follows.length).to.eq(0);",
+									"    pm.expect(user1.triedDrinks.length).to.eq(0);",
+									"    pm.expect(user1.reviewsWritten.length).to.eq(0);",
+									"});",
+									"",
+									"pm.test(\"User 2 is correct\", () => {",
+									"    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(user2.email);",
+									"    pm.expect(\"face.jpg\").to.eq(user2.profilePicture);",
+									"    pm.expect(\"Bob\").to.eq(user2.userName);",
+									"    pm.expect(\"Gatans väg\").to.eq(user2.street);",
+									"    pm.expect(1337).to.eq(user2.streetNumber);",
+									"    pm.expect(66655).to.eq(user2.postalCode);",
+									"    pm.expect(\"Göteborg\").to.eq(user2.city);",
+									"    pm.expect(654652).to.eq(user2.longitude);",
+									"    pm.expect(123124).to.eq(user2.latitude);",
+									"    pm.expect(user2.follows.length).to.eq(0);",
+									"    pm.expect(user2.triedDrinks.length).to.eq(0);",
+									"    pm.expect(user2.reviewsWritten.length).to.eq(0);",
+									"});",
+									"",
+									"pm.test(\"HATEOAS links exist\", () => {",
+									"    pm.expect(json).to.have.property(\"_links\");",
+									"    pm.expect(json._links).to.have.property(\"self\");",
+									"    pm.expect(json._links.self).to.eql(\"/users\");",
+									"    pm.expect(json._links).to.have.property(\"create\");",
+									"    pm.expect(json._links.create.url).to.eql(\"/users\");",
+									"    pm.expect(json._links.create.method).to.eql(\"POST\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fetched correct user info\", () => {\r",
+									"    pm.expect(1).to.eq(json.userID);\r",
+									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
+									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
+									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
+									"    pm.expect(\"Herkulesvägen\").to.eq(json.street);\r",
+									"    pm.expect(42).to.eq(json.streetNumber);\r",
+									"    pm.expect(55555).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654654).to.eq(json.longitude);\r",
+									"    pm.expect(123123).to.eq(json.latitude);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"HATEOAS links exist\", () => {\r",
+									"    pm.expect(json).to.have.property('_links');\r",
+									"    \r",
+									"    pm.expect(json._links).to.have.property('self');\r",
+									"    pm.expect(json._links.self).to.eql(`/users/${json.userID}`);\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('update');\r",
+									"    pm.expect(json._links.update.url).to.eql(`/users/${json.userID}`);\r",
+									"    pm.expect(json._links.update.method).to.eql(\"PATCH\");\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('delete');\r",
+									"    pm.expect(json._links.delete.url).to.eql(`/users/${json.userID}`);\r",
+									"    pm.expect(json._links.delete.method).to.eql(\"DELETE\");\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('follows');\r",
+									"    pm.expect(json._links.follows).to.eql(`/users/${json.userID}/follows`);\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('favoritesDrinks');\r",
+									"    pm.expect(json._links.favoritesDrinks)\r",
+									"        .to.eql(`/users/${json.userID}/favorites/drinks`);\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('favoritesSystembolag');\r",
+									"    pm.expect(json._links.favoritesSystembolag)\r",
+									"        .to.eql(`/users/${json.userID}/favorites/systembolag`);\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('settings');\r",
+									"    pm.expect(json._links.settings).to.eql(`/users/${json.userID}/settings`);\r",
+									"\r",
+									"    pm.expect(json._links).to.have.property('drinks');\r",
+									"    pm.expect(json._links.drinks).to.eql(`/users/${json.userID}/drinks`);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmptyUserFollows",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User does not follow any other users\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddUserFollower",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function (){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"User successfully follows a user.\", () => {",
+									"    pm.expect(json.follows.length).to.equal(1);",
+									"    pm.expect(json._id).to.not.equal(json.follows[0]);",
+									"    pm.expect(json.follows[0]).to.equal(pm.globals.get(\"targetID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{targetID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows",
+								"{{targetID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AttemptToFollowSelf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", () => {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"User unsuccessfully follows themselves.\", () => {",
+									"    pm.expect(json.message).to.eql(\"Users cannot follow themselves\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserFollows",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    console.log(json.follows[0]);\r",
+									"    pm.expect(json.follows.length).to.be.eq(1); // Assuming at least one follow is expected\r",
+									"    pm.expect(json.follows[0]).has.property('userID');\r",
+									"    pm.expect(json.follows[0]).has.property('profilePicture');\r",
+									"    pm.expect(json.follows[0]).has.property('userName');\r",
+									"    pm.expect(json.follows[0].userID).to.not.eq(json.userID);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmptyUserTriedDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches message for no drinks tried\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.equal(\"User has not tried any drinks\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmptyUserFavoriteDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches message for no favorite drinks\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.equal(\"User has no favorite drinks\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserTriesADrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function (){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"User successfully favorites a drink\", () => {",
+									"    pm.expect(json.triedDrinks).to.be.an(\"array\");",
+									"    pm.expect(json.triedDrinks[0].drink).to.be.a(\"string\");",
+									"    pm.expect(json.triedDrinks[0].drink).to.eq(pm.globals.get(\"triedDrinkID\"));",
+									"    pm.expect(json.triedDrinks.length).to.eq(1);",
+									"    pm.expect(json.triedDrinks[0].favorite).to.be.false;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/drinks/{{triedDrinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"drinks",
+								"{{triedDrinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserTriedDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"const drink = json.triedDrinks[0].drink;\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Tried drinks follow schema\", () => {\r",
+									"    json.triedDrinks.forEach(triedDrink => {\r",
+									"        pm.expect(triedDrink.drink).to.have.jsonSchema(drinkSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user's tried drinks\", () => {\r",
+									"    pm.expect(json.triedDrinks).to.be.an('array');\r",
+									"    pm.expect(json.triedDrinks.length).to.be.eq(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Values of user's tried drinks are correct\", () => {\r",
+									"    pm.expect(drink.name).to.eq('Festis Kaktus Lime');\r",
+									"    pm.expect(drink.type).to.eq('Saft');\r",
+									"    pm.expect(drink.container).to.eq('Flaska');\r",
+									"    pm.expect(drink.volume).to.eq(500);\r",
+									"    pm.expect(drink.percentage).to.eq(0);\r",
+									"    pm.expect(drink.colour).to.eq('Shrek-grön');\r",
+									"    pm.expect(drink.price).to.eq(25);\r",
+									"    pm.expect(drink.image).to.eq('bottle.jpg');\r",
+									"    pm.expect(drink.apk).to.eq(0);\r",
+									"    pm.expect(drink.hasReviews).to.be.empty;\r",
+									"    pm.expect(drink.availableAt).to.be.empty;\r",
+									"    pm.expect(drink.triedBy).to.be.empty;\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserFavoritesNewDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User successfully favorites a drink\", () => {",
+									"    pm.expect(json.favoriteDrinks).to.be.an(\"array\");",
+									"    pm.expect(json.favoriteDrinks.length).to.eq(1);",
+									"    pm.expect(json.favoriteDrinks[0].drink).to.be.a(\"string\");",
+									"    pm.expect(json.favoriteDrinks[0].drink).to.eq(pm.globals.get(\"drinkID\"));",
+									"    pm.expect(json.favoriteDrinks[0].favorite).to.be.true;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserFavoriteDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user's favorite drinks\", () => {\r",
+									"    pm.expect(json.favoriteDrinks).to.be.an('array');\r",
+									"    pm.expect(json.favoriteDrinks.length).to.be.eq(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Favorite drinks follow schema\", () => {\r",
+									"    json.favoriteDrinks.forEach(favDrink => {\r",
+									"        pm.expect(favDrink).to.have.jsonSchema(drinkSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Values of user's favorite drinks are correct\", () => {\r",
+									"    pm.expect(json.favoriteDrinks[0].name).to.eq('Laphroaig 10 Years');\r",
+									"    pm.expect(json.favoriteDrinks[0].type).to.eq('Maltwhisky');\r",
+									"    pm.expect(json.favoriteDrinks[0].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[0].volume).to.eq(700);\r",
+									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(40);\r",
+									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Mörk, gyllengul färg');\r",
+									"    pm.expect(json.favoriteDrinks[0].price).to.eq(519);\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(66);\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserFavoritesExistingDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User successfully favorites a drink\", () => {",
+									"    pm.expect(json.favoriteDrinks).to.be.an(\"array\");",
+									"    pm.expect(json.favoriteDrinks[0].drink).to.be.a(\"string\");",
+									"    pm.expect(json.favoriteDrinks[0].drink).to.eq(pm.globals.get(\"triedDrinkID\"));",
+									"    pm.expect(json.favoriteDrinks.length).to.eq(2);",
+									"    pm.expect(json.favoriteDrinks[0].favorite).to.be.true;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks/{{triedDrinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks",
+								"{{triedDrinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserFavoriteDrinksAgain",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user's favorite drinks\", () => {\r",
+									"    pm.expect(json.favoriteDrinks).to.be.an('array');\r",
+									"    pm.expect(json.favoriteDrinks.length).to.be.eq(2);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Favorite drinks follow schema\", () => {\r",
+									"    json.favoriteDrinks.forEach(favDrink => {\r",
+									"        pm.expect(favDrink).to.have.jsonSchema(drinkSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
+									"    pm.expect(json.favoriteDrinks[0].name).to.eq('Festis Kaktus Lime');\r",
+									"    pm.expect(json.favoriteDrinks[0].type).to.eq('Saft');\r",
+									"    pm.expect(json.favoriteDrinks[0].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[0].volume).to.eq(500);\r",
+									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(0);\r",
+									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Shrek-grön');\r",
+									"    pm.expect(json.favoriteDrinks[0].price).to.eq(25);\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(0);\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields of user's favorite drinks are correct\", () => {\r",
+									"    pm.expect(json.favoriteDrinks[1].name).to.eq('Laphroaig 10 Years');\r",
+									"    pm.expect(json.favoriteDrinks[1].type).to.eq('Maltwhisky');\r",
+									"    pm.expect(json.favoriteDrinks[1].container).to.eq('Flaska');\r",
+									"    pm.expect(json.favoriteDrinks[1].volume).to.eq(700);\r",
+									"    pm.expect(json.favoriteDrinks[1].percentage).to.eq(40);\r",
+									"    pm.expect(json.favoriteDrinks[1].colour).to.eq('Mörk, gyllengul färg');\r",
+									"    pm.expect(json.favoriteDrinks[1].price).to.eq(519);\r",
+									"    pm.expect(json.favoriteDrinks[1].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[1].apk).to.eq(66);\r",
+									"    pm.expect(json.favoriteDrinks[1].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[1].availableAt).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[1].triedBy).to.be.empty;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserNoFavoriteSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Unable to fetch user's favorite systembolag\", () => {\r",
+									"    pm.expect(json.favoriteSystembolag).to.be.undefined;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserFavoritesSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"});",
+									"",
+									"pm.test(\"User successfully favorites a drink\", () => {",
+									"    pm.expect(json.favoriteSystembolag).to.be.not.null;",
+									"    pm.expect(json.favoriteSystembolag).to.be.not.undefined;",
+									"    pm.expect(json.favoriteSystembolag).to.be.a('string');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserFavoriteSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user's favorite systembolag\", () => {\r",
+									"    pm.expect(json.favoriteSystembolag).to.be.not.null;\r",
+									"    pm.expect(json.favoriteSystembolag).to.be.not.undefined;\r",
+									"    pm.expect(json.favoriteSystembolag._id).to.eq(pm.globals.get(\"systembolagID\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.expect(json.favoriteSystembolag).to.have.jsonSchema(systembolagSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Fields of favorite systembolag is correct\", () => {\r",
+									"    pm.expect(json.favoriteSystembolag.name).to.eq('Nordstan');\r",
+									"    pm.expect(json.favoriteSystembolag.street).to.eq('Velourvägen');\r",
+									"    pm.expect(json.favoriteSystembolag.streetNumber).to.eq(75);\r",
+									"    pm.expect(json.favoriteSystembolag.postalCode).to.eq(45687);\r",
+									"    pm.expect(json.favoriteSystembolag.city).to.eq('Göteborg');\r",
+									"    pm.expect(json.favoriteSystembolag.longitude).to.eq(654987);\r",
+									"    pm.expect(json.favoriteSystembolag.latitude).to.eq(465132);\r",
+									"    pm.expect(json.favoriteSystembolag.hasInStock).to.be.empty;\r",
+									"    pm.expect(json.favoriteSystembolag.isFavoriteOf).to.be.empty;\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserAlcConsumed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test.skip(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"User has consumed drinks attribute\", () => {\r",
+									"    pm.expect(json).to.have.property(\"alcoholConsumed\");\r",
+									"    pm.expect(json.alcoholConsumed).to.be.an(\"object\");\r",
+									"});\r",
+									"\r",
+									"pm.test.skip(\"User alcoholConsumed has correct fields\", () => {\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"volume\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"percent\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"_id\");\r",
+									"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test.skip(\"The fields have the correct types\", () => {\r",
+									"    const json = pm.response.json()\r",
+									"    const entry = json.alcoholConsumed[0];\r",
+									"    \r",
+									"    pm.expect(entry.volume).to.be.a(\"number\");\r",
+									"    pm.expect(entry.percent).to.be.a(\"number\");\r",
+									"    pm.expect(entry._id).to.be.a(\"string\");\r",
+									"    const ts = entry.timestamp;\r",
+									"    pm.expect(!isNaN(Date.parse(ts))).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"alcoholConsumed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateUserByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User follows schema\", () => {\r",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"evert@raoul.com\").to.eq(json.email);\r",
+									"    pm.expect(\"feet.jpg\").to.eq(json.profilePicture);\r",
+									"    pm.expect(\"Evert\").to.eq(json.userName);\r",
+									"    pm.expect(\"Magnoliagatan\").to.eq(json.street);\r",
+									"    pm.expect(56).to.eq(json.streetNumber);\r",
+									"    pm.expect(45654).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Lindome\").to.eq(json.city);\r",
+									"    pm.expect(333333).to.eq(json.longitude);\r",
+									"    pm.expect(2222222).to.eq(json.latitude);\r",
+									"\r",
+									"    pm.expect(json.settings.darkMode).to.be.true;\r",
+									"    pm.expect(json.settings.notifications).to.be.false;\r",
+									"    pm.expect(json.settings.language).to.eq(\"sv\");\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"evert@raoul.com\",\r\n    \"profilePicture\":\"feet.jpg\",\r\n    \"userName\":\"Evert\",\r\n    \"street\":\"Magnoliagatan\",\r\n    \"streetNumber\":56,\r\n    \"postalCode\":45654,\r\n    \"city\":\"Lindome\",\r\n    \"longitude\":333333,\r\n    \"latitude\":2222222,\r\n    \"settings\": {\r\n        \"darkMode\": true,\r\n        \"notifications\": false,\r\n        \"language\": \"sv\" \r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfollowUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"})",
+									"",
+									"pm.test(\"Successfully unfollows a user\", () => {",
+									"    pm.expect(pm.globals.get(\"userID\")).not.to.equal(json.targetID);",
+									"    pm.expect(json.follows).to.not.include(pm.globals.get(\"targetID\"));",
+									"    pm.expect(json.follows.length).to.eq(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows/{{targetID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows",
+								"{{targetID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfavoriteDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"})",
+									"",
+									"pm.test(\"Successfully unfavorites a drink\", () => {",
+									"    pm.expect(json.triedDrinks.length).to.eq(1);",
+									"    pm.expect(json.triedDrinks).to.not.include(json.drinkID);",
+									"    pm.expect(json.triedDrinks[0].drink).to.eq(pm.globals.get(\"triedDrinkID\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnfavoriteSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json).to.have.jsonSchema(userSchema);",
+									"})",
+									"",
+									"pm.test(\"Successfully unfavorites a drink\", () => {",
+									"    pm.expect(json.systembolag).to.be.undefined;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteUserSession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User follows schema\", () => {",
+									"    pm.expect(json.user).to.have.jsonSchema(userSchema);",
+									"})",
+									"",
+									"pm.test(\"Session deleted successfully\", () => {",
+									"    pm.expect(json.message).to.eql(\"Logged out successfully\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Systembolag",
+			"item": [
+				{
+					"name": "GetAllSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched all systembolag\", () => {\r",
+									"    pm.expect(json).to.have.property(\"systembolag\");\r",
+									"    pm.expect(json.systembolag).to.be.an(\"array\");\r",
+									"    pm.expect(json.systembolag.length).to.be.above(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    json.systembolag.forEach(systembolag => {\r",
+									"        pm.expect(systembolag).to.have.jsonSchema(systembolagSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The systembolag have correct primary keys\", () => {\r",
+									"    // The first systembolag\r",
+									"    pm.expect(json.systembolag[0]._id).to.eq(pm.globals.get(\"systembolagID\"));\r",
+									"\r",
+									"    // The second systembolag\r",
+									"    pm.expect(json.systembolag[1]._id).to.eq(pm.globals.get(\"anotherSystembolagID\"));\r",
+									"\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The first systembolag's values are correct\", () => {\r",
+									"    pm.expect(pm.globals.get(\"systembolagID\")).to.eq(json.systembolag[0]._id);\r",
+									"    pm.expect(1).to.eq(json.systembolag[0].systembolagID);\r",
+									"    pm.expect(\"Nordstan\").to.eq(json.systembolag[0].name);\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.systembolag[0].street);\r",
+									"    pm.expect(75).to.eq(json.systembolag[0].streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.systembolag[0].postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.systembolag[0].city);\r",
+									"    pm.expect(654987).to.eq(json.systembolag[0].longitude);\r",
+									"    pm.expect(465132).to.eq(json.systembolag[0].latitude); \r",
+									"});\r",
+									"\r",
+									"pm.test(\"The second systembolag's values are correct\", () => {\r",
+									"    pm.expect(pm.globals.get(\"anotherSystembolagID\")).to.eq(json.systembolag[1]._id);\r",
+									"    pm.expect(2).to.eq(json.systembolag[1].systembolagID);\r",
+									"    pm.expect(\"Sydbyn\").to.eq(json.systembolag[1].name);\r",
+									"    pm.expect(\"Suedegatan\").to.eq(json.systembolag[1].street);\r",
+									"    pm.expect(57).to.eq(json.systembolag[1].streetNumber);\r",
+									"    pm.expect(78654).to.eq(json.systembolag[1].postalCode);\r",
+									"    pm.expect(\"Bötegorg\").to.eq(json.systembolag[1].city);\r",
+									"    pm.expect(465132).to.eq(json.systembolag[1].longitude);\r",
+									"    pm.expect(654987).to.eq(json.systembolag[1].latitude); \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSystembolagByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.response.to.have.jsonSchema(systembolagSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag\", () => {\r",
+									"    pm.expect(pm.globals.get(\"systembolagID\")).to.eq(json._id);\r",
+									"    pm.expect(1).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
+									"    pm.expect(75).to.eq(json.streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
+									"    pm.expect(654987).to.eq(json.longitude);\r",
+									"    pm.expect(465132).to.eq(json.latitude); \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSystembolagsAddress",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolags address\", () => {\r",
+									"    pm.expect(json).to.have.property(\"address\");\r",
+									"    pm.expect(\"Velourvägen\").to.eq(json.address.street);\r",
+									"    pm.expect(75).to.eq(json.address.streetNumber);\r",
+									"    pm.expect(45687).to.eq(json.address.postalCode);\r",
+									"    pm.expect(\"Göteborg\").to.eq(json.address.city);\r",
+									"    pm.expect(654987).to.eq(json.address.longitude);\r",
+									"    pm.expect(465132).to.eq(json.address.latitude); \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/address",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"address"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddProductToSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function (){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.response.to.have.jsonSchema(systembolagSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag's stock\", () => {\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock.length).to.be.above(0, \"hasInStock shouldn't be empty here\");\r",
+									"    pm.expect(json.hasInStock[0]).to.be.eq(pm.globals.get(\"drinkID\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{drinkID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProductsAtSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched systembolag's stock\", () => {\r",
+									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
+									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock.length).to.be.eq(1);\r",
+									"    pm.expect(json.hasInStock[0]._id).to.be.eq(pm.globals.get(\"drinkID\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Favorite drinks follow schema\", () => {\r",
+									"    json.hasInStock.forEach(drink => {\r",
+									"        pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All product fields are present\", () => {\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"_id\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"name\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"type\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"container\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"volume\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"percentage\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"colour\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"price\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"image\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"apk\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"hasReviews\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"availableAt\");\r",
+									"    pm.expect(json.hasInStock[0]).to.have.property(\"triedBy\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Fields are of correct type\", () => {\r",
+									"    pm.expect(json.hasInStock[0]._id).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].name).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].type).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].container).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].volume).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock[0].percentage).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock[0].colour).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].price).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock[0].image).to.be.a(\"string\");\r",
+									"    pm.expect(json.hasInStock[0].apk).to.be.a(\"number\");\r",
+									"    pm.expect(json.hasInStock[0].hasReviews).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock[0].availableAt).to.be.an(\"array\");\r",
+									"    pm.expect(json.hasInStock[0].triedBy).to.be.an(\"array\");\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Product details are correct\", () => {\r",
+									"    const product = json.hasInStock[0];\r",
+									"    pm.expect(product.name).to.eq(\"Laphroaig 10 Years\");\r",
+									"    pm.expect(product.type).to.eq(\"Maltwhisky\");\r",
+									"    pm.expect(product.container).to.eq(\"Flaska\");\r",
+									"    pm.expect(product.volume).to.eq(700);\r",
+									"    pm.expect(product.percentage).to.eq(40);\r",
+									"    pm.expect(product.colour).to.eq(\"Mörk, gyllengul färg\");\r",
+									"    pm.expect(product.price).to.eq(519);\r",
+									"    pm.expect(product.image).to.eq(\"bottle.jpg\");\r",
+									"    pm.expect(product.apk).to.eq(66);\r",
+									"    pm.expect(product.hasReviews).to.be.empty;\r",
+									"    pm.expect(product.availableAt).to.be.empty;\r",
+									"    pm.expect(product.triedBy).to.be.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateSystembolagByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.response.to.have.jsonSchema(systembolagSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(pm.globals.get(\"systembolagID\")).to.eq(json._id);\r",
+									"    pm.expect(5).to.eq(json.systembolagID);\r",
+									"    pm.expect(\"Krogen Skogen\").to.eq(json.name);\r",
+									"    pm.expect(\"Stigen\").to.eq(json.street);\r",
+									"    pm.expect(2).to.eq(json.streetNumber);\r",
+									"    pm.expect(12354).to.eq(json.postalCode);\r",
+									"    pm.expect(\"Hisingen\").to.eq(json.city);\r",
+									"    pm.expect(631321).to.eq(json.longitude);\r",
+									"    pm.expect(411558).to.eq(json.latitude);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagID\": 5,\r\n    \"name\": \"Krogen Skogen\",\r\n    \"street\": \"Stigen\",\r\n    \"streetNumber\": 2,\r\n    \"postalCode\": 12354,\r\n    \"city\": \"Hisingen\",\r\n    \"longitude\": 631321,\r\n    \"latitude\": 411558\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "GetAllReviews",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Successfully fetched all reviews\", () => {\r",
+									"    pm.expect(json).to.have.property(\"review\");\r",
+									"    pm.expect(json.review).to.be.an(\"array\");\r",
+									"    pm.expect(json.review.length).to.eq(2);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    json.review.forEach(review => {\r",
+									"        pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"    })\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Reviews have correct primary keys\", () => {\r",
+									"    // Check if the first review is from the correct user and product\r",
+									"    pm.expect(json.review[0].userID).to.eq(pm.globals.get(\"userID\"));\r",
+									"    pm.expect(json.review[0].productID).to.eq(pm.globals.get(\"drinkID\"));\r",
+									"    \r",
+									"    // Check if the second review is from the correct user and product\r",
+									"    pm.expect(json.review[1].userID).to.eq(pm.globals.get(\"userID\"));\r",
+									"    pm.expect(json.review[1].productID).to.eq(pm.globals.get(\"triedDrinkID\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReviewByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const review = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReviewsForDrinkByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const reviews = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched all reviews for a specific drink\", () => {\r",
+									"    pm.expect(reviews).to.have.property(\"reviewForDrink\");\r",
+									"    pm.expect(reviews.reviewForDrink).to.be.an(\"array\");\r",
+									"    pm.expect(reviews.reviewForDrink.length).to.be.above(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    reviews.reviewForDrink.forEach(review => {\r",
+									"        pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"    })\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReviewsByUserID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const reviews = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successfully fetched all reviews from a user\", () => {\r",
+									"    pm.expect(reviews).to.have.property(\"reviewedBy\");\r",
+									"    pm.expect(reviews.reviewedBy).to.be.an(\"array\");\r",
+									"    pm.expect(reviews.reviewedBy.length).to.be.above(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    reviews.reviewedBy.forEach(review => {\r",
+									"        pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"    })\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReviewForDrinkByUserID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/drinks/{{drinkID}}/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"drinks",
+								"{{drinkID}}",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(pm.globals.get(\"userID\")).to.eq(review.userID);\r",
+									"    pm.expect(pm.globals.get(\"drinkID\")).to.eq(review.productID);\r",
+									"    pm.expect(1).to.eq(review.rating);\r",
+									"    pm.expect(\"Wasn´t nice, taste like bajs\").to.eq(review.comment);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 1,\r\n    \"comment\": \"Wasn´t nice, taste like bajs\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewAboveMaxRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function (){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(review.message).to.eq(\"Validation error: Rating can not be more than 5\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 666,\r\n    \"comment\": \"Satanic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewBelowMinRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function (){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct error message\", function () {\r",
+									"    pm.expect(review.message).to.eq(\"Validation error: Rating must be atleast 1\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": -1,\r\n    \"comment\": \"It was frozen.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(review).to.have.jsonSchema(reviewSchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(pm.globals.get(\"userID\")).to.eq(review.userID);\r",
+									"    pm.expect(pm.globals.get(\"drinkID\")).to.eq(review.productID);\r",
+									"    pm.expect(3).to.eq(review.rating);\r",
+									"    pm.expect(\"It´s okey, by the way\").to.eq(review.comment);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 3,\r\n    \"comment\": \"It´s okey, by the way\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewAboveMaxRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function (){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(review.message).to.eq(\"Validation error: Rating can not be more than 5\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 666,\r\n    \"comment\": \"Satanic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReviewBelowMinRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var review = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function (){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct error message\", function () {\r",
+									"    pm.expect(review.message).to.eq(\"Validation error: Rating must be atleast 1\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": -1,\r\n    \"comment\": \"It was frozen.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Drinks",
+			"item": [
+				{
+					"name": "GetAllDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drinks = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    drinks.drinks.forEach(drink => {\r",
+									"        pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"    })\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDrinkByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDrinkAvailableAtNoSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Error message is correct\", () => {\r",
+									"    pm.expect(drink.message).to.eq(\"No Systembolag with drink in stock\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDrinkUnavailableAtASystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Error message is correct\", () => {\r",
+									"    pm.expect(drink.message).to.eq(\"The drink is not in stock at this Systembolag\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateDrinkByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Laphroaig Elements 2.0\").to.eq(drink.name);\r",
+									"    pm.expect(\"Maltwhisky\").to.eq(drink.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(drink.container);\r",
+									"    pm.expect(700).to.eq(drink.volume);\r",
+									"    pm.expect(59.6).to.eq(drink.percentage);\r",
+									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
+									"    pm.expect(1899).to.eq(drink.price);\r",
+									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(32).to.eq(drink.apk);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Laphroaig Elements 2.0\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 59.6,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 1899,\r\n    \"image\": \"bottle34.jpg\",\r\n    \"apk\": 32\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddSystembolagDrinkIsAvailableAt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Laphroaig Elements 2.0\").to.eq(drink.name);\r",
+									"    pm.expect(\"Maltwhisky\").to.eq(drink.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(drink.container);\r",
+									"    pm.expect(700).to.eq(drink.volume);\r",
+									"    pm.expect(59.6).to.eq(drink.percentage);\r",
+									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
+									"    pm.expect(1899).to.eq(drink.price);\r",
+									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(32).to.eq(drink.apk);\r",
+									"    pm.expect(1).to.eq(drink.availableAt.length);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagId\": \"{{systembolagID}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddAnotherSystembolagDrinkIsAvailableAt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Laphroaig Elements 2.0\").to.eq(drink.name);\r",
+									"    pm.expect(\"Maltwhisky\").to.eq(drink.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(drink.container);\r",
+									"    pm.expect(700).to.eq(drink.volume);\r",
+									"    pm.expect(59.6).to.eq(drink.percentage);\r",
+									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
+									"    pm.expect(1899).to.eq(drink.price);\r",
+									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(32).to.eq(drink.apk);\r",
+									"    pm.expect(2).to.eq(drink.availableAt.length);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"systembolagId\": \"{{systembolagID}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag/{{anotherSystembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag",
+								"{{anotherSystembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetDrinkAvailabilityAtSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink.availableAt).to.have.jsonSchema(systembolagSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetWhichSystembolagHasDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    drink.availableAt.forEach(systembolag => {\r",
+									"        pm.expect(systembolag).to.have.jsonSchema(systembolagSchema);\r",
+									"    })\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAndReplaceExistingDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.jsonSchema(drinkSchema);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"correct JSON\", function () {\r",
+									"    pm.expect(\"Hallonsaft\").to.eq(drink.name);\r",
+									"    pm.expect(\"Saft\").to.eq(drink.type);\r",
+									"    pm.expect(\"Flaska\").to.eq(drink.container);\r",
+									"    pm.expect(500).to.eq(drink.volume);\r",
+									"    pm.expect(0).to.eq(drink.percentage);\r",
+									"    pm.expect(\"Mörkröd\").to.eq(drink.colour);\r",
+									"    pm.expect(10).to.eq(drink.price);\r",
+									"    pm.expect(\"saftflaska.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(0).to.eq(drink.apk);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Hallonsaft\",\r\n    \"type\": \"Saft\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 500,\r\n    \"percentage\": 0,\r\n    \"colour\": \"Mörkröd\",\r\n    \"price\": 10,\r\n    \"image\": \"saftflaska.jpg\",\r\n    \"apk\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{triedDrinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{triedDrinkID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DeletePosts",
+			"item": [
+				{
+					"name": "DeleteUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedUser = pm.response.json();\r",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(deletedUser).to.have.jsonSchema(userSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteTargetUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedUser = pm.response.json();\r",
+									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(deletedUser).to.have.jsonSchema(userSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{targetID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{targetID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedDrink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(deletedDrink).to.have.jsonSchema(drinkSchema);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteTriedDrink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedDrink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(deletedDrink).to.have.jsonSchema(drinkSchema);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{triedDrinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{triedDrinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedSystembolag = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.expect(deletedSystembolag).to.have.jsonSchema(systembolagSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAnotherSystembolag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedSystembolag = pm.response.json();\r",
+									"const systembolagSchema = JSON.parse(pm.variables.get(\"systembolagSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Systembolag follows schema\", () => {\r",
+									"    pm.expect(deletedSystembolag).to.have.jsonSchema(systembolagSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/systembolag/{{anotherSystembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"systembolag",
+								"{{anotherSystembolagID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteReview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var deletedReview = pm.response.json();\r",
+									"const reviewSchema = JSON.parse(pm.variables.get(\"reviewSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function (){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(deletedReview).to.have.jsonSchema(reviewSchema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews",
+								"{{reviewID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAllReviews",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200: Reviews deleted\", function (){\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    }\r",
+									"});\r",
+									"pm.test(\"Status code is 404: Reviews not found\", function (){\r",
+									"    if (pm.response.code === 404) {\r",
+									"        pm.response.to.have.status(404);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/reviews",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAllUserSessions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is correct\", () => {",
+									"    pm.expect(json.message).to.eq(\"Logged out from all devices successfully\");",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "404Tests",
+			"item": [
+				{
+					"name": "GetMissingUserByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct response is received\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingUserFollows",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/follows",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"follows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingUserFavDrinks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correctly fetches user follows\", () => {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.eq(\"User was not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/drinks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{userID}}",
+								"favorites",
+								"drinks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingDrinkByID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.property(\"message\");\r",
+									"    pm.expect(drink.message).to.eq(\"Drink not found\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingDrinkSystembolagAvailability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.property(\"message\");\r",
+									"    pm.expect(drink.message).to.eq(\"Drink not found\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetMissingDrinkSpecificSystembolagAvailability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const drink = pm.response.json();\r",
+									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function (){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response follows schema\", () => {\r",
+									"    pm.expect(drink).to.have.property(\"message\");\r",
+									"    pm.expect(drink.message).to.eq(\"Drink not found\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/drinks/{{drinkID}}/systembolag/{{systembolagID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drinks",
+								"{{drinkID}}",
+								"systembolag",
+								"{{systembolagID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "GET /api",
 			"event": [
@@ -42,885 +4664,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "CreateNewUser",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"const response = pm.response.json();\r",
-							"pm.globals.set(\"userID\",response._id);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"userID\":1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"City\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetUserByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateUser",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"userID\":2,\r\n    \"email\":\"evert@raoul.com\",\r\n    \"profilePicture\":\"feet.jpg\",\r\n    \"userName\":\"Evert\",\r\n    \"street\":\"Magnoliagatan\",\r\n    \"streetNumber\":56,\r\n    \"postalCode\":45654,\r\n    \"City\":\"Lindome\",\r\n    \"longitude\":333333,\r\n    \"latitude\":2222222\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}"
-					],
-					"query": [
-						{
-							"key": "",
-							"value": null,
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateNewDrink",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"const response = pm.response.json();\r",
-							"pm.globals.set(\"drinkID\",response._id);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Laphroaig 10 Years\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 40,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 519,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 66\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/drinks",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"drinks"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetDrinkByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"drinks",
-						"{{drinkID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateDrinkByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Laphroaig Elements 2.0\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 59.6,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 1899,\r\n    \"image\": \"bottle34.jpg\",\r\n    \"apk\": 32\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"drinks",
-						"{{drinkID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateNewSystembolag",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"const response = pm.response.json();\r",
-							"pm.globals.set(\"systembolagID\",response._id);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"systembolagetID\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"longitude\": 654987,\r\n    \"latitude\": 465132\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/systembolag",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"systembolag"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetSystembolagByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"systembolag",
-						"{{systembolagID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateSystembolagByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"systembolagetID\": 5,\r\n    \"name\": \"Krogen Skogen\",\r\n    \"street\": \"Stigen\",\r\n    \"streetNumber\": 2,\r\n    \"postalCode\": 12354,\r\n    \"city\": \"Hisingen\",\r\n    \"longitude\": 631321,\r\n    \"latitude\": 411558\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"systembolag",
-						"{{systembolagID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateNewReview",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"const response = pm.response.json();\r",
-							"pm.globals.set(\"reviewID\",response._id);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 5,\r\n    \"comment\": \"Very good gummi snodd\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/reviews",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"reviews"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetReviewByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{reviewID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateReviewByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 1,\r\n    \"comment\": \"Wasn´t nice, taste like bajs\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{reviewID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateReviewByID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"userID\": \"{{userID}}\",\r\n    \"productID\": \"{{drinkID}}\",\r\n    \"rating\": 3,\r\n    \"comment\": \"It´s okey, by the way\",\r\n    \"reviewedBy\": \"{{userID}}\",\r\n    \"reviewOf\": \"{{drinkID}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{reviewID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteUser",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteDrink",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/drinks/{{drinkID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"drinks",
-						"{{drinkID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteSystembolag",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/systembolag/{{systembolagID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"systembolag",
-						"{{systembolagID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteReview",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function (){\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/v1/reviews/{{reviewID}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{reviewID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateNewAlcConsumed",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var json = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function (){\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"correct JSON\", function () {\r",
-							"    pm.expect(500).to.eq(json.volume);\r",
-							"    pm.expect(5).to.eq(json.percent);\r",
-							"\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"volume\": 500,\r\n    \"percent\": 5\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}",
-						"alcoholConsumed"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetUserAlcConsumed",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var json = pm.response.json();\r",
-							"\r",
-							"pm.test.skip(\"Status code is 200\", () => {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"pm.test.skip(\"User has consumed drinks attribute\", () => {\r",
-							"    pm.expect(json).to.have.property(\"alcoholConsumed\");\r",
-							"    pm.expect(json.alcoholConsumed).to.be.an(\"object\");\r",
-							"});\r",
-							"\r",
-							"pm.test.skip(\"User alcoholConsumed has correct fields\", () => {\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"volume\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"percent\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"_id\");\r",
-							"    pm.expect(json.alcoholConsumed).to.have.property(\"timestamp\");\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test.skip(\"The fields have the correct types\", () => {\r",
-							"    const json = pm.response.json()\r",
-							"    const entry = json.alcoholConsumed[0];\r",
-							"    \r",
-							"    pm.expect(entry.volume).to.be.a(\"number\");\r",
-							"    pm.expect(entry.percent).to.be.a(\"number\");\r",
-							"    pm.expect(entry._id).to.be.a(\"string\");\r",
-							"    const ts = entry.timestamp;\r",
-							"    pm.expect(!isNaN(Date.parse(ts))).to.be.true;\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/api/v1/users/{{userID}}/alcoholConsumed",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{userID}}",
-						"alcoholConsumed"
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"event": [
@@ -928,6 +4671,7 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -937,6 +4681,7 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -946,8 +4691,23 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://localhost:3000",
-			"type": "string"
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "userSchema",
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userID\":{\"type\":\"number\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"userID\":{\"type\":\"number\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"userID\",\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"userID\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
+		},
+		{
+			"key": "reviewSchema",
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userID\":{\"oneOf\":[{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"require\":[\"_id\",\"userName\"]},{\"type\":\"string\"}]},\"productID\":{\"oneOf\":[{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"name\":{\"type\":\"string\"}},\"required\":[\"_id\",\"name\"]},{\"type\":\"string\"}]},\"rating\":{\"type\":\"number\",\"minimum\":1,\"maximum\":5},\"comment\":{\"type\":\"string\"},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"userID\",\"productID\",\"rating\",\"comment\"],\"additionalProperties\":false}"
+		},
+		{
+			"key": "drinkSchema",
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"productNumber\":{\"type\":\"string\"},\"name\":{\"type\":\"string\"},\"type\":{\"type\":\"string\"},\"container\":{\"type\":\"string\"},\"volume\":{\"type\":\"number\"},\"percentage\":{\"type\":\"number\"},\"colour\":{\"type\":\"string\"},\"price\":{\"type\":\"number\"},\"image\":{\"type\":\"string\"},\"apk\":{\"type\":\"number\"},\"hasReviews\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"availableAt\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"triedBy\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"productNumber\",\"name\",\"type\",\"container\",\"volume\",\"percentage\",\"colour\",\"price\",\"image\",\"apk\",\"hasReviews\",\"availableAt\",\"triedBy\",\"__v\"],\"additionalProperties\":false}"
+		},
+		{
+			"key": "systembolagSchema",
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"systembolagID\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"hasInStock\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"isFavoriteOf\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"systembolagID\",\"name\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"hasInStock\",\"isFavoriteOf\",\"__v\"],\"additionalProperties\":false}"
 		}
 	]
 }

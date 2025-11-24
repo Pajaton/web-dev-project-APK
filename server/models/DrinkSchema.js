@@ -38,5 +38,4 @@ var drinkSchema = new Schema({
 })
 
 // Create a Mongoose model called "Drink" to interact with the "Drink" collection in the database
-//var Drink = mongoose.model("Drink", drinkSchema);
-module.exports=mongoose.model("drinks", drinkSchema);
+module.exports=mongoose.model("Drink", drinkSchema);
