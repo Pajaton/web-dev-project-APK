@@ -3,12 +3,13 @@ var path = require("path");
 const drinksURL = `http://localhost:3000/api/v1/drinks`;
 var oldDataDate = require("../Resources/lastImported.json");
 var oldDate = oldDataDate.lastImported;
-
 var filePath = path.join(__dirname, "..", "Resources", "drinkAssortment.json");
 var raw = fs.readFileSync(filePath, "utf8");
 var alcohol = JSON.parse(raw);
 var jsonDate = alcohol.assortmentDate;
 
+//Compare new document date to the one we previously added
+//Date feature can be tested by setting lastImported.json to date before the date of the new drinkAssortment.json you want to add.
 if (jsonDate > oldDate) {
     console.log("Adding new list");
     async function importAlcoholList() {
