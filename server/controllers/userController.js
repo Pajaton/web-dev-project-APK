@@ -119,6 +119,20 @@ router.get("/users/:userId/drinks", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
+router.get("/users/:userId/alcoholConsumed", async (req, res) => {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId).catch(err=>{
+        res.status(404).json({"message":"No user found"});
+    });
+    if (!user) {return;}
+
+    res.json({
+        userId: user.userID,
+        alcoholConsumed: user.alcoholConsumed,
+        timestamp: user.timstamp
+    });
+});
 
 // POST ROUTE DEFINITIONS
 
@@ -160,6 +174,31 @@ router.post("/sessions", async (req, res) => {
             "user": user,
         });
     } catch(err) { next(err) };
+});
+
+router.post("/users/:userId/alcoholConsumed", async (req, res, next) => {
+    //Could possibly add some data error fault handling in case the server receives the wrong 
+    //data type, even if the frontend enforces correct data type input
+    const userId = req.params.userId;
+    const {volume, percent} = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) 
+        return res.status(404).json({
+            message: "User not found"
+        });
+
+    user.alcoholConsumed.push({
+            volume,
+            percent
+    });
+
+    await user.save().catch(err=>{next(err)});
+
+    res.status(201).json({
+            volume: volume,
+            percent: percent
+    });
 });
 
 // PATCH ROUTE DEFINITIONS
