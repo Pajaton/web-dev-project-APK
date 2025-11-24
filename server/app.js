@@ -5,10 +5,11 @@ var path = require('path');
 var cors = require('cors');
 var history = require('connect-history-api-fallback');
 
-var usersController=require("./controllers/userRoutes");
-var drinkController=require("./controllers/drinkRoutes");
-var reviewController=require("./controllers/reviewRoutes");
-var systembolagetController=require("./controllers/systembolagRoutes");
+const apiVersion = 'v1';
+var usersController=require("./controllers/userController");
+var drinkController=require("./controllers/drinkController");
+var reviewController=require("./controllers/reviewController");
+var systembolagetController=require("./controllers/systembolagController");
 
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
@@ -39,11 +40,10 @@ app.get('/api', function(req, res) {
     res.json({'message': 'Welcome to your DIT342 backend ExpressJS project!'});
 });
 
-app.use(drinkController);
-app.use(usersController);
-app.use(reviewController);
-app.use(systembolagetController);
-
+app.use(`/api/${apiVersion}`, drinkController);
+app.use(`/api/${apiVersion}`, usersController);
+app.use(`/api/${apiVersion}`, reviewController);
+app.use(`/api/${apiVersion}`, systembolagetController);
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
@@ -70,6 +70,10 @@ app.use(function(err, req, res, next) {
     if (env === 'development') {
         // Return sensitive stack trace only in dev mode
         err_res['error'] = err.stack;
+    }
+    if (err.name === "ValidationError") {
+        const errors = Object.keys(err.errors).map( key => err.errors[key].message);
+        return res.status(400).json({"message": `Validation error: ${errors}`});
     }
     res.status(err.status || 500);
     res.json(err_res);
