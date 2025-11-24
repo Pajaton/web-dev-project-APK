@@ -29,6 +29,8 @@ router.get("/drinks/:drinkId/systembolag", async (req, res, next) => {
             .findById(req.params.drinkId)
             .populate("availableAt");
         if (!drinkInStockAt) {
+            return res.status(404).json({"message": "Drink not found"});
+        } else if (drinkInStockAt.availableAt.length === 0) {
             return res.status(404).json({"message": "No Systembolag with drink in stock"});
         }
         return res.json({"availableAt": drinkInStockAt.availableAt})
@@ -39,16 +41,21 @@ router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next)
     try {
         const drinkInStockAt = await Drink
             .findById(req.params.drinkId)
-            .populate({"availableAt": {
-                match: {
-                    _id: req.params.systembolagId
-                }}
-            });
-            if (!drinkInStockAt) {
-                return res.status(404).json({"message": "The drink is not in stock at this Systembolag"});
-            }
-            return res.json({ "availableAt": drinkInStockAt.availableAt });
-        } catch(err) { next(err) };
+            .populate("availableAt")
+         
+        if (!drinkInStockAt) {
+            return res.status(404).json({"message": "Drink not found"});
+        }
+
+        const isAvailableAt = drinkInStockAt.availableAt.find(systembolag => 
+            systembolag._id.toString() === req.params.systembolagId
+        );
+        
+        if (!isAvailableAt) {
+            return res.status(404).json({"message": "The drink is not in stock at this Systembolag"});
+        }
+        return res.json({ "availableAt": isAvailableAt });
+    } catch(err) { next(err) };
 });
 
 // POST ROUTES DEFINITION
@@ -106,6 +113,25 @@ router.patch("/drinks/:drinkId", async (req, res, next) => {
     } catch (err) { next(err) };
 });
 
+router.patch("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
+    try {
+        const updatedDrink = await Drink
+            .findById(req.params.drinkId);
+        if (!updatedDrink) {
+            return res.status(404).json({"message": "Drink was not found"});
+        }    
+
+        // Add the Systembolag to the availableAt array if not already present
+        if (!updatedDrink.availableAt.includes(req.params.systembolagId)) {
+            updatedDrink.availableAt.push(req.params.systembolagId);
+        }
+
+        // Save the updated Drink to the database
+        await updatedDrink.save().catch(err => { next(err) });
+
+        return res.json(updatedDrink);
+    } catch(err) { next(err) };
+});
 
 
 // PUT ROUTES DEFINITION

@@ -11,7 +11,7 @@ var reviewSchema = new Schema({
     "productID": {type: Schema.Types.ObjectId, ref: "Drink"},
 
     // Local attributes
-    "rating": {type: Number, min: [1, "Rating must be atleas 1"], max: [5, "Rating can not be more than 5"]},
+    "rating": {type: Number, min: [1, "Rating must be atleast 1"], max: [5, "Rating can not be more than 5"]},
     "comment": {type: String},
 })
 

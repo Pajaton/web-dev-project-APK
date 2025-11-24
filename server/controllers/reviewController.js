@@ -119,19 +119,20 @@ router.put("/reviews/:reviewId", async (req, res, next) => {
     // Find the review to update
     try {
         const updatedReview = await Review
-            .findByIdAndUpdate(
-                req.params.reviewId,
-                {
-                    userID: req.body.userID,
-                    productID: req.body.productID,
-                    rating: req.body.rating,
-                    comment: req.body.comment,
-                },
-                { new: true }
-            );
+            .findById(req.params.reviewId);
         if (!updatedReview) {
             return res.status(404).json({"message": "Review not found"});
-        } return res.json(updatedReview);
+        }
+
+        // Update the review's fields if new values are provided
+        updatedReview.userID = req.body.userID;
+        updatedReview.productID = req.body.productID;
+        updatedReview.rating = req.body.rating;
+        updatedReview.comment = req.body.comment;
+        
+        await updatedReview.save().catch(err => { next(err) });
+        
+        return res.json(updatedReview);
     } catch(err) { next(err) };
 });
 
