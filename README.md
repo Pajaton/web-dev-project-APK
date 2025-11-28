@@ -87,6 +87,28 @@ The system will be using Systembolaget's API to fetch the data needed.
 
 ![ER Diagram](./images/er_diagram.png)
 
+### Proposal for the Advanced Feature
+
+#### The idea:
+- Allow users to find the nearest public toilet, and how to get there.
+
+#### How it's done:
+1. Page requests coordinates from a user (current GPS location).
+2. If a user allows access to their current GPS location, the frontend will send a request, for the info needed to put the map together for the user, to the backend. The request also includes the user's coordinates.
+3. The backend then builds the URL to call the Refuge API to fetch the coordinates of the nearest n public toilets based on the user's current location.
+4. The response returned by the Refuge API contains the requested n nearest public toilets, together with their coordinates, establishments and more.
+5. The backend then extracts the needed information (e.g. coordinates and establishments), some useful information (e.g. accessibility and gendered or unisex), and some generally interesting information (e.g. upvotes and downvotes).
+6. The backend then calculates the user's map index based on their coordinates (to be uset for fetching the Open Street Map(OSM) map tile). This calculation is performed here to ensure the n nearest public toilets are present on the map tile (appropriate zoom level is used).
+7. The backend proceeds to build the URL for fetching the visual map tile.
+8. After receiving the map tile, the bounding box will be calculated based on the user's current map index.
+9. Then with the bounding box values, the backend makes a request to OSM for the map tile's underlying information (e.g. ways, nodes, area-types) to allow for processing of the directions.
+10. The backend then responds to the frontend's initial request with the map tile, and the map tile's information.
+11. The frontend calculates the relative position of the toilets, to be able to mark them down on the received visual map tile (e.g. by placing a toilet emoji where the toilets are located). This because the latitude and longitude values are based on the global map, so this calculation is necessary to allow for proper placement.
+12. By pressing one of the marked toilets, the user can get information of each one of them, upvote/downvote and get the directions to a toilet.
+13. After selecting a target toilet, the frontend calculates the shortest path from the user's current location to the target toilet by implementing an A-star algorithm. (Cost is total number of ways/nodes to get there from the user's current location)
+14. After calculating the shortest path, (which is returned in form of the nodes and ways required to get to the target location), the frontend will have to translate the nodes' and ways' coordinates in order to properly draw the directions along the map's visual roads and paths.
+15. Once these calculations are done, the frontend will draw the directions onto the map represented as dots and display it to the user.
+
 ## Teaser (MS3)
 
 ![Teaser](./images/teaser.png)
