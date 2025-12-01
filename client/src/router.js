@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from './views/Home.vue'
+import APK from './views/APK.vue'
 
 const routes = [
-  { path: '/', name: 'home', component: Home }
+  { path: '/home', name: 'home', component: Home },
+  { path: '/apk', name: 'APK', component: APK}
 ]
 
 const router = createRouter({

@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link>
+      <!-- Navbar component here instead of individual routes-->
+      <router-link to="/home">Home </router-link>
+      <router-link to="/apk">Drinks</router-link>
     </div>
     <!-- Render the content of the current page view -->
     <router-view/>
