@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var mongoose = require('mongoose');
 var morgan = require('morgan');
 var path = require('path');
@@ -14,6 +15,7 @@ var systembolagetController=require("./controllers/systembolagController");
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
 var port = process.env.PORT || 3000;
+const hour = 1000 * 60 * 60;
 
 // Connect to MongoDB
 mongoose.connect(mongoURI).catch(function(err) {
@@ -29,6 +31,12 @@ var app = express();
 // Parse requests of content-type 'application/json'
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session({
+    secret: 'apekå',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, }
+}));
 // HTTP request logger
 app.use(morgan('dev'));
 // Enable cross-origin resource sharing for frontend must be registered before api
@@ -37,7 +45,24 @@ app.use(cors());
 
 // Import routes
 app.get('/api', function(req, res) {
-    res.json({'message': 'Welcome to your DIT342 backend ExpressJS project!'});
+    res.json({ // TODO! Remove session details from response
+        'sID': req.sessionID,
+        'cookie': req.session.cookie 
+    });
+});
+
+// Session check route for unregistered users, used to check if an
+// age prompt is needed
+app.get('/api/guest-sessions', function(req, res) {
+    let isNewSession = false;
+
+    if (req.session.cookie.maxAge == null ) { // 1 hour
+        isNewSession = true;
+    }
+
+    req.session.cookie.maxAge = hour;
+
+    return res.json({ 'newSession': isNewSession });
 });
 
 app.use(`/api/${apiVersion}`, drinkController);
