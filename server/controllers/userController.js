@@ -465,7 +465,7 @@ router.delete("/sessions", (req, res) => {
         }
 
         return res.json({
-            "message": "Logged everyone out from all devices successfully"
+            "message": "Logged out from all devices successfully"
         });
     });
 });
