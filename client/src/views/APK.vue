@@ -3,100 +3,67 @@
     <div>
         <form @submit.prevent="submitFilter">
             <p>Filter for drinks:</p>
-            
+
             <ul class="filter-list">
                 <li>
                     <label>
                         <input 
-                            type="radio" 
+                            type="checkbox"
                             name="drink-filter" 
                             value="type"
-                            v-model="selectedFilter">
-                        Type of beverage
-                            <input
-                                v-if="selectedFilter === 'type'"
-                                type="text"
-                                v-model="typeText"
-                                placeholder="Enter beverage type"
-                            />
-                            <button @click="getMessage('?type=' + capitalizeFirst(typeText))"
-                                v-if="selectedFilter  === 'type'"
-                                type="submit">
-                            Get drinks
-                            </button>
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input
-                            type="radio" 
-                            name="drink-filter" 
-                            value="percentage"
-                            v-model="selectedFilter">
-                        Alcohol percentage
-                            <input
-                                v-if="selectedFilter === 'percentage'"
-                                type="text"
-                                v-model="percentageText"
-                                placeholder="Enter alcohol percentage"
-                            />
-                            <button 
-                                v-if="selectedFilter  === 'percentage'"
-                                type="submit">
-                            Get drinks
-                            </button>
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input
-                            type="radio" 
-                            name="drink-filter" 
-                            value="price"
-                            v-model="selectedFilter">
-                        Price
-                            <input
-                                v-if="selectedFilter === 'price'"
-                                type="text"
-                                v-model="priceText"
-                                placeholder="Enter price"
-                            />
-                            <button 
-                                v-if="selectedFilter  === 'price'"
-                                type="submit">
-                            Get drinks
-                            </button>
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <input
-                            type="radio" 
-                            name="drink-filter" 
-                            value="apk"
-                            v-model="selectedFilter">
-                        Alcohol per krona
-                            <input
-                                v-if="selectedFilter === 'apk'"
-                                type="text"
-                                v-model="apkText"
-                                placeholder="Enter APK value"
-                            />
-                            <button 
-                                v-if="selectedFilter  === 'apk'"
-                                type="submit">
-                            Get drinks
-                            </button>
-                            
+                            v-model="selectedFilter"
+                            >
+                            Type of beverage
+                        <form v-if="selectedFilter.includes('type')" class="sub-filter">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="drink"
+                                    value="beer"
+                                    v-model="selectedType"
+                                    >
+                                    Beer
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="drink"
+                                    value="wine"
+                                    v-model="selectedType"
+                                    >
+                                    Wine
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="drink"
+                                    value="cider"
+                                    v-model="selectedType"
+                                    >
+                                    Cider
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="drink"
+                                    value="sprit"
+                                    v-model="selectedType"
+                                    >
+                                    Sprit
+                            </label>
+                        </form>
                     </label>
                 </li>
             </ul>
+            <button type="submit">Apply filters</button>
         </form>
-        <ul>
-            <li v-for="drink in drinks" :key="drink._id">
+        <ul class="drinks-list">
+            <li v-for="drink in drinks" :key="drink._id"
+            >
                 {{drink.name}}
             </li>
         </ul>
+        <button @click="deBugging">DEBUG</button>
     </div>
 </template>
 
@@ -111,59 +78,83 @@ export default {
     data() {
         return {
             message: 'none',
-            selectedFilter: '',
+            selectedFilter: [],
+            selectedType: [],
             typeInput: false,
             typeText: '',
             percentageText: '',
             priceText: '',
             apkText: '',
             drinks: []
-    }
-  },
-  methods: {
-    getMessage(filterUrl) {
-    console.log(filterUrl)
-        drinkApi.get('/drinks/' + filterUrl)
-            .then(response => {
-            console.log('1')
-                this.drinks = response.data.drinks
-              
-            })
-            .catch(error => {
-                console.log('2')
-                this.message = error
-            })
-            
-    },
-    submitFilter() {
-        let valueToUse = '' 
-        if (this.selectedFilter === 'type') {
-            valueToUse = this.typeText
-        } else if (this.selectedFilter === 'percentage') {
-            valueToUse = this.percentageText
-        } else if (this.selectedFilter === 'price') {
-            valueToUse = this.priceText
-        } else if (this.selectedFilter === 'apk') {
-            valueToUse = this.apkText
         }
     },
-    showTypeInput() {
-        typeInput = true
-    },
-    capitalizeFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    methods: {
+        getMessage(filterUrl) {
+        console.log(filterUrl)
+            drinkApi.get('/drinks/' + filterUrl)
+                .then(response => {
+                console.log('1')
+                    this.drinks = response.data.drinks
+                
+                })
+                .catch(error => {
+                    console.log('2')
+                    this.message = error
+                })       
+        },
+        submitFilter() {
+            let query = ''
+
+            if (this.selectedType.length) {
+                this.selectedType.forEach((type, index) => {
+                let prefix 
+                if (index === 0) {
+                      prefix = '?'
+                    } else {
+                      prefix = '&'
+                    }
+                query += `${prefix}type=${this.capitalizeFirst(type)}`
+                })
+            }
+            //if (query) {
+                this.getMessage(query)
+            //}
+        }, 
+        showTypeInput() {
+            typeInput = true
+        },
+        capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+        },
+        deBugging() {
+            console.log(this.selectedType)
+        }
     }
-  }
 }
 </script>
 
 <style>
     .filter-list label {
-        display: flex;
         align-items: center;
         gap: 0.5rem;
     }
     .filter-list {
         list-style: none;
+    }
+    .filter-list li {
+        text-align: left;
+    }
+    .drinks-list {
+        margin-top: 1rem;
+        padding-left: 2rem;
+        list-style: none;
+        text-align: left;
+    }
+    .sub-filter {
+        margin-left: 2rem;
+        margin-top: 0.25rem;
+    }
+    .sub-filter label {
+        margin-right: 1rem;
     }
 </style>
