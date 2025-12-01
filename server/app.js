@@ -33,7 +33,7 @@ var app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'apekå',
+    secret: 'apekå', // In production, use .env variable for this
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, },
@@ -52,7 +52,7 @@ app.get('/api', function(req, res) {
 
 // Session check route for unregistered users, used to check if an
 // age prompt is needed
-app.get('/api/guest-sessions', function(req, res) {
+app.get(`/api/${apiVersion}/guest-sessions`, function(req, res) {
     let isNewSession = false;
 
     if (req.session.cookie.maxAge == null ) {
