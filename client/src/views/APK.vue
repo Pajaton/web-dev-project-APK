@@ -54,6 +54,27 @@
                         </form>
                     </label>
                 </li>
+                    <li>
+        <label>
+            <input 
+                type="checkbox"
+                name="drink-filter" 
+                value="percentage"
+                v-model="selectedFilter"
+                >
+                Alcohol percentage
+            <form v-if="selectedFilter.includes('percentage')" class="sub-filter">
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    v-model="percentageText"
+                >
+                {{ percentageText }} %
+            </form>
+        </label>
+    </li>
             </ul>
             <button type="submit">Apply filters</button>
         </form>
@@ -116,9 +137,16 @@ export default {
                 query += `${prefix}type=${this.capitalizeFirst(type)}`
                 })
             }
-            //if (query) {
-                this.getMessage(query)
-            //}
+
+            if (this.selectedFilter.includes('percentage') && this.percentageText) {
+                if (query === '') {
+                    query += '?'
+                } else {
+                    query += '&'
+                }
+                query += 'percentage=' + this.percentageText
+    }
+            this.getMessage(query)
         }, 
         showTypeInput() {
             typeInput = true
