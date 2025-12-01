@@ -1,5 +1,6 @@
 var express = require('express');
 var session = require('express-session');
+var MongoStore = require('connect-mongo').default || require('connect-mongo');
 var mongoose = require('mongoose');
 var morgan = require('morgan');
 var path = require('path');
@@ -15,7 +16,7 @@ var systembolagetController=require("./controllers/systembolagController");
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
 var port = process.env.PORT || 3000;
-const hour = 1000 * 60 * 60;
+const cookieTtl = 1000 * 60 * 30; // 30 minutes
 
 // Connect to MongoDB
 mongoose.connect(mongoURI).catch(function(err) {
@@ -34,8 +35,9 @@ app.use(express.json());
 app.use(session({
     secret: 'apekå',
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, }
+    saveUninitialized: false,
+    cookie: { secure: false, },
+    store: MongoStore.create({ mongoUrl: mongoURI })
 }));
 // HTTP request logger
 app.use(morgan('dev'));
@@ -45,10 +47,7 @@ app.use(cors());
 
 // Import routes
 app.get('/api', function(req, res) {
-    res.json({ // TODO! Remove session details from response
-        'sID': req.sessionID,
-        'cookie': req.session.cookie 
-    });
+    res.json({ 'message': 'Welcome to the APK Calc API' });
 });
 
 // Session check route for unregistered users, used to check if an
@@ -56,11 +55,11 @@ app.get('/api', function(req, res) {
 app.get('/api/guest-sessions', function(req, res) {
     let isNewSession = false;
 
-    if (req.session.cookie.maxAge == null ) { // 1 hour
+    if (req.session.cookie.maxAge == null ) {
         isNewSession = true;
     }
 
-    req.session.cookie.maxAge = hour;
+    req.session.cookie.maxAge = cookieTtl;
 
     return res.json({ 'newSession': isNewSession });
 });
