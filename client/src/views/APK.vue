@@ -19,10 +19,11 @@
                                 v-model="typeText"
                                 placeholder="Enter beverage type"
                             />
-                            <button @click="getMessage"
+                            <button @click="getMessage('?type=' + capitalizeFirst(typeText))"
                                 v-if="selectedFilter  === 'type'"
                                 type="submit">
-                            Get drinks</button>
+                            Get drinks
+                            </button>
                     </label>
                 </li>
                 <li>
@@ -42,7 +43,8 @@
                             <button 
                                 v-if="selectedFilter  === 'percentage'"
                                 type="submit">
-                            Get drinks</button>
+                            Get drinks
+                            </button>
                     </label>
                 </li>
                 <li>
@@ -62,7 +64,8 @@
                             <button 
                                 v-if="selectedFilter  === 'price'"
                                 type="submit">
-                            Get drinks</button>
+                            Get drinks
+                            </button>
                     </label>
                 </li>
                 <li>
@@ -82,7 +85,8 @@
                             <button 
                                 v-if="selectedFilter  === 'apk'"
                                 type="submit">
-                            Get drinks</button>
+                            Get drinks
+                            </button>
                             
                     </label>
                 </li>
@@ -117,31 +121,37 @@ export default {
     }
   },
   methods: {
-    getMessage() {
-      drinkApi.get('/drinks')
-        .then(response => {
-          this.drinks = response.data.drinks
-        })
-        .catch(error => {
-          this.message = error
-        })
+    getMessage(filterUrl) {
+    console.log(filterUrl)
+        drinkApi.get('/drinks/' + filterUrl)
+            .then(response => {
+            console.log('1')
+                this.drinks = response.data.drinks
+              
+            })
+            .catch(error => {
+                console.log('2')
+                this.message = error
+            })
+            
     },
     submitFilter() {
         let valueToUse = '' 
         if (this.selectedFilter === 'type') {
-          valueToUse = this.typeText
+            valueToUse = this.typeText
         } else if (this.selectedFilter === 'percentage') {
-          valueToUse = this.percentageText
+            valueToUse = this.percentageText
         } else if (this.selectedFilter === 'price') {
-          valueToUse = this.priceText
+            valueToUse = this.priceText
         } else if (this.selectedFilter === 'apk') {
-          valueToUse = this.apkText
+            valueToUse = this.apkText
         }
-        console.log('Selected filter:', this.selectedFilter)
-        console.log('Input value:', valueToUse)
     },
     showTypeInput() {
         typeInput = true
+    },
+    capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
     }
   }
 }
