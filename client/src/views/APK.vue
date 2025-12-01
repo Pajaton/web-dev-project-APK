@@ -19,7 +19,7 @@
                                 v-model="typeText"
                                 placeholder="Enter beverage type"
                             />
-                            <button 
+                            <button @click="getMessage"
                                 v-if="selectedFilter  === 'type'"
                                 type="submit">
                             Get drinks</button>
@@ -83,13 +83,12 @@
                                 v-if="selectedFilter  === 'apk'"
                                 type="submit">
                             Get drinks</button>
+                            
                     </label>
                 </li>
             </ul>
         </form>
-        <!--      <button @click="getMessage">Load drinks</button>
-        <pre>{{ message }}</pre>     -->
-
+        <pre>{{ message }}</pre>
     </div>
 </template>
 
