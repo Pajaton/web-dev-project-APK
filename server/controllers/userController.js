@@ -1,4 +1,5 @@
 var express = require("express");
+var session = require("express-session");
 var router = express.Router();
 
 var User = require("../models/UserSchema");
@@ -161,9 +162,9 @@ router.post("/users", async (req, res, next) => {
     });
 
 // Create a new session (log in)
-router.post("/sessions", async (req, res) => {
+router.post("/sessions", async (req, res, next) => {
     // TEMPORARY AUTHENTICATION LOGIC FOR DEMO PURPOSES ONLY
-    try {    
+    try {
         const user = await User.findOne({ email: req.body.email });
 
         if (!user) {
@@ -171,6 +172,9 @@ router.post("/sessions", async (req, res) => {
                 "message": "Authentication failed"
             });
         }
+
+        req.session.user = user;
+        req.session.save();
 
         return res.status(201).json({
             "message": "Logged in successfully",
@@ -417,22 +421,6 @@ router.delete("/users/:userId/follows/:targetUserId", async (req, res, next) => 
     } catch(err) { next(err) };
 });
 
-// Log out (delete current session)
-router.delete("/sessions/:userId", async (req, res, next) => {
-    // TEMPORARY LOGOUT LOGIC FOR DEMO PURPOSES ONLY
-   try {
-        const user = await User
-            .findById(req.params.userId);
-        if (!user) {
-                    return res.status(404).json({"message": "user was not found"})
-                }
-        return res.json({
-            "message": "Logged out successfully",
-            "user": user
-        });
-    } catch(err) { next(err) };
-});
-
 // Delete a user's own account
 router.delete("/users/:userId", async (req, res, next) => {
     try {    
@@ -445,10 +433,40 @@ router.delete("/users/:userId", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
-// Delete all sessions (log out from all devices)
-router.delete("/sessions", async (req, res) => {
-    return res.json({
-        "message": "Logged out from all devices successfully"
+// Log out (delete current session)
+router.delete("/sessions/:userId", async (req, res, next) => {
+   try {
+        const user = await User.findById(req.params.userId);
+
+        if (!user) {
+            return res.status(404).json({"message": "user was not found"});
+        }
+
+        req.session.destroy((err) => {
+            if (err) {
+                return next(err);
+            }
+        
+            return res.json({
+                "message": "Logged out successfully",
+                "user": user
+            });
+        });
+    } catch(err) { next(err) };
+});
+
+// Delete all sessions (log out everyone from all devices)
+router.delete("/sessions", (req, res) => {
+    req.sessionStore.clear((err) => {
+        if (err) {
+            return res.status(500).json({
+                "message": "Error logging out everyone from all devices"
+            });
+        }
+
+        return res.json({
+            "message": "Logged everyone out from all devices successfully"
+        });
     });
 });
 
