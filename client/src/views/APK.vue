@@ -88,7 +88,11 @@
                 </li>
             </ul>
         </form>
-        <pre>{{ message }}</pre>
+        <ul>
+            <li v-for="drink in drinks" :key="drink._id">
+                {{drink.name}}
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -108,14 +112,15 @@ export default {
             typeText: '',
             percentageText: '',
             priceText: '',
-            apkText: ''
+            apkText: '',
+            drinks: []
     }
   },
   methods: {
     getMessage() {
       drinkApi.get('/drinks')
         .then(response => {
-          this.message = JSON.stringify(response.data, null, 2)
+          this.drinks = response.data.drinks
         })
         .catch(error => {
           this.message = error
