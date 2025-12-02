@@ -215,12 +215,13 @@
                 <button type="submit" class="sort-button">Apply sort</button>
             </div>
         </form>
-        <ul class="drinks-list">
-            <li v-for="drink in drinks" :key="drink._id"
-            >
-                {{drink.name}}
-            </li>
-        </ul>
+            <ul class="drinks-list">
+                <li v-for="drink in drinks" :key="drink._id">
+                    <a href="#" class="drink-link">
+                        {{ drink.name }}
+                    </a>
+                </li>
+            </ul>
     </div>
 </template>
 
