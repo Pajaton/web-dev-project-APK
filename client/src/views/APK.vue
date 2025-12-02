@@ -1,8 +1,7 @@
 <template>
-    <!-- APK HTML template -->
     <div>
         <form @submit.prevent="submitFilter">
-            <p>Filter for drinks:</p>
+            <p>Filter drinks:</p>
 
             <ul class="filter-list">
                 <li>
@@ -228,7 +227,6 @@
 
 import { drinkApi } from '@/Api'
 
-    // APK view behavior
 export default {
     name: 'APK',
     data() {
