@@ -1,19 +1,21 @@
 <template>
     <div>
-      <b-button-group variant="navbar">
-        <b-dropdown variant="navbar" text="APK Menu">
-          <b-dropdown-item variant="navbar" to="/home">HOME</b-dropdown-item>
-          <b-dropdown-item variant="navbar" to="/drinks">Drinks</b-dropdown-item>
-          <b-dropdown-item variant="navbar" to="/systembolag">Systembolag</b-dropdown-item>
-          <b-dropdown-item variant="navbar" to="/users">Users</b-dropdown-item>
-          <b-dropdown-item variant="navbar" to="/reviews">Reviews</b-dropdown-item>
-        </b-dropdown>
-        <b-button variant="navbar" to="/home">HOME</b-button>
-        <b-button variant="navbar" to="/drinks">Drinks</b-button>
-        <b-button variant="navbar" to="/systembolag">Systembolag</b-button>
-        <b-button variant="navbar" to="/users">Users</b-button>
-        <b-button variant="navbar" to="/reviews">Reviews</b-button>
-      </b-button-group>
+      <b-navbar toggleable="sm" type="dark" variant="info">
+        <b-navbar-toggle target="nav-text-collapse">
+           <b-button variant="navbar" block>APK Menu</b-button>
+        </b-navbar-toggle>
+          <b-container fluid>
+            <b-row>
+              <b-collapse id="nav-text-collapse" is-nav>
+                <b-col><b-button block variant="navbar" to="/home">HOME</b-button></b-col>
+                <b-col><b-button block variant="navbar" to="/drinks">Drinks</b-button></b-col>
+                <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
+                <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
+                <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
+              </b-collapse>
+            </b-row>
+          </b-container>
+        </b-navbar>
     </div>
 </template>
 
