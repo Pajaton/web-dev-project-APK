@@ -328,8 +328,6 @@ export default {
             this.getMessage(query)
         },
 
-//["productNumber", "name", "type", "container", "volume", "percentage", "colour", "price", "apk"]
-
         capitalizeFirst(str) {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
         },
