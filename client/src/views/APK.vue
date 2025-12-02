@@ -122,8 +122,6 @@
                 <button type="submit" class="filter-button">Apply filters</button>
             </div>
         </form>
-
-        <button @click="deBugging">DEBUG</button>
     </div>
     <div>
         <form @submit.prevent="submitSort">
