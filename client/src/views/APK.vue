@@ -1,9 +1,10 @@
 <template>
     <div>
         <form @submit.prevent="submitFilter">
-            <h1>Filter drinks:</h1>
+            
 
             <ul class="filter-list">
+                <h1>Filter drinks:</h1>
                 <li>
                     <label>
                         <input 
@@ -339,6 +340,7 @@ export default {
     }
     .filter-list {
         list-style: none;
+        text-align: left;
     }
     .filter-list li {
         text-align: left;
@@ -358,6 +360,11 @@ export default {
     }
     .filter-button {
         margin-left: 2rem;
+        display: block;
+    }
+    .sort-button {
+        margin-left: 2rem;
+        display: block;
     }
     .sort-list {
         list-style: none;
