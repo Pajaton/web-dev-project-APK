@@ -96,6 +96,27 @@
                         </form>
                     </label>
                 </li>
+                <li>
+                    <label>
+                        <input 
+                            type="checkbox"
+                            name="drink-filter" 
+                            value="apk"
+                            v-model="selectedFilter"
+                            >
+                            Alcohol per krona (krona per 1 ml of 100% alcohol)
+                        <form v-if="selectedFilter.includes('apk')" class="sub-filter">
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                v-model="apkText"
+                            >
+                            {{ apkText }} kr
+                        </form>
+                    </label>
+                </li>
             </ul>
             <button type="submit">Apply filters</button>
         </form>
@@ -174,6 +195,14 @@ export default {
                     query += '&'
                 }
                 query += 'price=' + this.priceText
+            }
+            if (this.selectedFilter.includes('apk') && this.apkText) {
+                if (query === '') {
+                    query += '?'
+                } else {
+                    query += '&'
+                }
+                query += 'apk=' + this.apkText
             }
 
             this.getMessage(query)
