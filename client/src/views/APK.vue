@@ -1,7 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="submitFilter">
-            <p>Filter drinks:</p>
+            <h1>Filter drinks:</h1>
 
             <ul class="filter-list">
                 <li>
@@ -13,7 +13,7 @@
                             v-model="selectedFilter"
                             >
                             Type of beverage
-                        <form v-if="selectedFilter.includes('type')" class="sub-filter">
+                        <div v-if="selectedFilter.includes('type')" class="sub-filter">
                             <label>
                                 <input
                                     type="checkbox"
@@ -50,7 +50,7 @@
                                     >
                                     Sprit
                             </label>
-                        </form>
+                        </div>
                     </label>
                 </li>
                 <li>
@@ -62,7 +62,7 @@
                             v-model="selectedFilter"
                             >
                             Alcohol percentage
-                        <form v-if="selectedFilter.includes('percentage')" class="sub-filter">
+                        <div v-if="selectedFilter.includes('percentage')" class="sub-filter">
                             <input
                                 type="number"
                                 min="0"
@@ -71,7 +71,7 @@
                                 v-model="percentageText"
                             >
                             {{ percentageText }} %
-                        </form>
+                        </div>
                     </label>
                 </li>
                 <li>
@@ -83,7 +83,7 @@
                             v-model="selectedFilter"
                             >
                             Price
-                        <form v-if="selectedFilter.includes('price')" class="sub-filter">
+                        <div v-if="selectedFilter.includes('price')" class="sub-filter">
                             <input
                                 type="number"
                                 min="0"
@@ -92,7 +92,7 @@
                                 v-model="priceText"
                             >
                             {{ priceText }} kr
-                        </form>
+                        </div>
                     </label>
                 </li>
                 <li>
@@ -104,7 +104,7 @@
                             v-model="selectedFilter"
                             >
                             Alcohol per krona (krona per 1 ml of 100% alcohol)
-                        <form v-if="selectedFilter.includes('apk')" class="sub-filter">
+                        <div v-if="selectedFilter.includes('apk')" class="sub-filter">
                             <input
                                 type="number"
                                 min="0"
@@ -113,7 +113,7 @@
                                 v-model="apkText"
                             >
                             {{ apkText }} kr
-                        </form>
+                        </div>
                     </label>
                 </li>
             </ul>
@@ -126,7 +126,7 @@
         <form @submit.prevent="submitSort">
             <ul class="sort-list">
                 <li>
-                    <p>Sort drinks:</p>
+                    <h1>Sort drinks:</h1>
                     <input 
                         type="checkbox"
                         name="drink-sort" 
