@@ -118,7 +118,102 @@
                     </label>
                 </li>
             </ul>
-            <button type="submit">Apply filters</button>
+            <div>
+                <button type="submit" class="filter-button">Apply filters</button>
+            </div>
+        </form>
+
+        <button @click="deBugging">DEBUG</button>
+    </div>
+    <div>
+        <form @submit.prevent="submitSort">
+            <ul class="sort-list">
+                <li>
+                    <p>Sort drinks:</p>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="productNumber"
+                        v-model="selectedSort"
+                        >
+                        Product number
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="name"
+                        v-model="selectedSort"
+                        >
+                        Name
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="type"
+                        v-model="selectedSort"
+                        >
+                        Type
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="container"
+                        v-model="selectedSort"
+                        >
+                        Container
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="volume"
+                        v-model="selectedSort"
+                        >
+                        Volume
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="percentage"
+                        v-model="selectedSort"
+                        >
+                        Percentage
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="colour"
+                        v-model="selectedSort"
+                        >
+                        Colour
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="price"
+                        v-model="selectedSort"
+                        >
+                        Price
+                </li>
+                <li>
+                    <input 
+                        type="checkbox"
+                        name="drink-sort" 
+                        value="apk"
+                        v-model="selectedSort"
+                        >
+                        APK
+                </li>
+            </ul>
+            <div>
+                <button type="submit" class="sort-button">Apply sort</button>
+            </div>
         </form>
         <ul class="drinks-list">
             <li v-for="drink in drinks" :key="drink._id"
@@ -126,7 +221,6 @@
                 {{drink.name}}
             </li>
         </ul>
-        <button @click="deBugging">DEBUG</button>
     </div>
 </template>
 
@@ -141,17 +235,20 @@ export default {
     data() {
         return {
             message: 'none',
+            drinks: [],
             selectedFilter: [],
+            selectedSort: [],
             selectedType: [],
-            typeInput: false,
             typeText: '',
             percentageText: '',
             priceText: '',
             apkText: '',
-            drinks: []
         }
     },
     methods: {
+        prepareMessage(url) {
+
+        },
         getMessage(filterUrl) {
         console.log(filterUrl)
             drinkApi.get('/drinks/' + filterUrl)
@@ -165,18 +262,19 @@ export default {
                     this.message = error
                 })       
         },
-        submitFilter() {
+
+        buildQuery() {
             let query = ''
 
             if (this.selectedType.length) {
                 this.selectedType.forEach((type, index) => {
-                let prefix 
-                if (index === 0) {
-                      prefix = '?'
+                    let prefix 
+                    if (index === 0) {
+                        prefix = '?'
                     } else {
-                      prefix = '&'
+                        prefix = '&'
                     }
-                query += `${prefix}type=${this.capitalizeFirst(type)}`
+                    query += `${prefix}type=${this.capitalizeFirst(type)}`
                 })
             }
 
@@ -188,6 +286,7 @@ export default {
                 }
                 query += 'percentage=' + this.percentageText
             }
+
             if (this.selectedFilter.includes('price') && this.priceText) {
                 if (query === '') {
                     query += '?'
@@ -196,6 +295,7 @@ export default {
                 }
                 query += 'price=' + this.priceText
             }
+
             if (this.selectedFilter.includes('apk') && this.apkText) {
                 if (query === '') {
                     query += '?'
@@ -205,20 +305,41 @@ export default {
                 query += 'apk=' + this.apkText
             }
 
+            if (this.selectedSort.length) {
+                if (query === '') {
+                    query += '?'
+                } else {
+                    query += '&'
+                }
+                query += 'sort=' + this.selectedSort[0]
+            }
+
+            return query
+        },
+
+        submitFilter() {
+            const query = this.buildQuery()
             this.getMessage(query)
         }, 
-        showTypeInput() {
-            typeInput = true
+
+        submitSort() {
+            const query = this.buildQuery()
+            this.getMessage(query)
         },
+
+//["productNumber", "name", "type", "container", "volume", "percentage", "colour", "price", "apk"]
+
         capitalizeFirst(str) {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
         },
+
         deBugging() {
             console.log(this.selectedType)
         }
     }
 }
 </script>
+
 
 <style>
     .filter-list label {
@@ -243,5 +364,14 @@ export default {
     }
     .sub-filter label {
         margin-right: 1rem;
+    }
+    .filter-button {
+        margin-left: 2rem;
+    }
+    .sort-list {
+        list-style: none;
+    }
+    .sort-list li {
+        text-align: left;
     }
 </style>
