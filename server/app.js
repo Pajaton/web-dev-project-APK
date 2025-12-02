@@ -1,4 +1,6 @@
 var express = require('express');
+var session = require('express-session');
+var MongoStore = require('connect-mongo').default || require('connect-mongo');
 var mongoose = require('mongoose');
 var morgan = require('morgan');
 var path = require('path');
@@ -14,6 +16,7 @@ var systembolagetController=require("./controllers/systembolagController");
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
 var port = process.env.PORT || 3000;
+const cookieTtl = 1000 * 60 * 30; // 30 minutes
 
 // Connect to MongoDB
 mongoose.connect(mongoURI).catch(function(err) {
@@ -29,6 +32,13 @@ var app = express();
 // Parse requests of content-type 'application/json'
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session({
+    secret: 'apekå', // In production, use .env variable for this
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, },
+    store: MongoStore.create({ mongoUrl: mongoURI })
+}));
 // HTTP request logger
 app.use(morgan('dev'));
 // Enable cross-origin resource sharing for frontend must be registered before api
@@ -37,7 +47,21 @@ app.use(cors());
 
 // Import routes
 app.get('/api', function(req, res) {
-    res.json({'message': 'Welcome to your DIT342 backend ExpressJS project!'});
+    res.json({ 'message': 'Welcome to the APK Calc API' });
+});
+
+// Session check route for unregistered users, used to check if an
+// age prompt is needed
+app.get(`/api/${apiVersion}/guest-sessions`, function(req, res) {
+    let isNewSession = false;
+
+    if (req.session.cookie.maxAge == null ) {
+        isNewSession = true;
+    }
+
+    req.session.cookie.maxAge = cookieTtl;
+
+    return res.json({ 'newSession': isNewSession });
 });
 
 app.use(`/api/${apiVersion}`, drinkController);
