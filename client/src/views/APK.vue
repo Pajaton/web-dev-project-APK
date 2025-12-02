@@ -54,27 +54,48 @@
                         </form>
                     </label>
                 </li>
-                    <li>
-        <label>
-            <input 
-                type="checkbox"
-                name="drink-filter" 
-                value="percentage"
-                v-model="selectedFilter"
-                >
-                Alcohol percentage
-            <form v-if="selectedFilter.includes('percentage')" class="sub-filter">
-                <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    v-model="percentageText"
-                >
-                {{ percentageText }} %
-            </form>
-        </label>
-    </li>
+                <li>
+                    <label>
+                        <input 
+                            type="checkbox"
+                            name="drink-filter" 
+                            value="percentage"
+                            v-model="selectedFilter"
+                            >
+                            Alcohol percentage
+                        <form v-if="selectedFilter.includes('percentage')" class="sub-filter">
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                v-model="percentageText"
+                            >
+                            {{ percentageText }} %
+                        </form>
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input 
+                            type="checkbox"
+                            name="drink-filter" 
+                            value="price"
+                            v-model="selectedFilter"
+                            >
+                            Price
+                        <form v-if="selectedFilter.includes('price')" class="sub-filter">
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                v-model="priceText"
+                            >
+                            {{ priceText }} kr
+                        </form>
+                    </label>
+                </li>
             </ul>
             <button type="submit">Apply filters</button>
         </form>
@@ -145,7 +166,16 @@ export default {
                     query += '&'
                 }
                 query += 'percentage=' + this.percentageText
-    }
+            }
+            if (this.selectedFilter.includes('price') && this.priceText) {
+                if (query === '') {
+                    query += '?'
+                } else {
+                    query += '&'
+                }
+                query += 'price=' + this.priceText
+            }
+
             this.getMessage(query)
         }, 
         showTypeInput() {
