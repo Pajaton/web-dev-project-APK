@@ -242,9 +242,6 @@ export default {
         }
     },
     methods: {
-        prepareMessage(url) {
-
-        },
         getMessage(filterUrl) {
         console.log(filterUrl)
             drinkApi.get('/drinks/' + filterUrl)
