@@ -299,8 +299,13 @@ export default {
         },
         sendReviewRating() {
             drinkApi.post('/reviews', {
-                userID: this.currentUser._id,
-                productID: this.chosenDrink._id,
+                //userID: this.currentUser._id,
+                //productID: this.chosenDrink._id,
+                //rating: this.rating,
+                //comment: this.reviewText
+
+                userID: "69308b34756b2fadd3c41772",
+                productID: "692dec915d23285d6a24b089",
                 rating: this.rating,
                 comment: this.reviewText
             })
