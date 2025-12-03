@@ -109,7 +109,7 @@
         </form>
             <ul class="drinks-list">
                 <li v-for="drink in drinks" :key="drink._id">
-                    <a href="#" class="drink-link" @click.prevent="openDrink(drink)">
+                    <a href="#" class="drink-link" @click.prevent="openDrinkPopup(drink)">
                         {{ drink.name }}
                     </a>
                 </li>
@@ -129,6 +129,18 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <button @click="closeDrinkPopup">Close</button>
+                    <button class="review-button" @click="openReviewPopup">Review drink</button>
+                </div>
+            </div>
+            <div v-if="showReviewPopup" class="popup-overlay">
+                <div class="review-popup">
+                    <div>
+                        <h5>Comment on the drink: </h5>
+                            <textarea class="review-input-field" type="text" placeholder="Write your review" v-model="reviewText"></textarea>
+
+                    </div>
+                        <button class="submit-review-button" @click="sendReview(reviewText)">Submit</button>
+                        <button class="close-review-button" @click="closeReviewPopup">Close</button>
                 </div>
             </div>
     </div>
@@ -153,7 +165,9 @@ export default {
             priceText: '',
             apkText: '',
             showDrinkPopup: false,
-            chosenDrink: null
+            chosenDrink: null,
+            showReviewPopup: '',
+            reviewText: ''
         }
     },
     methods: {
@@ -242,7 +256,7 @@ export default {
         capitalizeFirst(str) {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
         },
-        openDrink(drink) {
+        openDrinkPopup(drink) {
             this.showDrinkPopup = true
             this.getDrinkById(drink._id)
         },
@@ -250,6 +264,17 @@ export default {
             this.showDrinkPopup = false
             this.chosenDrink = null
         },
+        openReviewPopup(drink) {
+            this.showReviewPopup = true
+            this.showDrinkPopup = false
+        },
+        closeReviewPopup() {
+            this.showReviewPopup = false
+            console.log(this.showReviewPopup)
+        },
+        sendReview(reviewText) {
+            console.log(this.reviewText)
+        }
     }
 }
 </script>
@@ -299,12 +324,34 @@ export default {
         inset: 0;
         background: rgba(0, 0, 0, 0.6);
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
     }
     .drink-popup {
         background: white;
         padding: 2rem;
         text-align: left;
+    }
+    .review-popup {
+        background: white;
+        padding: 2rem;
+        text-align: left;
+        width: 60%;
+        max-width: 700px;
+        min-height: 50vh;
+        box-sizing: border-box;
+    }
+    .review-button {
+        margin-left: 20rem
+    }
+    .submit-review-button {
+        margin-top: 2rem
+    }
+    .close-review-button {
+        margin-left: 30rem;
+    }
+    .review-input-field {
+        width: 400px; 
+        height: 120px;
     }
 </style>
