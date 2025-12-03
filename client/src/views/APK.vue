@@ -162,7 +162,7 @@
                             </label>             
                         </p>
                         <div class="review-buttons">
-                            <button class="submit-review-button" @click="sendReviewRating(reviewText, rating)">Submit</button>
+                            <button class="submit-review-button" @click="sendReviewRating()">Submit</button>
                             <button class="close-review-button" @click="closeReviewPopup">Close</button>
                         </div>
                 </div>
@@ -297,8 +297,16 @@ export default {
             this.showReviewPopup = false
             console.log(this.showReviewPopup)
         },
-        sendReviewRating(reviewText, rating) {
+        sendReviewRating() {
+            drinkApi.post('/reviews', {
+                userID: this.currentUser._id,
+                productID: this.chosenDrink._id,
+                rating: this.rating,
+                comment: this.reviewText
+            })
             console.log("Review: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
+            this.reviewText = '';
+            this.rating = null;
             this.showReviewPopup = false
         }
     }
