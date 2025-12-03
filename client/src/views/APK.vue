@@ -1,8 +1,6 @@
 <template>
     <div>
         <form @submit.prevent="submitFilter">
-            
-
             <ul class="filter-list">
                 <h1>Filter drinks:</h1>
                 <li>
@@ -251,12 +249,9 @@ export default {
         console.log(filterUrl)
             drinkApi.get('/drinks/' + filterUrl)
                 .then(response => {
-                console.log('1')
-                    this.drinks = response.data.drinks
-                
+                    this.drinks = response.data.drinks        
                 })
                 .catch(error => {
-                    console.log('2')
                     this.message = error
                 })       
         },
