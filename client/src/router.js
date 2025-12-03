@@ -4,8 +4,7 @@ import Home from './views/Home.vue'
 import APK from './views/APK.vue'
 
 const routes = [
-  { path: '/home', name: 'home', component: Home },
-  { path: '/apk', name: 'APK', component: APK}
+  { path: '/home', name: 'home', component: Home }
 ]
 
 const router = createRouter({
