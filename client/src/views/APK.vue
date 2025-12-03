@@ -162,8 +162,8 @@
                             </label>             
                         </p>
                         <div class="review-buttons">
-                            <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Submit</button>
-                            <button v-if="oldReview" class="submit-review-button" @click="sendReviewRating()">Change review</button>
+                            <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
+                            <button v-if="oldReview" class="submit-review-button" @click="updateReviewRating()">Update your review</button>
                             <button class="close-review-button" @click="closeReviewPopup">Close</button>
                         </div>
                 </div>
@@ -307,16 +307,13 @@ export default {
 
                     if (reviews.length === 0) {
                         this.oldReview = null
-                        console.log('There is no old review for this drink')
                     }
                     else {
                         this.oldReview = reviews[0]
-                        console.log('This is the old review:', this.oldReview)
                     }
                 })
                 .catch(error => {
                     this.message = error
-                    console.log('There is no review: ' + this.message)
                 })       
         },
         sendReviewRating() {
@@ -327,7 +324,19 @@ export default {
                 rating: this.rating,
                 comment: this.reviewText
             })
-            console.log("Review: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
+            console.log("Review added: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
+            this.reviewText = '';
+            this.rating = null;
+            this.showReviewPopup = false
+        },
+        updateReviewRating() {
+            drinkApi.patch('/reviews/'+this.oldReview._id, {
+                userID: this.mockUserId,
+                productID: this.chosenDrink._id,
+                rating: this.rating,
+                comment: this.reviewText
+            })
+            console.log("Review updated: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
             this.reviewText = '';
             this.rating = null;
             this.showReviewPopup = false
