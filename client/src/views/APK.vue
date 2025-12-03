@@ -129,7 +129,7 @@
                 <li>
                     <h1>Sort drinks:</h1>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="productNumber"
                         v-model="selectedSort"
@@ -138,7 +138,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="name"
                         v-model="selectedSort"
@@ -147,7 +147,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="type"
                         v-model="selectedSort"
@@ -156,7 +156,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="container"
                         v-model="selectedSort"
@@ -165,7 +165,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="volume"
                         v-model="selectedSort"
@@ -174,7 +174,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="percentage"
                         v-model="selectedSort"
@@ -183,7 +183,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="colour"
                         v-model="selectedSort"
@@ -192,7 +192,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="price"
                         v-model="selectedSort"
@@ -201,7 +201,7 @@
                 </li>
                 <li>
                     <input 
-                        type="checkbox"
+                        type="radio"
                         name="drink-sort" 
                         value="apk"
                         v-model="selectedSort"
@@ -235,7 +235,7 @@ export default {
             message: 'none',
             drinks: [],
             selectedFilter: [],
-            selectedSort: [],
+            selectedSort: '',
             selectedType: [],
             typeText: '',
             percentageText: '',
@@ -303,13 +303,13 @@ export default {
                 query += 'apk=' + this.apkText
             }
 
-            if (this.selectedSort.length) {
+            if (this.selectedSort) {
                 if (query === '') {
                     query += '?'
                 } else {
                     query += '&'
                 }
-                query += 'sort=' + this.selectedSort[0]
+                query += 'sort=' + this.selectedSort
             }
 
             return query
