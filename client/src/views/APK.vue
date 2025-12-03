@@ -209,15 +209,33 @@
             </ul>
             <div>
                 <button type="submit" class="sort-button">Apply sort</button>
+                <p>showDrinkPopup: {{ showDrinkPopup }}</p>
             </div>
         </form>
             <ul class="drinks-list">
                 <li v-for="drink in drinks" :key="drink._id">
-                    <a href="#" class="drink-link">
+                    <a href="#" class="drink-link" @click.prevent="openDrink(drink)">
                         {{ drink.name }}
                     </a>
                 </li>
             </ul>
+            <div v-if="showDrinkPopup" class="popup-overlay">
+                <div class="drink-popup">
+                    <div v-if="chosenDrink">
+                        <h2>{{ chosenDrink.name }}</h2>
+
+                        <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
+                        <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
+                        <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
+                        <p><strong>Volume:</strong> {{ chosenDrink.volume }} ml</p>
+                        <p><strong>Alcohol percentage:</strong> {{ chosenDrink.percentage }} %</p>
+                        <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
+                        <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
+                        <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
+                    </div>
+                    <button @click="closeDrinkPopup">Close</button>
+                </div>
+            </div>
     </div>
 </template>
 
@@ -239,11 +257,12 @@ export default {
             percentageText: '',
             priceText: '',
             apkText: '',
+            showDrinkPopup: false,
+            chosenDrink: null
         }
     },
     methods: {
-        getMessage(filterUrl) {
-        console.log(filterUrl)
+        getDrinklist(filterUrl) {
             drinkApi.get('/drinks/' + filterUrl)
                 .then(response => {
                     this.drinks = response.data.drinks        
@@ -252,7 +271,15 @@ export default {
                     this.message = error
                 })       
         },
-
+        getDrinkById(id) {
+            drinkApi.get('/drinks/' + id)
+                .then(response => {
+                this.chosenDrink = response.data
+                })
+                .catch(error => {
+                this.message = error
+                })
+        },
         buildQuery() {
             let query = ''
 
@@ -309,16 +336,24 @@ export default {
 
         submitFilter() {
             const query = this.buildQuery()
-            this.getMessage(query)
+            this.getDrinklist(query)
         }, 
 
         submitSort() {
             const query = this.buildQuery()
-            this.getMessage(query)
+            this.getDrinklist(query)
         },
 
         capitalizeFirst(str) {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+        },
+        openDrink(drink) {
+            this.showDrinkPopup = true
+            this.getDrinkById(drink._id)
+        },
+        closeDrinkPopup() {
+            this.showDrinkPopup = false
+            this.chosenDrink = null
         },
     }
 }
@@ -362,6 +397,19 @@ export default {
         list-style: none;
     }
     .sort-list li {
+        text-align: left;
+    }
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .drink-popup {
+        background: white;
+        padding: 2rem;
         text-align: left;
     }
 </style>
