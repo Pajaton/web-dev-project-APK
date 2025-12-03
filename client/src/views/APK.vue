@@ -6,47 +6,23 @@
                 <li>
                     <label>
                         <input 
-                            type="checkbox"
-                            name="drink-filter" 
-                            value="type"
-                            v-model="selectedFilter"
-                            >
+                            type="checkbox" name="drink-filter" value="type" v-model="selectedFilter">
                             Type of beverage
                         <div v-if="selectedFilter.includes('type')" class="sub-filter">
                             <label>
-                                <input
-                                    type="checkbox"
-                                    name="drink"
-                                    value="beer"
-                                    v-model="selectedType"
-                                    >
+                                <input type="checkbox" name="drink" value="beer" v-model="selectedType">
                                     Beer
                             </label>
                             <label>
-                                <input
-                                    type="checkbox"
-                                    name="drink"
-                                    value="wine"
-                                    v-model="selectedType"
-                                    >
+                                <input type="checkbox" name="drink" value="wine" v-model="selectedType">
                                     Wine
                             </label>
                             <label>
-                                <input
-                                    type="checkbox"
-                                    name="drink"
-                                    value="cider"
-                                    v-model="selectedType"
-                                    >
+                                <input type="checkbox" name="drink" value="cider" v-model="selectedType">
                                     Cider
                             </label>
                             <label>
-                                <input
-                                    type="checkbox"
-                                    name="drink"
-                                    value="sprit"
-                                    v-model="selectedType"
-                                    >
+                                <input type="checkbox" name="drink" value="sprit" v-model="selectedType">
                                     Sprit
                             </label>
                         </div>
@@ -54,63 +30,30 @@
                 </li>
                 <li>
                     <label>
-                        <input 
-                            type="checkbox"
-                            name="drink-filter" 
-                            value="percentage"
-                            v-model="selectedFilter"
-                            >
+                        <input  type="checkbox" name="drink-filter"  value="percentage" v-model="selectedFilter">
                             Alcohol percentage
                         <div v-if="selectedFilter.includes('percentage')" class="sub-filter">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                v-model="percentageText"
-                            >
+                            <input type="number" min="0" max="100" step="0.1" v-model="percentageText">
                             {{ percentageText }} %
                         </div>
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input 
-                            type="checkbox"
-                            name="drink-filter" 
-                            value="price"
-                            v-model="selectedFilter"
-                            >
+                        <input type="checkbox" name="drink-filter" value="price" v-model="selectedFilter">
                             Price
                         <div v-if="selectedFilter.includes('price')" class="sub-filter">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                v-model="priceText"
-                            >
+                            <input type="number" min="0" max="100" step="0.1" v-model="priceText">
                             {{ priceText }} kr
                         </div>
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input 
-                            type="checkbox"
-                            name="drink-filter" 
-                            value="apk"
-                            v-model="selectedFilter"
-                            >
+                        <input type="checkbox" name="drink-filter" value="apk" v-model="selectedFilter">
                             Alcohol per krona (krona per 1 ml of 100% alcohol)
                         <div v-if="selectedFilter.includes('apk')" class="sub-filter">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                v-model="apkText"
-                            >
+                            <input type="number" min="0" max="100" step="0.1" v-model="apkText">
                             {{ apkText }} kr
                         </div>
                     </label>
@@ -120,90 +63,43 @@
                 <button type="submit" class="filter-button">Apply filters</button>
             </div>
         </form>
-    </div>
-    <div>
         <form @submit.prevent="submitSort">
             <ul class="sort-list">
                 <li>
                     <h1>Sort drinks:</h1>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="productNumber"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="productNumber" v-model="selectedSort">
                         Product number
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="name"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="name" v-model="selectedSort">
                         Name
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="type"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="type" v-model="selectedSort">
                         Type
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="container"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="container" v-model="selectedSort">
                         Container
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="volume"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="volume" v-model="selectedSort">
                         Volume
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="percentage"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="percentage" v-model="selectedSort">
                         Percentage
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="colour"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="colour" v-model="selectedSort">
                         Colour
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="price"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="price" v-model="selectedSort">
                         Price
                 </li>
                 <li>
-                    <input 
-                        type="radio"
-                        name="drink-sort" 
-                        value="apk"
-                        v-model="selectedSort"
-                        >
+                    <input type="radio" name="drink-sort" value="apk" v-model="selectedSort">
                         APK
                 </li>
             </ul>
