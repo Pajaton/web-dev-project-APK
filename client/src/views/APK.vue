@@ -129,7 +129,7 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <button @click="closeDrinkPopup">Close</button>
-                    <button class="review-button" @click="openReviewPopup">Review drink</button>
+                    <button class="review-button" @click="openReviewPopup(); getReviewRating();">Review drink</button>
                 </div>
             </div>
             <div v-if="showReviewPopup" class="popup-overlay">
@@ -162,7 +162,8 @@
                             </label>             
                         </p>
                         <div class="review-buttons">
-                            <button class="submit-review-button" @click="sendReviewRating()">Submit</button>
+                            <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Submit</button>
+                            <button v-if="oldReview" class="submit-review-button" @click="sendReviewRating()">Change review</button>
                             <button class="close-review-button" @click="closeReviewPopup">Close</button>
                         </div>
                 </div>
@@ -192,7 +193,9 @@ export default {
             chosenDrink: null,
             showReviewPopup: '',
             reviewText: '',
-            rating: null
+            rating: null,
+            mockUserId:  '69308b34756b2fadd3c41772',
+            oldReview: null
         }
     },
     methods: {
@@ -297,10 +300,29 @@ export default {
             this.showReviewPopup = false
             console.log(this.showReviewPopup)
         },
+        getReviewRating() {
+            drinkApi.get('/users/'+this.mockUserId+'/drinks/'+this.chosenDrink._id+'/reviews')
+                .then(response => {
+                    const reviews = response.data.reviews || []
+
+                    if (reviews.length === 0) {
+                        this.oldReview = null
+                        console.log('There is no old review for this drink')
+                    }
+                    else {
+                        this.oldReview = reviews[0]
+                        console.log('This is the old review:', this.oldReview)
+                    }
+                })
+                .catch(error => {
+                    this.message = error
+                    console.log('There is no review: ' + this.message)
+                })       
+        },
         sendReviewRating() {
             drinkApi.post('/reviews', {
                 // Change the mock data for the user who is currently logged in.
-                userID: "69308b34756b2fadd3c41772",
+                userID: this.mockUserId,
                 productID: this.chosenDrink._id,
                 rating: this.rating,
                 comment: this.reviewText
