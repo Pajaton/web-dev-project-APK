@@ -209,7 +209,6 @@
             </ul>
             <div>
                 <button type="submit" class="sort-button">Apply sort</button>
-                <p>showDrinkPopup: {{ showDrinkPopup }}</p>
             </div>
         </form>
             <ul class="drinks-list">
