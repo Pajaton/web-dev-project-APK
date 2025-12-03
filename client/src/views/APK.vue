@@ -137,10 +137,34 @@
                     <div>
                         <h5>Comment on the drink: </h5>
                             <textarea class="review-input-field" type="text" placeholder="Write your review" v-model="reviewText"></textarea>
-
                     </div>
-                        <button class="submit-review-button" @click="sendReview(reviewText)">Submit</button>
-                        <button class="close-review-button" @click="closeReviewPopup">Close</button>
+                    Rating
+                        <p>
+                            <label class="rating-label">
+                                1
+                                <input type="radio" name="rating" value="1" v-model="rating">
+                            </label>
+                            <label class="rating-label">
+                                2
+                                <input type="radio" name="rating" value="2" v-model="rating">
+                            </label>
+                            <label class="rating-label">
+                                3
+                                <input type="radio" name="rating" value="3" v-model="rating">
+                            </label>
+                            <label class="rating-label">
+                                4
+                                <input type="radio" name="rating" value="4" v-model="rating">
+                            </label>
+                            <label class="rating-label">
+                                5
+                                <input type="radio" name="rating" value="5" v-model="rating">
+                            </label>             
+                        </p>
+                        <div class="review-buttons">
+                            <button class="submit-review-button" @click="sendReviewRating(reviewText, rating)">Submit</button>
+                            <button class="close-review-button" @click="closeReviewPopup">Close</button>
+                        </div>
                 </div>
             </div>
     </div>
@@ -167,7 +191,8 @@ export default {
             showDrinkPopup: false,
             chosenDrink: null,
             showReviewPopup: '',
-            reviewText: ''
+            reviewText: '',
+            rating: null
         }
     },
     methods: {
@@ -272,8 +297,9 @@ export default {
             this.showReviewPopup = false
             console.log(this.showReviewPopup)
         },
-        sendReview(reviewText) {
-            console.log(this.reviewText)
+        sendReviewRating(reviewText, rating) {
+            console.log("Review: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
+            this.showReviewPopup = false
         }
     }
 }
@@ -344,14 +370,17 @@ export default {
     .review-button {
         margin-left: 20rem
     }
-    .submit-review-button {
-        margin-top: 2rem
+    .review-buttons {
+        display: flex;
     }
     .close-review-button {
-        margin-left: 30rem;
+        margin-left: auto;
     }
     .review-input-field {
-        width: 400px; 
-        height: 120px;
+        width: 60%; 
+        height: 80px;
+    }
+    .rating-label {
+        margin-right: 20px
     }
 </style>
