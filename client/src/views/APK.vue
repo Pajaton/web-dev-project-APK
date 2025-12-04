@@ -5,7 +5,7 @@
                 <h1>Filter drinks:</h1>
                 <li>
                     <label>
-                        <input 
+                        <input
                             type="checkbox" name="drink-filter" value="type" v-model="selectedFilter">
                             Type of beverage
                         <div v-if="selectedFilter.includes('type')" class="sub-filter">
@@ -159,7 +159,7 @@
                             <label class="rating-label">
                                 5
                                 <input type="radio" name="rating" value="5" v-model="rating">
-                            </label>             
+                            </label>
                         </p>
                         <div class="review-buttons">
                             <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
@@ -171,180 +171,167 @@
     </div>
 </template>
 
-
 <script>
 
 import { drinkApi } from '@/Api'
 
 export default {
-    name: 'APK',
-    data() {
-        return {
-            message: 'none',
-            drinks: [],
-            selectedFilter: [],
-            selectedSort: '',
-            selectedType: [],
-            typeText: '',
-            percentageText: '',
-            priceText: '',
-            apkText: '',
-            showDrinkPopup: false,
-            chosenDrink: null,
-            showReviewPopup: '',
-            reviewText: '',
-            rating: null,
-            mockUserId:  '69308b34756b2fadd3c41772',
-            oldReview: null
-        }
-    },
-    methods: {
-        getDrinklist(filterUrl) {
-            drinkApi.get('/drinks/' + filterUrl)
-                .then(response => {
-                    this.drinks = response.data.drinks        
-                })
-                .catch(error => {
-                    this.message = error
-                })       
-        },
-        getDrinkById(id) {
-            drinkApi.get('/drinks/' + id)
-                .then(response => {
-                this.chosenDrink = response.data
-                })
-                .catch(error => {
-                this.message = error
-                })
-        },
-        buildQuery() {
-            let query = ''
-
-            if (this.selectedType.length) {
-                this.selectedType.forEach((type, index) => {
-                    let prefix 
-                    if (index === 0) {
-                        prefix = '?'
-                    } else {
-                        prefix = '&'
-                    }
-                    query += `${prefix}type=${this.capitalizeFirst(type)}`
-                })
-            }
-
-            if (this.selectedFilter.includes('percentage') && this.percentageText) {
-                if (query === '') {
-                    query += '?'
-                } else {
-                    query += '&'
-                }
-                query += 'percentage=' + this.percentageText
-            }
-
-            if (this.selectedFilter.includes('price') && this.priceText) {
-                if (query === '') {
-                    query += '?'
-                } else {
-                    query += '&'
-                }
-                query += 'price=' + this.priceText
-            }
-
-            if (this.selectedFilter.includes('apk') && this.apkText) {
-                if (query === '') {
-                    query += '?'
-                } else {
-                    query += '&'
-                }
-                query += 'apk=' + this.apkText
-            }
-
-            if (this.selectedSort) {
-                if (query === '') {
-                    query += '?'
-                } else {
-                    query += '&'
-                }
-                query += 'sort=' + this.selectedSort
-            }
-
-            return query
-        },
-
-        submitFilter() {
-            const query = this.buildQuery()
-            this.getDrinklist(query)
-        }, 
-
-        submitSort() {
-            const query = this.buildQuery()
-            this.getDrinklist(query)
-        },
-
-        capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
-        },
-        openDrinkPopup(drink) {
-            this.showDrinkPopup = true
-            this.getDrinkById(drink._id)
-        },
-        closeDrinkPopup() {
-            this.showDrinkPopup = false
-            this.chosenDrink = null
-        },
-        openReviewPopup(drink) {
-            this.showReviewPopup = true
-            this.showDrinkPopup = false
-        },
-        closeReviewPopup() {
-            this.showReviewPopup = false
-            console.log(this.showReviewPopup)
-        },
-        getReviewRating() {
-            drinkApi.get('/users/'+this.mockUserId+'/drinks/'+this.chosenDrink._id+'/reviews')
-                .then(response => {
-                    const reviews = response.data.reviews || []
-
-                    if (reviews.length === 0) {
-                        this.oldReview = null
-                    }
-                    else {
-                        this.oldReview = reviews[0]
-                    }
-                })
-                .catch(error => {
-                    this.message = error
-                })       
-        },
-        sendReviewRating() {
-            drinkApi.post('/reviews', {
-                // Change the mock data for the user who is currently logged in.
-                userID: this.mockUserId,
-                productID: this.chosenDrink._id,
-                rating: this.rating,
-                comment: this.reviewText
-            })
-            console.log("Review added: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
-            this.reviewText = '';
-            this.rating = null;
-            this.showReviewPopup = false
-        },
-        updateReviewRating() {
-            drinkApi.patch('/reviews/'+this.oldReview._id, {
-                userID: this.mockUserId,
-                productID: this.chosenDrink._id,
-                rating: this.rating,
-                comment: this.reviewText
-            })
-            console.log("Review updated: " + this.reviewText + ' ' + ' Rating: ' + this.rating)
-            this.reviewText = '';
-            this.rating = null;
-            this.showReviewPopup = false
-        }
+  name: 'APK',
+  data() {
+    return {
+      message: 'none',
+      drinks: [],
+      selectedFilter: [],
+      selectedSort: '',
+      selectedType: [],
+      typeText: '',
+      percentageText: '',
+      priceText: '',
+      apkText: '',
+      showDrinkPopup: false,
+      chosenDrink: null,
+      showReviewPopup: '',
+      reviewText: '',
+      rating: null,
+      mockUserId: '69308b34756b2fadd3c41772',
+      oldReview: null
     }
+  },
+  methods: {
+    getDrinklist(filterUrl) {
+      drinkApi.get('/drinks/' + filterUrl)
+        .then(response => {
+          this.drinks = response.data.drinks
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    getDrinkById(id) {
+      drinkApi.get('/drinks/' + id)
+        .then(response => {
+          this.chosenDrink = response.data
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    buildQuery() {
+      let query = ''
+      if (this.selectedType.length) {
+        this.selectedType.forEach((type, index) => {
+          let prefix
+          if (index === 0) {
+            prefix = '?'
+          } else {
+            prefix = '&'
+          }
+          query += `${prefix}type=${this.capitalizeFirst(type)}`
+        })
+      }
+      if (this.selectedFilter.includes('percentage') && this.percentageText) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'percentage=' + this.percentageText
+      }
+      if (this.selectedFilter.includes('price') && this.priceText) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'price=' + this.priceText
+      }
+      if (this.selectedFilter.includes('apk') && this.apkText) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'apk=' + this.apkText
+      }
+      if (this.selectedSort) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'sort=' + this.selectedSort
+      }
+      return query
+    },
+    submitFilter() {
+      const query = this.buildQuery()
+      this.getDrinklist(query)
+    },
+    submitSort() {
+      const query = this.buildQuery()
+      this.getDrinklist(query)
+    },
+    capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    },
+    openDrinkPopup(drink) {
+      this.showDrinkPopup = true
+      this.getDrinkById(drink._id)
+    },
+    closeDrinkPopup() {
+      this.showDrinkPopup = false
+      this.chosenDrink = null
+    },
+    openReviewPopup(drink) {
+      this.showReviewPopup = true
+      this.showDrinkPopup = false
+    },
+    closeReviewPopup() {
+      this.showReviewPopup = false
+      console.log(this.showReviewPopup)
+    },
+    getReviewRating() {
+      drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
+        .then(response => {
+          const reviews = response.data.reviews || []
+          if (reviews.length === 0) {
+            this.oldReview = null
+          } else {
+            this.oldReview = reviews[0]
+          }
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    sendReviewRating() {
+      drinkApi.post('/reviews', {
+        // Change the mock data for the user who is currently logged in.
+        userID: this.mockUserId,
+        productID: this.chosenDrink._id,
+        rating: this.rating,
+        comment: this.reviewText
+      })
+      console.log('Review added: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
+      this.reviewText = ''
+      this.rating = null
+      this.showReviewPopup = false
+    },
+    updateReviewRating() {
+      drinkApi.patch('/reviews/' + this.oldReview._id, {
+        userID: this.mockUserId,
+        productID: this.chosenDrink._id,
+        rating: this.rating,
+        comment: this.reviewText
+      })
+      console.log('Review updated: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
+      this.reviewText = ''
+      this.rating = null
+      this.showReviewPopup = false
+    }
+  }
 }
 </script>
-
 
 <style>
     .filter-list label {
@@ -417,7 +404,7 @@ export default {
         margin-left: auto;
     }
     .review-input-field {
-        width: 60%; 
+        width: 60%;
         height: 80px;
     }
     .rating-label {
