@@ -5,7 +5,7 @@ import APK from './views/APK.vue'
 
 const routes = [
   { path: '/home', name: 'home', component: Home },
-  { path: '/drinks', name: 'drinks', component: APK}
+  { path: '/drinks', name: 'drinks', component: APK }
 ]
 
 const router = createRouter({
