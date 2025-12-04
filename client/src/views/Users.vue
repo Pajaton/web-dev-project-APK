@@ -1,11 +1,16 @@
 <template>
     <!-- User Profile HTML template -->
     <div>
-      <ul class="users-list">
-        <p v-for="user in users" :key="user._id">
+      <h1>COMMUNITY HOMEPAGE</h1>
+      <h3 class="users-info-style">List of users: </h3>
+      <div class="users-info-style" style="padding-left: 1rem;">
+        <li style="list-style: none;" v-for="user in users" :key="user._id">
+          <router-link
+            :to="{ name: 'userProfile', params: { id: user._id } }">
             {{ user.userName }}
-        </p>
-      </ul>
+          </router-link>
+        </li>
+      </div>
     </div>
 </template>
 
@@ -32,6 +37,7 @@ export default {
         })
     }
   },
+  // Methods run when entering this webpage
   created() {
     this.users = this.getUsers()
   }
@@ -39,5 +45,7 @@ export default {
 </script>
 
 <style>
-    /* User Profile CSS styles */
+  .users-info-style {
+    text-align: left;
+  }
 </style>

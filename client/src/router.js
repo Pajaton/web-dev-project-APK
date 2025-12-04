@@ -9,7 +9,7 @@ const routes = [
   { path: '/home', name: 'home', component: Home },
   { path: '/drinks', name: 'drinks', component: APK },
   { path: '/users', name: 'users', component: Users },
-  { path: '/userProfile', name: 'userProfile', component: UserProfile }
+  { path: '/users/:id', name: 'userProfile', component: UserProfile, props: true }
 ]
 
 const router = createRouter({
