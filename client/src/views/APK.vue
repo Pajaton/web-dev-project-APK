@@ -319,7 +319,7 @@ export default {
       this.showReviewPopup = false
     },
     updateReviewRating() {
-      drinkApi.patch('/reviews/' + this.oldReview._id, {
+      drinkApi.put('/reviews/' + this.oldReview._id, {
         userID: this.mockUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
