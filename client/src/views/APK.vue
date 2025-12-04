@@ -193,7 +193,7 @@ export default {
       showReviewPopup: '',
       reviewText: '',
       rating: null,
-      mockUserId: '69308b34756b2fadd3c41772',
+      mockUserId: '69315df03496883746342df8',
       oldReview: null
     }
   },
@@ -293,6 +293,7 @@ export default {
     getReviewRating() {
       drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
+        //  random comment for new git push, pipeline issue
           const reviews = response.data.reviews || []
           if (reviews.length === 0) {
             this.oldReview = null
