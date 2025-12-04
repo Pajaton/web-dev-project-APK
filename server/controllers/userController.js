@@ -37,14 +37,14 @@ router.get("/users/:userId", async (req, res, next) => {
         const userObject = user.toObject();
 
         userObject._links = {
-            self: `/users/${userObject.userID}`,
-            update: { url: `/users/${userObject.userID}`, method: "PATCH" },
-            delete: { url: `/users/${userObject.userID}`, method: "DELETE" },
-            follows: `/users/${userObject.userID}/follows`,
-            favoritesDrinks: `/users/${userObject.userID}/favorites/drinks`,
-            favoritesSystembolag: `/users/${userObject.userID}/favorites/systembolag`,
-            settings: `/users/${userObject.userID}/settings`,
-            drinks: `/users/${userObject.userID}/drinks`
+            self: `/users/${userObject._id}`,
+            update: { url: `/users/${userObject._id}`, method: "PATCH" },
+            delete: { url: `/users/${userObject._id}`, method: "DELETE" },
+            follows: `/users/${userObject._id}/follows`,
+            favoritesDrinks: `/users/${userObject._id}/favorites/drinks`,
+            favoritesSystembolag: `/users/${userObject._id}/favorites/systembolag`,
+            settings: `/users/${userObject._id}/settings`,
+            drinks: `/users/${userObject._id}/drinks`
         };
 
         return res.json(userObject);
