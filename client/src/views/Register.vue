@@ -23,7 +23,7 @@
         <BFormInput
           id="floatingprofilepicture"
           v-model="ProfilePicture"
-          type="picture"
+          type="text"
           placeholder="Profile Picture"
         />
         </BFormFloatingLabel>
@@ -35,7 +35,7 @@
         <BFormInput
           id="floatingName"
           v-model="UserName"
-          type="name"
+          type="text"
           placeholder="UserName"
         />
         </BFormFloatingLabel>
@@ -47,7 +47,7 @@
         <BFormInput
           id="floatingStreet"
           v-model="street"
-          type="street"
+          type="text"
           placeholder="street"
         />
         </BFormFloatingLabel>
@@ -59,7 +59,7 @@
         <BFormInput
           id="floatingStreetNumber"
           v-model="streetNumber"
-          type="streetNumber"
+          type="text"
           placeholder="streetNumber"
         />
         </BFormFloatingLabel>
@@ -71,7 +71,7 @@
         <BFormInput
           id="floatingpostalCode"
           v-model="postalCode"
-          type="postalCode"
+          type="text"
           placeholder="postalCode"
         />
         </BFormFloatingLabel>
@@ -83,7 +83,7 @@
         <BFormInput
           id="floatingcity"
           v-model="city"
-          type="city"
+          type="text"
           placeholder="city"
         />
         </BFormFloatingLabel>
@@ -95,8 +95,10 @@
 </template>
 
 <script>
-
 // Register view behavior
+
+import { drinkApi } from '@/Api'
+
 export default {
   name: 'Register',
   data() {
@@ -108,10 +110,28 @@ export default {
       street: '',
       streetNumber: '',
       postalCode: '',
-      city: ''
+      city: '',
+      userExist: false
     }
   },
   methods: {
+    async registerUser() {
+      this.userVerification()
+      if (this.userExist === false) {
+        drinkApi.post('/users', {
+          email: this.email,
+          ProfilePicture: this.ProfilePicture,
+          userName: this.UserName,
+          street: this.street,
+          streetNumber: this.streetNumber,
+          postalCode: this.postalCode,
+          city: this.city,
+          longitude: null,
+          latitude: null
+        })
+      }
+      console.log('User added: ' + this.userName + ' ' + ' Email: ' + this.email)
+    },
     resetFields() {
       this.email = ''
       this.ProfilePicture = ''
@@ -120,6 +140,15 @@ export default {
       this.streetNumber = ''
       this.postalCode = ''
       this.city = ''
+    },
+    async userVerification() {
+      const response = await drinkApi('/users/')
+      const data = response.data
+      data.users.forEach(user => {
+        if (user.email === this.email) {
+          this.userExist = true
+        }
+      })
     }
   }
 }
