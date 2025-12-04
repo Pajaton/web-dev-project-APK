@@ -105,6 +105,7 @@
             </ul>
             <div>
                 <button type="submit" class="sort-button">Apply sort</button>
+                <button class="delete-all-reviews-button" @click="deleteAllReviews()"> <strong>DELETE ALL REVIEWS</strong></button>
             </div>
         </form>
             <ul class="drinks-list">
@@ -164,6 +165,7 @@
                         <div class="review-buttons">
                             <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
                             <button v-if="oldReview" class="submit-review-button" @click="updateReviewRating()">Update your review</button>
+                            <button v-if="oldReview" class="delete-review-button" @click="deleteReview">Delete review</button>
                             <button class="close-review-button" @click="closeReviewPopup">Close</button>
                         </div>
                 </div>
@@ -319,7 +321,7 @@ export default {
       this.showReviewPopup = false
     },
     updateReviewRating() {
-      drinkApi.patch('/reviews/' + this.oldReview._id, {
+      drinkApi.put('/reviews/' + this.oldReview._id, {
         userID: this.mockUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
@@ -329,6 +331,30 @@ export default {
       this.reviewText = ''
       this.rating = null
       this.showReviewPopup = false
+    },
+    deleteReview() {
+      if (!this.oldReview) {
+        return
+      }
+      drinkApi.delete('/reviews/' + this.oldReview._id)
+        .then(response => {
+          this.oldReview = null
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    deleteAllReviews() {
+      drinkApi.delete('/reviews')
+        .then(response => {
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     }
   }
 }
@@ -336,79 +362,85 @@ export default {
 
 <style>
     .filter-list label {
-        align-items: center;
-        gap: 0.5rem;
+      align-items: center;
+      gap: 0.5rem;
     }
     .filter-list {
-        list-style: none;
-        text-align: left;
+      list-style: none;
+      text-align: left;
     }
     .filter-list li {
-        text-align: left;
+      text-align: left;
     }
     .drinks-list {
-        margin-top: 1rem;
-        padding-left: 2rem;
-        list-style: none;
-        text-align: left;
+      margin-top: 1rem;
+      padding-left: 2rem;
+      list-style: none;
+      text-align: left;
     }
     .sub-filter {
-        margin-left: 2rem;
-        margin-top: 0.25rem;
+      margin-left: 2rem;
+      margin-top: 0.25rem;
     }
     .sub-filter label {
-        margin-right: 1rem;
+      margin-right: 1rem;
     }
     .filter-button {
-        margin-left: 2rem;
-        display: block;
+      margin-left: 2rem;
+      display: block;
     }
     .sort-button {
-        margin-left: 2rem;
-        display: block;
+      margin-left: 2rem;
+      display: block;
     }
     .sort-list {
-        list-style: none;
+      list-style: none;
     }
     .sort-list li {
-        text-align: left;
+      text-align: left;
     }
     .popup-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
     }
     .drink-popup {
-        background: white;
-        padding: 2rem;
-        text-align: left;
+      background: white;
+      padding: 2rem;
+      text-align: left;
     }
     .review-popup {
-        background: white;
-        padding: 2rem;
-        text-align: left;
-        width: 60%;
-        max-width: 700px;
-        min-height: 50vh;
-        box-sizing: border-box;
+      background: white;
+      padding: 2rem;
+      text-align: left;
+      width: 60%;
+      max-width: 700px;
+      min-height: 50vh;
+      box-sizing: border-box;
     }
     .review-button {
-        margin-left: 20rem
+      margin-left: 20rem
     }
     .review-buttons {
-        display: flex;
+      display: flex;
     }
     .close-review-button {
-        margin-left: auto;
+      margin-left: auto;
     }
     .review-input-field {
-        width: 60%;
-        height: 80px;
+      width: 60%;
+      height: 80px;
     }
     .rating-label {
-        margin-right: 20px
+      margin-right: 20px
+    }
+    .delete-review-button {
+      margin-left: 1rem;
+    }
+    .delete-all-reviews-button {
+      color: red;
     }
 </style>
