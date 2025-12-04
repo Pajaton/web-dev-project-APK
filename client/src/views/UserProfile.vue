@@ -11,6 +11,7 @@
         <li>Number of review written: {{user.reviewsWritten.length}}</li>
         <li>Alcoholic intake: {{user.alcoholConsumed.length}}</li>
         <li>How many drinks tried: {{user.triedDrinks.length}}</li>
+        <li v-for="followedUser in userFollowingList" :key="followedUser.userID">{{ user.userName }} follows: {{ followedUser.userName }}</li>
       </ul>
     </div>
   </div>
@@ -24,7 +25,8 @@ export default {
   name: 'users',
   data() {
     return {
-      user: null
+      user: null,
+      userFollowingList: []
     }
   },
   props: {
@@ -35,17 +37,17 @@ export default {
       drinkApi.get('/users/' + this.id)
         .then(response => {
           this.user = response.data
-          console.log(this.user._links.following)
+          this.getUserFollowingList()
         })
         .catch(error => {
           this.message = error
         })
     },
     getUserFollowingList() {
-      drinkApi.get(this.user._links.following)
+      drinkApi.get(this.user._links.follows)
         .then(response => {
-          console.log('this method ran')
-          this.user = response.data
+          this.userFollowingList = response.data.follows
+          console.log('following:', this.userFollowingList)
         })
         .catch(error => {
           this.message = error
@@ -53,7 +55,7 @@ export default {
     }
   },
   created() {
-    this.user = this.getUserInfo()
+    this.getUserInfo()
   }
 }
 </script>
