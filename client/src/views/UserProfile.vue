@@ -6,9 +6,9 @@
 </template>
 
 <script>
-    // User Profile view behavior
+// User Profile view behavior
 export default {
-    name: 'UserProfile'
+  name: 'UserProfile'
 }
 </script>
 
