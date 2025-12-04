@@ -28,8 +28,8 @@
         />
       </BFormFloatingLabel>
     </BForm>
-    <b-button block variant="navbar">Login</b-button>
-    <b-button block >Register</b-button>
+    <b-button block variant="login">Login</b-button>
+    <b-button block  to="/register">Register</b-button>
   </div>
 </template>
 
@@ -43,11 +43,12 @@ export default {
     }
   }
 }
+
 </script>
 
 <style>
     /* Login CSS styles */
-  .btn-navbar {
+  .btn-login {
     color: green !important;
     font-family: Impact,'Arial Narrow Bold', sans-serif !important;
     background: yellow !important;
