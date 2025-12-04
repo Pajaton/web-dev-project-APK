@@ -12,6 +12,7 @@
       >
         <BFormInput
           id="floatingEmail"
+          v-model="email"
           type="email"
           placeholder="Email address"
         />
@@ -23,27 +24,64 @@
       >
         <BFormInput
           id="floatingPassword"
+          v-model="password"
           type="password"
           placeholder="Password"
         />
       </BFormFloatingLabel>
+      <b-button block variant="danger" @click="resetFields()">Reset</b-button>
+      <b-button block type="button" variant="login" @click="userVerification()">Login</b-button>
+
     </BForm>
-    <b-button block variant="login">Login</b-button>
     <b-button block  to="/register">Register</b-button>
+    <BToast
+      v-model="show"
+      variant="info"
+      solid
+    >
+      <template #title> Unable to login </template>
+      Email or password is wrong.
+    </BToast>
   </div>
 </template>
 
 <script>
 // Login view behavior
+
+import { drinkApi } from '@/Api'
+
 export default {
   name: 'login',
   data() {
     return {
-      message: 'none'
+      message: 'none',
+      email: '',
+      password: '',
+      verifiedUser: false,
+      show: false
+    }
+  },
+  methods: {
+    async userVerification() {
+      const response = await drinkApi('/users/')
+      const data = response.data
+      data.users.forEach(user => {
+        if (user.email === this.email) {
+          this.$router.push({ path: '/home' })
+          this.verifiedUser = true
+        }
+      })
+      if (this.verifiedUser === false) {
+        this.show = true
+      }
+    },
+    resetFields() {
+      this.email = ''
+      this.password = ''
+      this.show = false
     }
   }
 }
-
 </script>
 
 <style>
