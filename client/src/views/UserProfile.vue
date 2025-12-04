@@ -18,7 +18,6 @@
 </template>
 
 <script>
-
 import { drinkApi } from '@/Api'
 
 export default {
@@ -26,7 +25,8 @@ export default {
   data() {
     return {
       user: null,
-      userFollowingList: []
+      userFollowingList: [],
+      mockUserId: '69315df03496883746342df8'
     }
   },
   props: {
@@ -47,7 +47,6 @@ export default {
       drinkApi.get(this.user._links.follows)
         .then(response => {
           this.userFollowingList = response.data.follows
-          console.log('following:', this.userFollowingList)
         })
         .catch(error => {
           this.message = error
