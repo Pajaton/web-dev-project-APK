@@ -164,6 +164,7 @@
                         <div class="review-buttons">
                             <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
                             <button v-if="oldReview" class="submit-review-button" @click="updateReviewRating()">Update your review</button>
+                            <button v-if="oldReview" class="delete-review-button" @click="deleteReview">Delete review</button>
                             <button class="close-review-button" @click="closeReviewPopup">Close</button>
                         </div>
                 </div>
@@ -329,6 +330,23 @@ export default {
       this.reviewText = ''
       this.rating = null
       this.showReviewPopup = false
+    },
+    deleteReview() {
+      if (!this.oldReview) {
+        return
+      }
+
+      drinkApi.delete('/reviews/' + this.oldReview._id)
+        .then(response => {
+          console.log('Review deleted:', response.data)
+          this.oldReview = null
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     }
   }
 }
@@ -410,5 +428,8 @@ export default {
     }
     .rating-label {
         margin-right: 20px
+    }
+    .delete-review-button {
+      margin-left: 1rem;
     }
 </style>
