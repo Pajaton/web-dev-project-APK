@@ -1,3 +1,5 @@
+var https = require('https');
+var fs = require('fs');
 var express = require('express');
 var session = require('express-session');
 var MongoStore = require('connect-mongo').default || require('connect-mongo');
@@ -12,6 +14,7 @@ var usersController=require("./controllers/userController");
 var drinkController=require("./controllers/drinkController");
 var reviewController=require("./controllers/reviewController");
 var systembolagetController=require("./controllers/systembolagController");
+var mapController=require("./controllers/mapController");
 
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apk_calc';
@@ -68,6 +71,7 @@ app.use(`/api/${apiVersion}`, drinkController);
 app.use(`/api/${apiVersion}`, usersController);
 app.use(`/api/${apiVersion}`, reviewController);
 app.use(`/api/${apiVersion}`, systembolagetController);
+app.use(`/api/${apiVersion}`, mapController);
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
@@ -103,11 +107,26 @@ app.use(function(err, req, res, next) {
     res.json(err_res);
 });
 
-app.listen(port, function(err) {
-    if (err) throw err;
-    console.log(`Express server listening on port ${port}, in ${env} mode`);
-    console.log(`Backend: http://localhost:${port}/api/`);
-    console.log(`Frontend (production): http://localhost:${port}/`);
-});
+// app.listen(port, function(err) {
+//     if (err) throw err;
+//     console.log(`Express server listening on port ${port}, in ${env} mode`);
+//     console.log(`Backend: http://localhost:${port}/api/`);
+//     console.log(`Frontend (production): http://localhost:${port}/`);
+// });
+
+try {
+    const httpsOptions = {
+        key: fs.readFileSync('localhost-key.pem'),
+        cert: fs.readFileSync('localhost.pem')
+    };
+    https.createServer(httpsOptions, app).listen(port, function(err) {
+        if (err) throw err;
+        console.log(`Express HTTPS server listening on port ${port}, in ${env} mode`);
+        console.log(`Backend: https://localhost:${port}/api/`);
+        console.log(`Frontend (production): https://localhost:${port}/`);
+    });
+} catch (err) {
+    console.error("Failed to start HTTPS server:", err);
+}
 
 module.exports = app;
