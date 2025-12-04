@@ -1,14 +1,14 @@
 <template>
     <!-- User Profile HTML template -->
     <div>
-        <p>User Profile</p>
+        <p>List of all registrered users</p>
     </div>
 </template>
 
 <script>
 // User Profile view behavior
 export default {
-  name: 'userProfile'
+  name: 'users'
 }
 </script>
 
