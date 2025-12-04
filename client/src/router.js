@@ -11,7 +11,7 @@ const routes = [
   { path: '/home', name: 'home', component: Home },
   { path: '/drinks', name: 'drinks', component: APK },
   { path: '/users', name: 'users', component: Users },
-  { path: '/users/:id', name: 'userProfile', component: UserProfile, props: true }
+  { path: '/users/:id', name: 'userProfile', component: UserProfile, props: true },
   { path: '/login', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register }
 ]
