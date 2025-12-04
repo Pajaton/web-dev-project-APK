@@ -12,6 +12,8 @@
                 <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
+                <b-col><b-button block variant="navbar" to="/login">Login</b-button></b-col>
+
               </b-collapse>
             </b-row>
           </b-container>
