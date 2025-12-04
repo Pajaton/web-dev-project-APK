@@ -8,7 +8,7 @@
 <script>
 // User Profile view behavior
 export default {
-  name: 'UserProfile'
+  name: 'userProfile'
 }
 </script>
 
