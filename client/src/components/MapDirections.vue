@@ -1,0 +1,239 @@
+<template>
+  <div>
+    <b-container fluid>
+      <h1 class="display-5 fw-bold">Get directions to a {{ location }}</h1>
+      <p class="fs-4">Click the button below to find the {{ location }} closest to you</p>
+
+      <!-- Temp button for testing -->
+      <b-button
+        class="btn_message"
+        variant="primary"
+        v-on:click="getLocation()"
+        :disabled="isLoading">
+        {{ isLoading ? 'Locating...' : 'Get directions to a ' + location }}
+      </b-button>
+
+      <p class="col-xl-9">
+        The {{ location }} closest to you is: <pre class="mt3 bg-light p-3 border">{{ fetchedSystembolag }}</pre>
+      </p>
+    </b-container>
+  </div>
+</template>
+
+<script>
+import { Api } from '@/Api'
+
+export default {
+  props: {
+    location: {
+      type: String,
+      default: 'location'
+    }
+  },
+  data() {
+    return {
+      message: '',
+      fetchedSystembolag: [],
+      coordinates: null,
+      isLoading: false
+    }
+  },
+  methods: {
+    async getLocation() {
+      this.isLoading = true
+      if (this.coordinates === null) {
+        await this.getUserCoordinates()
+      }
+
+      if (this.location.toLowerCase() === 'systembolag') {
+        const response = await Api.get('/maps/coordinates', {
+          params: {
+            userLat: this.coordinates.lat,
+            userLng: this.coordinates.lng,
+            type: this.location
+          }
+        })
+
+        const mapData = response.data
+        const userNodeId = this.getNearestNodeId(
+          mapData,
+          this.coordinates.lat,
+          this.coordinates.lng
+        )
+        const targetNodeIds = mapData.targetLocations.map(target => {
+          return this.getNearestNodeId(mapData, target.lat, target.lon)
+        })
+        this.fetchedSystembolag = this.findShortestPath(userNodeId, targetNodeIds, mapData)
+        this.isLoading = false
+      }
+    },
+
+    getUserCoordinates() {
+      return new Promise((resolve, reject) => {
+        // initialize state
+        this.message = 'Waiting for user permission...'
+        this.coordinates = null
+
+        // check if geolocation is supported
+        if (!('geolocation' in navigator)) {
+          this.message = 'Geolocation is not supported by this browser.'
+          return
+        }
+
+        const options = {
+          enableHighAccuracy: true, // Use WiFi scanning/GPS (more precise)
+          timeout: 20000 // Wait 20 seconds before failing
+        }
+
+        // Request geolocation from browser
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.message = 'Location successfully retrieved!'
+
+            this.coordinates = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            }
+            resolve()
+          },
+          (error) => {
+            this.message = `Error: ${error.message}`
+            reject(error)
+          },
+          options
+        )
+      })
+    },
+
+    getNearestNodeId(mapData, lat, lng) {
+      const { nodes } = mapData
+      let nearestNodeId = null
+      let minDistance = Infinity
+
+      for (const nodeId in nodes) {
+        if (!mapData.adjacencyList[nodeId] || mapData.adjacencyList[nodeId].length === 0) {
+          continue // skip isolated nodes
+        }
+        const node = nodes[nodeId]
+        const deltaLat = node.lat - lat
+        const deltaLng = node.lon - lng
+        const distance = (deltaLat * deltaLat) + (deltaLng * deltaLng)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          nearestNodeId = nodeId
+        }
+      }
+
+      return nearestNodeId ? String(nearestNodeId) : null
+    },
+
+    // Shortest path algorithm implemented as A*
+    findShortestPath(startId, targets, mapData) {
+      const { nodes, adjacencyList } = mapData
+      const targetSet = new Set(targets)
+
+      const nodesToVisit = [startId]
+      const cameFrom = {}
+      const costToHere = {}
+      const estimatedTotalCost = {}
+
+      Object.keys(nodes).forEach(nodeId => {
+        costToHere[nodeId] = Infinity
+        estimatedTotalCost[nodeId] = Infinity
+      })
+
+      costToHere[startId] = 0
+      estimatedTotalCost[startId] = this.getHeuristic(startId, targets, nodes)
+
+      while (nodesToVisit.length > 0) {
+        nodesToVisit.sort((a, b) => estimatedTotalCost[a] - estimatedTotalCost[b]) // Sort by estimated total cost (priority queue)
+        const currentNode = nodesToVisit.shift()
+
+        if (targetSet.has(currentNode)) {
+          return {
+            found: true,
+            targetId: currentNode,
+            path: this.reconstructPath(cameFrom, currentNode),
+            distance: costToHere[currentNode]
+          }
+        }
+
+        const neighbors = adjacencyList[currentNode] || []
+
+        for (const edge of neighbors) {
+          const neighbor = String(edge.node)
+          const costToNext = costToHere[currentNode] + edge.weight
+
+          if (costToNext < costToHere[neighbor]) {
+            cameFrom[neighbor] = currentNode
+            costToHere[neighbor] = costToNext
+
+            const estimatedNextCost = this.getHeuristic(neighbor, targets, nodes)
+            estimatedTotalCost[neighbor] = costToNext + estimatedNextCost
+
+            if (!nodesToVisit.includes(neighbor)) {
+              nodesToVisit.push(neighbor)
+            }
+          }
+        }
+      }
+
+      return { found: false, distance: Infinity, path: [] }
+    },
+
+    getHeuristic(nodeId, targets, nodes) {
+      let minDistance = Infinity
+      const currentNode = nodes[nodeId]
+
+      for (const targetId of targets) {
+        const targetNode = nodes[targetId]
+
+        if (!targetNode) continue
+
+        const distance = this.getDistance(currentNode, targetNode)
+
+        if (distance < minDistance) {
+          minDistance = distance
+        }
+      }
+
+      return minDistance
+    },
+
+    getDistance(nodeA, nodeB) {
+      const R = 6371e3 // radius of earth in meters
+      const toRadians = (degrees) => degrees * (Math.PI / 180)
+      const latA = toRadians(nodeA.lat)
+      const latB = toRadians(nodeB.lat)
+      const deltaLat = toRadians(nodeB.lat - nodeA.lat)
+      const deltaLon = toRadians(nodeB.lon - nodeA.lon)
+      const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                  Math.cos(latA) * Math.cos(latB) *
+                  Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
+
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    },
+
+    reconstructPath(cameFrom, current) {
+      const totalPath = [current]
+
+      while (current in cameFrom) {
+        current = cameFrom[current]
+        totalPath.unshift(current)
+      }
+
+      return totalPath
+    }
+  },
+  created() {
+    this.getUserCoordinates() // Pre-fetch coordinates on component creation (page load)
+  }
+}
+</script>
+
+<style>
+.btn_message {
+  margin-bottom: 1em;
+}
+</style>
