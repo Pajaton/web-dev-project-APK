@@ -4,6 +4,19 @@
       <h1 class="display-5 fw-bold">Get directions to a {{ location }}</h1>
       <p class="fs-4">Click the button below to find the {{ location }} closest to you</p>
 
+      <!-- Map canvas -->
+      <div class="map-wrapper border mt-3" style="position: relative;">
+        <canvas
+          ref="mapCanvas"
+          width="800"
+          height="600"
+          style="width: 100%; background-color: #f8f9fa;"
+        ></canvas>
+        <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
+           <b-spinner label="Loading..."></b-spinner>
+        </div>
+      </div>
+
       <!-- Temp button for testing -->
       <b-button
         class="btn_message"
@@ -35,7 +48,11 @@ export default {
       message: '',
       fetchedSystembolag: [],
       coordinates: null,
-      isLoading: false
+      isLoading: false,
+      ctx: null,
+      bounds: { minLat: 0, maxLat: 0, minLon: 0, maxLon: 0 },
+      canvasWidth: 800,
+      canvasHeight: 600
     }
   },
   methods: {
@@ -64,6 +81,11 @@ export default {
           return this.getNearestNodeId(mapData, target.lat, target.lon)
         })
         this.fetchedSystembolag = this.findShortestPath(userNodeId, targetNodeIds, mapData)
+
+        this.$nextTick(() => {
+          this.renderMap(mapData, this.fetchedSystembolag)
+        })
+
         this.isLoading = false
       }
     },
@@ -224,6 +246,138 @@ export default {
       }
 
       return totalPath
+    },
+
+    calculateBounds(nodes) {
+      let minLat = Infinity
+      let maxLat = -Infinity
+      let minLon = Infinity
+      let maxLon = -Infinity
+
+      for (const nodeId in nodes) {
+        const node = nodes[nodeId]
+        if (node.lat < minLat) minLat = node.lat
+        if (node.lat > maxLat) maxLat = node.lat
+        if (node.lon < minLon) minLon = node.lon
+        if (node.lon > maxLon) maxLon = node.lon
+      }
+
+      this.bounds = { minLat, maxLat, minLon, maxLon }
+    },
+
+    // converts lat/lon to x/y on canvas
+    project(lat, lon) {
+      const { minLat, maxLat, minLon, maxLon } = this.bounds
+      const percentageX = ((lon - minLon) / (maxLon - minLon))
+      const percentageY = ((lat - minLat) / (maxLat - minLat))
+
+      const x = percentageX * this.canvasWidth
+      const y = this.canvasHeight - (percentageY * this.canvasHeight) // Invert
+
+      return { x, y }
+    },
+
+    renderMap(mapData, pathResult) {
+      const canvas = this.$refs.mapCanvas
+      const dpr = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      this.ctx = canvas.getContext('2d')
+      this.canvasWidth = rect.width
+      this.canvasHeight = rect.height
+      this.ctx.scale(dpr, dpr)
+
+      this.ctx.globalAlpha = 1.0
+      this.ctx.lineCap = 'round'
+      this.ctx.lineJoin = 'round'
+
+      this.ctx.fillStyle = '#ffffff'
+      this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+      this.calculateBounds(mapData.nodes)
+
+      this.drawRoads(mapData)
+
+      if (pathResult && pathResult.found) {
+        this.drawPath(mapData.nodes, pathResult.path)
+
+        const startNodeId = pathResult.path[0]
+        const targetNodeId = pathResult.path[pathResult.path.length - 1]
+        this.drawMarker(mapData.nodes[startNodeId], 'blue') // Start
+        this.drawMarker(mapData.nodes[targetNodeId], 'blue') // Target
+      }
+    },
+
+    drawRoads(mapData) {
+      const { adjacencyList, nodes } = mapData
+
+      this.ctx.beginPath()
+      this.ctx.strokeStyle = 'lightblue'
+      this.ctx.lineWidth = 1
+
+      let counter = 0
+      const batchSize = 500
+
+      for (const fromId in adjacencyList) {
+        const fromNode = nodes[fromId]
+        if (!fromNode) continue
+
+        const neighbors = adjacencyList[fromId]
+
+        neighbors.forEach(edge => {
+          const toNode = nodes[edge.node]
+          if (toNode) {
+            const p1 = this.project(fromNode.lat, fromNode.lon)
+            const p2 = this.project(toNode.lat, toNode.lon)
+
+            // draw line
+            this.ctx.moveTo(p1.x, p1.y)
+            this.ctx.lineTo(p2.x, p2.y)
+            counter++
+          }
+        })
+
+        if (counter >= batchSize) {
+          this.ctx.stroke()
+          this.ctx.beginPath()
+          counter = 0
+        }
+      }
+      this.ctx.stroke()
+    },
+    drawPath(nodes, pathIds) {
+      this.ctx.beginPath()
+      this.ctx.strokeStyle = 'blue'
+      this.ctx.lineWidth = 4
+      this.ctx.lineCap = 'round'
+      this.ctx.lineJoin = 'round'
+
+      if (pathIds.length < 2) return
+
+      const start = nodes[pathIds[0]]
+      const startProj = this.project(start.lat, start.lon)
+      this.ctx.moveTo(startProj.x, startProj.y)
+
+      for (let i = 1; i < pathIds.length; i++) {
+        const node = nodes[pathIds[i]]
+        const proj = this.project(node.lat, node.lon)
+        this.ctx.lineTo(proj.x, proj.y)
+      }
+      this.ctx.stroke()
+    },
+    drawMarker(node, color) {
+      if (!node) return
+
+      const proj = this.project(node.lat, node.lon)
+
+      this.ctx.beginPath()
+      this.ctx.arc(proj.x, proj.y, 6, 0, 2 * Math.PI)
+      this.ctx.fillStyle = color
+      this.ctx.fill()
+      this.ctx.strokeStyle = 'white'
+      this.ctx.lineWidth = 2
+      this.ctx.stroke()
     }
   },
   created() {
