@@ -452,4 +452,53 @@ export default {
     .delete-all-reviews-button {
       color: red;
     }
+
+  /* Iphone 14 pro max media query */
+  @media (max-width: 500px) {
+
+  .filter-list {
+    margin-left: 5px;
+    padding-left: 0;
+  }
+  .drinks-list {
+    margin-left: 5px;
+    padding-left: 0;
+  }
+  .sub-filter {
+    margin-left: 5px;
+    padding-left: 0;
+  }
+  .filter-button {
+    margin-left: 5px;
+    text-align: center;
+  }
+  .sort-button {
+    margin-left: 5px;
+    text-align: center;
+  }
+  .drink-popup {
+    width: 90%;
+    padding: 1rem;
+    margin-top: 7rem;
+  }
+  .review-popup {
+    width: 80%;
+    padding: 0.7rem;
+    margin-top: 9rem;
+  }
+  .review-input-field {
+    width: 100%;
+  }
+  .review-buttons {
+    gap: 0.5rem;
+    padding-top: 20px;
+  }
+  .review-button {
+    margin-left: 10rem;
+  }
+  .sort-list {
+    padding-top: 5px;
+    margin-left: -26px;
+  }
+}
 </style>
