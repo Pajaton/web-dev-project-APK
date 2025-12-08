@@ -3,6 +3,7 @@ var router = express.Router();
 
 var Review = require("../models/ReviewSchema");
 var User = require("../models/UserSchema");
+var Drink = require ("../models/DrinkSchema")
 
 // GET ROUTE DEFINITIONS
 
@@ -83,10 +84,14 @@ router.post("/reviews", async (req, res, next) => {
             "comment": req.body.comment,
         });
         await newReview.save();
-        
+
         await User.findByIdAndUpdate(
             req.body.userID,
             {$addToSet: {reviewsWritten: newReview._id} 
+        });
+        await Drink.findByIdAndUpdate(
+            req.body.productID,
+            {$addToSet: {hasReviews: newReview._id} 
         });
 
         return res.status(201).json(newReview);
