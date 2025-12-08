@@ -130,7 +130,7 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <button @click="closeDrinkPopup">Close</button>
-                    <button class="review-button" @click="openReviewPopup(); getReviewRating();">Review drink</button>
+                    <button class="review-button" @click="getReviewRating();">Review drink</button>
                 </div>
             </div>
             <div v-if="showReviewPopup" class="popup-overlay">
@@ -196,7 +196,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '69371efc65a159ba5223dff5',
+      mockUserId: '69372ad2ae60bfe07fb7f837',
       oldReview: null
     }
   },
@@ -285,9 +285,16 @@ export default {
       this.showDrinkPopup = false
       this.chosenDrink = null
     },
-    openReviewPopup(drink) {
+    openReviewPopup() {
       this.showReviewPopup = true
       this.showDrinkPopup = false
+      if (this.oldReview) {
+        this.reviewText = this.oldReview.comment
+        this.rating = this.oldReview.rating
+      } else {
+        this.reviewText = ''
+        this.rating = null
+      }
     },
     closeReviewPopup() {
       this.showReviewPopup = false
@@ -296,13 +303,14 @@ export default {
     getReviewRating() {
       drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
-        //  random comment for new git push, pipeline issue
           const reviews = response.data.reviews || []
           if (reviews.length === 0) {
             this.oldReview = null
           } else {
             this.oldReview = reviews[0]
           }
+
+          this.openReviewPopup()
         })
         .catch(error => {
           this.message = error
