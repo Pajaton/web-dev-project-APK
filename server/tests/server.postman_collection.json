@@ -820,7 +820,7 @@
 									"    pm.expect(123123).to.eq(user1.latitude);",
 									"    pm.expect(user1.follows.length).to.eq(0);",
 									"    pm.expect(user1.triedDrinks.length).to.eq(0);",
-									"    pm.expect(user1.reviewsWritten.length).to.eq(0);",
+									"    pm.expect(user1.reviewsWritten.length).to.eq(2);",
 									"});",
 									"",
 									"pm.test(\"User 2 is correct\", () => {",
