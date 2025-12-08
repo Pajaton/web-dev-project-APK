@@ -154,10 +154,20 @@ router.put("/reviews/:reviewId", async (req, res, next) => {
 router.delete("/reviews/:reviewId", async (req, res, next) => {
     try {
         const reviewToDelete = await Review
-            .findByIdAndDelete(req.params.reviewId)
+        .findByIdAndDelete(req.params.reviewId)
+
         if (!reviewToDelete) {
             return res.status(404).json({"message": "Review not found"})
-        } return res.json(reviewToDelete);
+        }
+        await User.findByIdAndUpdate(
+            reviewToDelete.userID,
+            {$pull: {reviewsWritten: reviewToDelete._id} 
+        });
+        await Drink.findByIdAndUpdate(
+            reviewToDelete.productID,
+            {$pull: {hasReviews: reviewToDelete._id} 
+        });
+        return res.json(reviewToDelete);
     } catch(err) { next(err) };
 });
 
