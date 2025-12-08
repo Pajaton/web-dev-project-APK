@@ -154,19 +154,19 @@ router.put("/reviews/:reviewId", async (req, res, next) => {
 router.delete("/reviews/:reviewId", async (req, res, next) => {
     try {
         const reviewToDelete = await Review
-        .findByIdAndDelete(req.params.reviewId)
+            .findByIdAndDelete(req.params.reviewId)
 
-        if (!reviewToDelete) {
-            return res.status(404).json({"message": "Review not found"})
-        }
-        await User.findByIdAndUpdate(
-            reviewToDelete.userID,
-            {$pull: {reviewsWritten: reviewToDelete._id} 
-        });
-        await Drink.findByIdAndUpdate(
-            reviewToDelete.productID,
-            {$pull: {hasReviews: reviewToDelete._id} 
-        });
+            if (!reviewToDelete) {
+                return res.status(404).json({"message": "Review not found"})
+            }
+            await User.findByIdAndUpdate(
+                reviewToDelete.userID,
+                {$pull: {reviewsWritten: reviewToDelete._id} 
+            });
+            await Drink.findByIdAndUpdate(
+                reviewToDelete.productID,
+                {$pull: {hasReviews: reviewToDelete._id} 
+            });
         return res.json(reviewToDelete);
     } catch(err) { next(err) };
 });
@@ -176,9 +176,17 @@ router.delete("/reviews", async (req, res, next) => {
     try {
         const reviewsToDelete = await Review
             .deleteMany()
-        if (reviewsToDelete.deletedCount == 0) {
-            return res.status(404).json({"message": "No reviews found"})
-        } return res.json(reviewsToDelete);
+
+            await User.updateMany({},
+                {$set: {reviewsWritten: []}
+            });
+            
+            await Drink.updateMany({},
+                {$set: {hasReviews: []}
+            });
+            if (reviewsToDelete.deletedCount == 0) {
+                return res.status(404).json({"message": "No reviews found"})
+            } return res.json(reviewsToDelete);
     } catch(err) {next(err) };
 });
 
