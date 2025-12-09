@@ -10,6 +10,9 @@
           ref="mapCanvas"
           width="800"
           height="600"
+          @mousedown="handleMouseDown"
+          @mouseUp="handleMouseUp"
+          @mousemove="handleMouseMove"
         ></canvas>
         <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
            <b-spinner label="Loading..."></b-spinner>
@@ -26,7 +29,7 @@
       </b-button>
 
       <p class="col-xl-9">
-        The {{ location }} closest to you is: <pre class="mt3 bg-light p-3 border">{{ fetchedSystembolag }}</pre>
+        The {{ location }} closest to you is: <pre class="mt3 bg-light p-3 border">{{ pathResult }}</pre>
       </p>
     </b-container>
   </div>
@@ -45,13 +48,25 @@ export default {
   data() {
     return {
       message: '',
-      fetchedSystembolag: [],
       coordinates: null,
+      mapData: {},
+      pathResult: {},
       isLoading: false,
+
+      // canvas
       ctx: null,
+      offscreenCanvas: null,
+      renderPending: false,
       bounds: { minLat: 0, maxLat: 0, minLon: 0, maxLon: 0 },
       canvasWidth: 800,
-      canvasHeight: 600
+      canvasHeight: 600,
+
+      // map movement
+      isDraggingMap: false,
+      prevMouseX: 0,
+      prevMouseY: 0,
+      newX: 0,
+      newY: 0
     }
   },
   methods: {
@@ -70,19 +85,18 @@ export default {
           }
         })
 
-        const mapData = response.data
+        this.mapData = response.data
         const userNodeId = this.getNearestNodeId(
-          mapData,
           this.coordinates.lat,
           this.coordinates.lng
         )
-        const targetNodeIds = mapData.targetLocations.map(target => {
-          return this.getNearestNodeId(mapData, target.lat, target.lon)
+        const targetNodeIds = this.mapData.targetLocations.map(target => {
+          return this.getNearestNodeId(target.lat, target.lon)
         })
-        this.fetchedSystembolag = this.findShortestPath(userNodeId, targetNodeIds, mapData)
+        this.pathResult = this.findShortestPath(userNodeId, targetNodeIds)
 
         this.$nextTick(() => {
-          this.renderMap(mapData, this.fetchedSystembolag)
+          this.renderMap(this.mapData, this.pathResult)
         })
 
         this.isLoading = false
@@ -126,16 +140,15 @@ export default {
       })
     },
 
-    getNearestNodeId(mapData, lat, lng) {
-      const { nodes } = mapData
+    getNearestNodeId(lat, lng) {
       let nearestNodeId = null
       let minDistance = Infinity
 
-      for (const nodeId in nodes) {
-        if (!mapData.adjacencyList[nodeId] || mapData.adjacencyList[nodeId].length === 0) {
+      for (const nodeId in this.mapData.nodes) {
+        if (!this.mapData.adjacencyList[nodeId] || this.mapData.adjacencyList[nodeId].length === 0) {
           continue // skip isolated nodes
         }
-        const node = nodes[nodeId]
+        const node = this.mapData.nodes[nodeId]
         const deltaLat = node.lat - lat
         const deltaLng = node.lon - lng
         const distance = (deltaLat * deltaLat) + (deltaLng * deltaLng)
@@ -150,8 +163,8 @@ export default {
     },
 
     // Shortest path algorithm implemented as A*
-    findShortestPath(startId, targets, mapData) {
-      const { nodes, adjacencyList } = mapData
+    findShortestPath(startId, targets) {
+      const { nodes, adjacencyList } = this.mapData
       const targetSet = new Set(targets)
 
       const nodesToVisit = [startId]
@@ -278,45 +291,54 @@ export default {
       return { x, y }
     },
 
-    renderMap(mapData, pathResult) {
-      const canvas = this.$refs.mapCanvas
-      const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width
-      canvas.height = rect.height
-      this.ctx = canvas.getContext('2d')
-      this.canvasWidth = rect.width
-      this.canvasHeight = rect.height
+    prerenderMap() {
+      this.offscreenCanvas = document.createElement('canvas')
+      this.offscreenCanvas.width = this.canvasWidth
+      this.offscreenCanvas.height = this.canvasHeight
+      const offscreenCanvasCtx = this.offscreenCanvas.getContext('2d')
 
-      this.ctx.globalAlpha = 1.0
-      this.ctx.lineCap = 'round'
-      this.ctx.lineJoin = 'round'
+      this.offscreenCanvas.lineCap = 'round'
+      this.offscreenCanvas.lineJoin = 'round'
 
+      this.drawRoads(this.offscreenCanvas, offscreenCanvasCtx)
+    },
+
+    renderMap() {
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       this.ctx.fillStyle = '#ffffff'
       this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-      this.calculateBounds([pathResult.path, mapData.nodes])
+      this.ctx.save() // save current state
+      this.ctx.translate(this.newX, this.newY) // move the viewport/camera
 
-      this.drawRoads(mapData)
-
-      if (pathResult && pathResult.found) {
-        this.drawPath(mapData.nodes, pathResult.path)
-
-        const startNodeId = pathResult.path[0]
-        const targetNodeId = pathResult.path[pathResult.path.length - 1]
-        this.drawMarker(mapData.nodes[startNodeId], '#005885') // Start
-        this.drawMarker(mapData.nodes[targetNodeId], '#76B07E') // Target
+      if (this.offscreenCanvas) {
+        this.ctx.drawImage(this.offscreenCanvas, 0, 0)
+      } else {
+        this.drawRoads(this.mapData, this.ctx)
       }
+
+      if (this.bounds.minLat === 0 && this.bounds.maxLat === 0) {
+        this.calculateBounds([this.pathResult.path, this.mapData.nodes])
+      }
+
+      if (this.pathResult && this.pathResult.found) {
+        this.drawPath(this.mapData.nodes, this.pathResult.path, this.ctx)
+
+        const startNodeId = this.pathResult.path[0]
+        const targetNodeId = this.pathResult.path[this.pathResult.path.length - 1]
+        this.drawMarker(this.mapData.nodes[startNodeId], '#005885', this.ctx) // Start
+        this.drawMarker(this.mapData.nodes[targetNodeId], '#76B07E', this.ctx) // Target
+      }
+
+      this.ctx.restore() // restore state
     },
 
-    drawRoads(mapData) {
+    drawRoads(mapData, ctx) {
       const { adjacencyList, nodes } = mapData
 
-      this.ctx.beginPath()
-      this.ctx.strokeStyle = 'darkgray'
-      this.ctx.lineWidth = 1
-
-      let counter = 0
-      const batchSize = 500
+      ctx.beginPath()
+      ctx.strokeStyle = 'darkgray'
+      ctx.lineWidth = 1
 
       for (const fromId in adjacencyList) {
         const fromNode = nodes[fromId]
@@ -333,53 +355,92 @@ export default {
             // draw line
             this.ctx.moveTo(p1.x, p1.y)
             this.ctx.lineTo(p2.x, p2.y)
-            counter++
           }
         })
-
-        if (counter >= batchSize) {
-          this.ctx.stroke()
-          this.ctx.beginPath()
-          counter = 0
-        }
       }
       this.ctx.stroke()
     },
-    drawPath(nodes, pathIds) {
-      this.ctx.beginPath()
-      this.ctx.strokeStyle = '#FF9494'
-      this.ctx.lineWidth = 4
-      this.ctx.lineCap = 'round'
-      this.ctx.lineJoin = 'round'
+    drawPath(nodes, pathIds, ctx) {
+      ctx.beginPath()
+      ctx.strokeStyle = '#FF9494'
+      ctx.lineWidth = 4
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
 
       if (pathIds.length < 2) return
 
       const start = nodes[pathIds[0]]
       const startProj = this.project(start.lat, start.lon)
-      this.ctx.moveTo(startProj.x, startProj.y)
+      ctx.moveTo(startProj.x, startProj.y)
 
       for (let i = 1; i < pathIds.length; i++) {
         const node = nodes[pathIds[i]]
         const proj = this.project(node.lat, node.lon)
-        this.ctx.lineTo(proj.x, proj.y)
+        ctx.lineTo(proj.x, proj.y)
       }
-      this.ctx.stroke()
+      ctx.stroke()
     },
-    drawMarker(node, color) {
+
+    drawMarker(node, color, ctx) {
       if (!node) return
 
       const proj = this.project(node.lat, node.lon)
 
-      this.ctx.beginPath()
-      this.ctx.arc(proj.x, proj.y, 6, 0, 2 * Math.PI)
-      this.ctx.fillStyle = color
-      this.ctx.fill()
-      this.ctx.strokeStyle = 'white'
-      this.ctx.lineWidth = 2
-      this.ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(proj.x, proj.y, 6, 0, 2 * Math.PI)
+      ctx.fillStyle = color
+      ctx.fill()
+      ctx.strokeStyle = 'white'
+      ctx.lineWidth = 2
+      ctx.stroke()
+    },
+
+    handleMouseDown(event) {
+      this.isDraggingMap = true
+
+      // store initial dragging position
+      this.prevMouseX = event.clientX
+      this.prevMouseY = event.clientY
+    },
+
+    handleMouseUp() {
+      this.isDraggingMap = false
+    },
+
+    handleMouseMove(event) {
+      if (!this.isDraggingMap) return
+
+      // calculate the new position of the map
+      this.newX += event.clientX - this.prevMouseX
+      this.newY += event.clientY - this.prevMouseY
+
+      // store current mouse position
+      this.prevMouseX = event.clientX
+      this.prevMouseY = event.clientY
+
+      // re-render map with new offset
+      if (!this.renderPending) {
+        this.renderPending = true
+        requestAnimationFrame(() => {
+          this.renderMap()
+          this.renderPending = false
+        })
+      }
+    },
+
+    resizeCanvas() {
+      const canvas = this.$refs.mapCanvas
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width
+      canvas.height = rect.height
+      this.canvasWidth = rect.width
+      this.canvasHeight = rect.height
+
+      this.ctx = canvas.getContext('2d')
     }
   },
-  created() {
+  mounted() {
+    this.resizeCanvas()
     this.getUserCoordinates() // Pre-fetch coordinates on component creation (page load)
   }
 }
