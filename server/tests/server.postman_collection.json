@@ -3,8 +3,8 @@
 		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50199247",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50199247"
+		"_exporter_id": "50143285",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50143285"
 	},
 	"item": [
 		{
@@ -678,7 +678,7 @@
 									"})\r",
 									"\r",
 									"\r",
-									"pm.globals.set(\"reviewID\",json._id);"
+									"pm.globals.set(\"anotherReviewID\",json._id);"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -820,7 +820,7 @@
 									"    pm.expect(123123).to.eq(user1.latitude);",
 									"    pm.expect(user1.follows.length).to.eq(0);",
 									"    pm.expect(user1.triedDrinks.length).to.eq(0);",
-									"    pm.expect(user1.reviewsWritten.length).to.eq(0);",
+									"    pm.expect(user1.reviewsWritten.length).to.eq(2);",
 									"});",
 									"",
 									"pm.test(\"User 2 is correct\", () => {",
@@ -1420,7 +1420,7 @@
 									"    pm.expect(drink.price).to.eq(25);\r",
 									"    pm.expect(drink.image).to.eq('bottle.jpg');\r",
 									"    pm.expect(drink.apk).to.eq(0);\r",
-									"    pm.expect(drink.hasReviews).to.be.empty;\r",
+									"    pm.expect(drink.hasReviews.length).to.eq(1);\r",
 									"    pm.expect(drink.availableAt).to.be.empty;\r",
 									"    pm.expect(drink.triedBy).to.be.empty;\r",
 									"})\r",
@@ -1532,6 +1532,7 @@
 								"exec": [
 									"var json = pm.response.json();\r",
 									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"const reviewID = pm.globals.get(\"reviewID\");\r",
 									"\r",
 									"pm.test(\"Status code is 200\", () => {\r",
 									"    pm.response.to.have.status(200);\r",
@@ -1558,7 +1559,7 @@
 									"    pm.expect(json.favoriteDrinks[0].price).to.eq(519);\r",
 									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
 									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(66);\r",
-									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.include(reviewID);\r",
 									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
 									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
 									"});\r",
@@ -1671,6 +1672,8 @@
 								"exec": [
 									"var json = pm.response.json();\r",
 									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"const reviewID = pm.globals.get(\"reviewID\");\r",
+									"const anotherReviewID = pm.globals.get(\"anotherReviewID\");\r",
 									"\r",
 									"pm.test(\"Status code is 200\", () => {\r",
 									"    pm.response.to.have.status(200);\r",
@@ -1697,7 +1700,7 @@
 									"    pm.expect(json.favoriteDrinks[0].price).to.eq(25);\r",
 									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
 									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(0);\r",
-									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.include(anotherReviewID)\r",
 									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
 									"    pm.expect(json.favoriteDrinks[0].triedBy).to.be.empty;\r",
 									"});\r",
@@ -1712,7 +1715,7 @@
 									"    pm.expect(json.favoriteDrinks[1].price).to.eq(519);\r",
 									"    pm.expect(json.favoriteDrinks[1].image).to.eq('bottle.jpg');\r",
 									"    pm.expect(json.favoriteDrinks[1].apk).to.eq(66);\r",
-									"    pm.expect(json.favoriteDrinks[1].hasReviews).to.be.empty;\r",
+									"    pm.expect(json.favoriteDrinks[1].hasReviews).to.include(reviewID);\r",
 									"    pm.expect(json.favoriteDrinks[1].availableAt).to.be.empty;\r",
 									"    pm.expect(json.favoriteDrinks[1].triedBy).to.be.empty;\r",
 									"});\r",
@@ -2602,6 +2605,7 @@
 								"exec": [
 									"const json = pm.response.json();\r",
 									"const drinkSchema = JSON.parse(pm.variables.get(\"drinkSchema\"));\r",
+									"const reviewID = pm.globals.get(\"reviewID\");\r",
 									"\r",
 									"pm.test(\"Status code is 200\", function (){\r",
 									"    pm.response.to.have.status(200);\r",
@@ -2663,7 +2667,7 @@
 									"    pm.expect(product.price).to.eq(519);\r",
 									"    pm.expect(product.image).to.eq(\"bottle.jpg\");\r",
 									"    pm.expect(product.apk).to.eq(66);\r",
-									"    pm.expect(product.hasReviews).to.be.empty;\r",
+									"    pm.expect(product.hasReviews).to.include(reviewID);\r",
 									"    pm.expect(product.availableAt).to.be.empty;\r",
 									"    pm.expect(product.triedBy).to.be.empty;\r",
 									"});"
