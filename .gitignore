@@ -174,7 +174,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# certs and keys
-*.pem
-
 # End of https://www.gitignore.io/api/node,vuejs,visualstudiocode,linux,macos,windows
