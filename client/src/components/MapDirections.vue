@@ -10,7 +10,6 @@
           ref="mapCanvas"
           width="800"
           height="600"
-          style="width: 100%; background-color: #f8f9fa;"
         ></canvas>
         <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
            <b-spinner label="Loading..."></b-spinner>
@@ -254,12 +253,14 @@ export default {
       let minLon = Infinity
       let maxLon = -Infinity
 
-      for (const nodeId in nodes) {
-        const node = nodes[nodeId]
-        if (node.lat < minLat) minLat = node.lat
-        if (node.lat > maxLat) maxLat = node.lat
-        if (node.lon < minLon) minLon = node.lon
-        if (node.lon > maxLon) maxLon = node.lon
+      for (const nodeId in nodes[1]) {
+        const node = nodes[1][nodeId]
+        if (nodes[0].includes(nodeId)) {
+          if (node.lat < minLat) minLat = node.lat - 0.001
+          if (node.lat > maxLat) maxLat = node.lat + 0.001
+          if (node.lon < minLon) minLon = node.lon - 0.001
+          if (node.lon > maxLon) maxLon = node.lon + 0.001
+        }
       }
 
       this.bounds = { minLat, maxLat, minLon, maxLon }
@@ -279,14 +280,12 @@ export default {
 
     renderMap(mapData, pathResult) {
       const canvas = this.$refs.mapCanvas
-      const dpr = window.devicePixelRatio || 1
       const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
+      canvas.width = rect.width
+      canvas.height = rect.height
       this.ctx = canvas.getContext('2d')
       this.canvasWidth = rect.width
       this.canvasHeight = rect.height
-      this.ctx.scale(dpr, dpr)
 
       this.ctx.globalAlpha = 1.0
       this.ctx.lineCap = 'round'
@@ -295,7 +294,7 @@ export default {
       this.ctx.fillStyle = '#ffffff'
       this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-      this.calculateBounds(mapData.nodes)
+      this.calculateBounds([pathResult.path, mapData.nodes])
 
       this.drawRoads(mapData)
 
@@ -304,8 +303,8 @@ export default {
 
         const startNodeId = pathResult.path[0]
         const targetNodeId = pathResult.path[pathResult.path.length - 1]
-        this.drawMarker(mapData.nodes[startNodeId], 'blue') // Start
-        this.drawMarker(mapData.nodes[targetNodeId], 'blue') // Target
+        this.drawMarker(mapData.nodes[startNodeId], '#005885') // Start
+        this.drawMarker(mapData.nodes[targetNodeId], '#76B07E') // Target
       }
     },
 
@@ -313,7 +312,7 @@ export default {
       const { adjacencyList, nodes } = mapData
 
       this.ctx.beginPath()
-      this.ctx.strokeStyle = 'lightblue'
+      this.ctx.strokeStyle = 'darkgray'
       this.ctx.lineWidth = 1
 
       let counter = 0
@@ -348,7 +347,7 @@ export default {
     },
     drawPath(nodes, pathIds) {
       this.ctx.beginPath()
-      this.ctx.strokeStyle = 'blue'
+      this.ctx.strokeStyle = '#FF9494'
       this.ctx.lineWidth = 4
       this.ctx.lineCap = 'round'
       this.ctx.lineJoin = 'round'
