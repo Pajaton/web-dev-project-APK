@@ -3,8 +3,8 @@
 		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50143285",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50143285"
+		"_exporter_id": "50127910",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50127910"
 	},
 	"item": [
 		{
@@ -20,7 +20,7 @@
 									"var json = pm.response.json();\r",
 									"const userSchema = JSON.parse(pm.variables.get(\"userSchema\"));\r",
 									"\r",
-									"pm.test(\"Status code is 201\", function (){\r",
+									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
@@ -29,7 +29,6 @@
 									"});\r",
 									"\r",
 									"pm.test(\"correct JSON\", function () {\r",
-									"    pm.expect(1).to.eq(json.userID);\r",
 									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
 									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
 									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
@@ -41,7 +40,18 @@
 									"    pm.expect(123123).to.eq(json.latitude);\r",
 									"})\r",
 									"\r",
-									"pm.globals.set(\"userID\",json._id);"
+									"pm.globals.set(\"userID\", json._id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -60,7 +70,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userID\": 1,\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
+							"raw": "{\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -156,7 +166,6 @@
 									"});",
 									"",
 									"pm.test(\"Correct user info\", () => {",
-									"    pm.expect(3).to.eq(json.userID);",
 									"    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(json.email);",
 									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);",
 									"    pm.expect(\"Bob\").to.eq(json.userName);",
@@ -205,7 +214,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userID\": 3,\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
+							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -906,7 +915,6 @@
 									"});\r",
 									"\r",
 									"pm.test(\"Fetched correct user info\", () => {\r",
-									"    pm.expect(1).to.eq(json.userID);\r",
 									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
 									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
 									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
@@ -1175,7 +1183,6 @@
 									"pm.test(\"Correctly fetches user follows\", () => {\r",
 									"    console.log(json.follows[0]);\r",
 									"    pm.expect(json.follows.length).to.be.eq(1); // Assuming at least one follow is expected\r",
-									"    pm.expect(json.follows[0]).has.property('userID');\r",
 									"    pm.expect(json.follows[0]).has.property('profilePicture');\r",
 									"    pm.expect(json.follows[0]).has.property('userName');\r",
 									"    pm.expect(json.follows[0].userID).to.not.eq(json.userID);\r",
@@ -4809,11 +4816,11 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "https://localhost:3001"
+			"value": "http://localhost:3000"
 		},
 		{
 			"key": "userSchema",
-			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"userID\":{\"type\":\"number\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"userID\":{\"type\":\"number\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"userID\",\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"userID\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
 		},
 		{
 			"key": "reviewSchema",
