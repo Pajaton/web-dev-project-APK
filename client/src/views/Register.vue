@@ -15,18 +15,6 @@
           placeholder="Email address"
         />
         </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="Profile Picture"
-        label-for="floatingProfilePicture"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingprofilepicture"
-          v-model="ProfilePicture"
-          type="text"
-          placeholder="Profile Picture"
-        />
-        </BFormFloatingLabel>
                 <BFormFloatingLabel
         label="User Name"
         label-for="floatingUserName"
@@ -105,7 +93,6 @@ export default {
     return {
       message: 'none',
       email: '',
-      ProfilePicture: '',
       UserName: '',
       street: '',
       streetNumber: '',
@@ -119,9 +106,8 @@ export default {
       this.userVerification()
       if (this.userExist === false) {
         drinkApi.post('/users', {
-          userID: 5,
           email: this.email,
-          ProfilePicture: this.ProfilePicture,
+          ProfilePicture: null,
           userName: this.UserName,
           street: this.street,
           streetNumber: this.streetNumber,
@@ -135,7 +121,6 @@ export default {
     },
     resetFields() {
       this.email = ''
-      this.ProfilePicture = ''
       this.UserName = ''
       this.street = ''
       this.streetNumber = ''

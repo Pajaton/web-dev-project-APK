@@ -11,7 +11,7 @@
         <li>Number of review written: {{user.reviewsWritten.length}}</li>
         <li>Alcoholic intake: {{user.alcoholConsumed.length}}</li>
         <li>How many drinks tried: {{user.triedDrinks.length}}</li>
-        <li v-for="followedUser in userFollowingList" :key="followedUser.userID">{{ user.userName }} follows: {{ followedUser.userName }}</li>
+        <li v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</li>
       </ul>
     </div>
   </div>
