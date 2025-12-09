@@ -33,7 +33,7 @@ router.get("/drinks/:drinkId/reviews", async (req, res, next) => {
     try {
         const reviewForDrink = await Review
             .find({"productID": req.params.drinkId})
-            .populate("userID", "userName")
+            .populate("email", "userName")
             .populate("productID", "name")
             .select("-__v");
         if (!reviewForDrink) {
@@ -47,7 +47,7 @@ router.get("/drinks/:drinkId/reviews", async (req, res, next) => {
 router.get("/users/:userId/reviews", async (req, res, next) => {
     try {
         const reviewedByUser = await Review
-            .find({"userID": req.params.userId});
+            .find({"email": req.params.email});
         if(!reviewedByUser) {
             return res.status(404).json({"message": "User has not made any reviews"});
         }
@@ -60,10 +60,10 @@ router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
     try {
         const drinkReviewedByUser = await Review
             .find({
-                "userID": req.params.userId,
+                "email": req.params.email,
                 "productID": req.params.drinkId
             })
-            .populate("userID")
+            .populate("email")
             .populate("productID");
         if (!drinkReviewedByUser) {
             return res.status(404).json({"message": "User has not reviewed this drink"});
@@ -78,7 +78,7 @@ router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
 router.post("/reviews", async (req, res, next) => {
     try {
         var newReview = new Review({
-            "userID": req.body.userID,
+            "email": req.body.email,
             "productID": req.body.productID,
             "rating": req.body.rating,
             "comment": req.body.comment,
@@ -86,7 +86,7 @@ router.post("/reviews", async (req, res, next) => {
         await newReview.save();
 
         await User.findByIdAndUpdate(
-            req.body.userID,
+            req.body.email,
             {$addToSet: {reviewsWritten: newReview._id} 
         });
         await Drink.findByIdAndUpdate(
@@ -112,7 +112,7 @@ router.patch("/reviews/:reviewId", async (req, res, next) => {
     
 
         // Update the review's fields if new values are provided
-        updatedReview.userID = (req.body.userID || updatedReview.userID);
+        updatedReview.email = (req.body.email || updatedReview.email);
         updatedReview.productID = (req.body.productID || updatedReview.productID);
         updatedReview.rating = (req.body.rating || updatedReview.rating);
         updatedReview.comment = (req.body.comment || updatedReview.comment);
@@ -137,7 +137,7 @@ router.put("/reviews/:reviewId", async (req, res, next) => {
         }
 
         // Update the review's fields if new values are provided
-        updatedReview.userID = req.body.userID;
+        updatedReview.email = req.body.email;
         updatedReview.productID = req.body.productID;
         updatedReview.rating = req.body.rating;
         updatedReview.comment = req.body.comment;
@@ -160,7 +160,7 @@ router.delete("/reviews/:reviewId", async (req, res, next) => {
                 return res.status(404).json({"message": "Review not found"})
             }
             await User.findByIdAndUpdate(
-                reviewToDelete.userID,
+                reviewToDelete.email,
                 {$pull: {reviewsWritten: reviewToDelete._id} 
             });
             await Drink.findByIdAndUpdate(

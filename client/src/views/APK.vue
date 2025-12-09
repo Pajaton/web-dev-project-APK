@@ -196,7 +196,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '69372ad2ae60bfe07fb7f837',
+      mockEmail: 'greger@hawkwind.com',
       oldReview: null
     }
   },
@@ -301,7 +301,7 @@ export default {
       console.log(this.showReviewPopup)
     },
     getReviewRating() {
-      drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
+      drinkApi.get('/users/' + this.mockEmail + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
           const reviews = response.data.reviews || []
           if (reviews.length === 0) {
@@ -319,7 +319,7 @@ export default {
     sendReviewRating() {
       drinkApi.post('/reviews', {
         // Change the mock data for the user who is currently logged in.
-        userID: this.mockUserId,
+        email: this.mockEmail,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText
@@ -331,7 +331,7 @@ export default {
     },
     updateReviewRating() {
       drinkApi.put('/reviews/' + this.oldReview._id, {
-        userID: this.mockUserId,
+        email: this.mockEmail,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText

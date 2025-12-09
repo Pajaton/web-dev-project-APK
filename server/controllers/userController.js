@@ -64,7 +64,7 @@ router.get("/users/:userId/follows", async (req, res, next) => {
             .filter(followedUser => followedUser)
             .map(followedUser => {
                 return {
-                    "userID": followedUser.userID,
+                    "userID": followedUser._id,
                     "profilePicture": followedUser.profilePicture,
                     "userName": followedUser.userName,
                 };
@@ -131,7 +131,7 @@ router.get("/users/:userId/alcoholConsumed", async (req, res) => {
         }
 
         res.json({
-            userId: user.userID,
+            userId: user._id,
             alcoholConsumed: user.alcoholConsumed,
             timestamp: user.timstamp
         });
@@ -145,7 +145,6 @@ router.get("/users/:userId/alcoholConsumed", async (req, res) => {
 router.post("/users", async (req, res, next) => {
     try {
         var newUser = new User({
-            "userID": req.body.userID,
             "email": req.body.email,
             "profilePicture": req.body.profilePicture,
             "userName": req.body.userName,
@@ -323,7 +322,6 @@ router.patch("/users/:userId", async (req, res, next) => {
         }
 
         // Update only the fields provided in the request body
-        userToUpdate.userID = (req.body.userID || userToUpdate.userID);
         userToUpdate.email = (req.body.email || userToUpdate.email);
         userToUpdate.profilePicture = (req.body.profilePicture || userToUpdate.profilePicture);
         userToUpdate.userName = (req.body.userName || userToUpdate.userName);

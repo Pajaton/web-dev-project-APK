@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 //Define the structure of the schema
 var reviewSchema = new Schema({
     // Composite primary key
-    "userID": {type: Schema.Types.ObjectId, ref: "User"},
+    "email": {type: Schema.Types.String, ref: "User"},
     "productID": {type: Schema.Types.ObjectId, ref: "Drink"},
 
     // Local attributes

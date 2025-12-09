@@ -119,7 +119,6 @@ export default {
       this.userVerification()
       if (this.userExist === false) {
         drinkApi.post('/users', {
-          userID: 5,
           email: this.email,
           ProfilePicture: this.ProfilePicture,
           userName: this.UserName,
