@@ -1,17 +1,19 @@
 <template>
-    <!-- Find Systembolag HTML template -->
-    <div>
-        <p>Find Systembolag</p>
-    </div>
+  <div>
+    <MapDirections location="Systembolag"/>
+  </div>
 </template>
 
 <script>
-    // Find Systembolag view behavior
+import MapDirections from '@/components/MapDirections.vue'
+
 export default {
-    name: 'FindSystembolag'
+  components: {
+    MapDirections
+  }
 }
 </script>
 
 <style>
-    /* Find Systembolag CSS styles */
+
 </style>

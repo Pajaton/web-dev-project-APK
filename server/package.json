@@ -14,8 +14,8 @@
     "test": "cross-env-shell MONGODB_URI=mongodb://localhost:27017/serverTestDB \"npm run newman-server\"",
     "ci-test": "npm run newman-server",
     "newman-server": "cross-env-shell PORT=3001 \"npm run dropdb && run-p --race start newman-wait\"",
-    "newman-wait": "wait-on http://localhost:3001/api && npm run newman",
-    "newman": "newman run ./tests/server.postman_collection.json --env-var host=http://localhost:3001",
+    "newman-wait": "wait-on https://localhost:3001/api && npm run newman",
+    "newman": "newman run ./tests/server.postman_collection.json --env-var host=https://localhost:3001 --insecure",
     "dropdb": "node ./tests/dropdb.js"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "connect-history-api-fallback": "^2.0.0",
     "connect-mongo": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^4.19.2",
     "express-session": "^1.18.2",
     "mongoose": "^8.5.4",
