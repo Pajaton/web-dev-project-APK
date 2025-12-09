@@ -108,29 +108,19 @@ app.use(function(err, req, res, next) {
     res.json(err_res);
 });
 
-if (process.env.USE_HTTPS === 'true') {
-    try {
-        const httpsOptions = {
-            key: fs.readFileSync('localhost-key.pem'),
-            cert: fs.readFileSync('localhost.pem')
-        };
-        https.createServer(httpsOptions, app).listen(port, function(err) {
-            if (err) throw err;
-            console.log(`Express HTTPS server listening on port ${port}, in ${env} mode`);
-            console.log(`Backend: https://localhost:${port}/api/`);
-            console.log(`Frontend (production): https://localhost:${port}/`);
-        });
-    } catch (err) {
-        console.error("Failed to start HTTPS server:", err);
-    }
-} else {
-    // Start the server
-    app.listen(port, function(err) {
+try {
+    const httpsOptions = {
+        key: fs.readFileSync('localhost-key.pem'),
+        cert: fs.readFileSync('localhost.pem')
+    };
+    https.createServer(httpsOptions, app).listen(port, function(err) {
         if (err) throw err;
-        console.log(`Express server listening on port ${port}, in ${env} mode`);
-        console.log(`Backend: http://localhost:${port}/api/`);
-        console.log(`Frontend (production): http://localhost:${port}/`);
+        console.log(`Express HTTPS server listening on port ${port}, in ${env} mode`);
+        console.log(`Backend: https://localhost:${port}/api/`);
+        console.log(`Frontend (production): https://localhost:${port}/`);
     });
+} catch (err) {
+    console.error("Failed to start HTTPS server:", err);
 }
 
 
