@@ -130,6 +130,7 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <button @click="closeDrinkPopup">Close</button>
+                    <button class="check-reviews-button" @click="getReviewRating();">Check reviews</button>
                     <button class="review-button" @click="getReviewRating();">Review drink</button>
                 </div>
             </div>
@@ -196,7 +197,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '693829765bf1f5e8e4ac7518',
+      mockUserId: '6938ab8bd7166063b9b7025f',
       oldReview: null
     }
   },
@@ -370,10 +371,7 @@ export default {
 </script>
 
 <style>
-    .filter-list label {
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .sort-list,
     .filter-list {
       list-style: none;
       text-align: left;
@@ -401,9 +399,6 @@ export default {
     .sort-button {
       margin-left: 2rem;
       display: block;
-    }
-    .sort-list {
-      list-style: none;
     }
     .sort-list li {
       text-align: left;
@@ -451,6 +446,10 @@ export default {
     }
     .delete-all-reviews-button {
       color: red;
+    }
+    .check-reviews-button {
+      position: relative;
+      left: 150px;
     }
 
   /* Iphone 14 pro max media query */
