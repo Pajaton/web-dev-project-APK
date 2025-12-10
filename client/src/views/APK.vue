@@ -201,7 +201,8 @@ export default {
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
       mockUserId: '6938ab2cd7166063b9b70254',
       oldReview: null,
-      allReviews: null
+      allReviews: null,
+      reviewsForChosenDrink: null
     }
   },
   methods: {
@@ -374,10 +375,16 @@ export default {
         .then(response => {
           this.allReviews = response.data.review
 
-          /* Extract names of the people who have done reviews */
           this.allReviews.forEach(review => {
             if (review.productID === this.chosenDrink._id) {
-              console.log(review.comment)
+              /* Extract names and review/rating of the people who have done reviews on the drink */
+              drinkApi.get('/users/' + review.userID)
+                .then(response => {
+                  this.user = response.data
+                  console.log('Rating: ' + review.rating)
+                  console.log('Comment: ' + review.comment)
+                  console.log('Username: ' + this.user.userName)
+                })
             }
           })
         })
