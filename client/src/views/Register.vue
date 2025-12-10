@@ -22,7 +22,7 @@
       >
         <BFormInput
           id="floatingName"
-          v-model="userName"
+          v-model="UserName"
           type="text"
           placeholder="UserName"
         />

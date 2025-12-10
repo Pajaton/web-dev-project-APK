@@ -1,109 +1,108 @@
 <template>
   <!-- Register HTML template -->
   <div>
-    <p>Register</p>
+    <p>Edit Profile</p>
     <BForm>
-        <BFormFloatingLabel
+      <BFormFloatingLabel
         label="Email address"
         label-for="floatingEmail"
         class="my-2"
       >
-        <BFormInput
-          id="floatingEmail"
-          v-model="email"
-          type="email"
-          placeholder="Email address"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
+      <BFormInput
+        id="floatingEmail"
+        v-model="email"
+        type="email"
+        placeholder="Email address"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="User Name"
         label-for="floatingUserName"
         class="my-2"
       >
-        <BFormInput
-          id="floatingName"
-          v-model="UserName"
-          type="text"
-          placeholder="UserName"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
+      <BFormInput
+        id="floatingName"
+        v-model="userName"
+        type="text"
+        placeholder="UserName"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="Street"
         label-for="floatingStreet"
         class="my-2"
       >
-        <BFormInput
-          id="floatingStreet"
-          v-model="street"
-          type="text"
-          placeholder="street"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
+      <BFormInput
+        id="floatingStreet"
+        v-model="street"
+        type="text"
+        placeholder="street"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="StreetNumber"
         label-for="floatingStreetNumber"
         class="my-2"
       >
-        <BFormInput
-          id="floatingStreetNumber"
-          v-model="streetNumber"
-          type="text"
-          placeholder="streetNumber"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
+      <BFormInput
+        id="floatingStreetNumber"
+        v-model="streetNumber"
+        type="text"
+        placeholder="streetNumber"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="postalCode"
         label-for="floatingpostalCode"
         class="my-2"
       >
-        <BFormInput
-          id="floatingpostalCode"
-          v-model="postalCode"
-          type="text"
-          placeholder="postalCode"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
+      <BFormInput
+        id="floatingpostalCode"
+        v-model="postalCode"
+        type="text"
+        placeholder="postalCode"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="city"
         label-for="floatingcity"
         class="my-2"
       >
-        <BFormInput
-          id="floatingcity"
-          v-model="city"
-          type="text"
-          placeholder="city"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
+      <BFormInput
+        id="floatingcity"
+        v-model="city"
+        type="text"
+        placeholder="city"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="longitude"
         label-for="floatinglongitude"
         class="my-2"
       >
-        <BFormInput
-          id="floatinglongitude"
-          v-model="longitude"
-          type="text"
-          placeholder="longitude"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
+      <BFormInput
+        id="floatinglongitude"
+        v-model="longitude"
+        type="text"
+        placeholder="longitude"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel
         label="latitude"
         label-for="floatinglatitude"
         class="my-2"
       >
-        <BFormInput
-          id="floatinglatitude"
-          v-model="latitude"
-          type="text"
-          placeholder="latitude"
-        />
-        </BFormFloatingLabel>
+      <BFormInput
+        id="floatinglatitude"
+        v-model="latitude"
+        type="text"
+        placeholder="latitude"
+      />
+      </BFormFloatingLabel>
     </BForm>
     <b-button block variant="danger" @click="resetFields()">Reset</b-button>
     <b-button block @click="editUser()">Edit Profile</b-button>
-
-    </div>
+  </div>
 </template>
 
 <script>
@@ -120,7 +119,7 @@ export default {
     return {
       message: 'none',
       email: '',
-      UserName: '',
+      userName: '',
       street: '',
       streetNumber: '',
       postalCode: '',
@@ -133,10 +132,10 @@ export default {
   },
   methods: {
     async editUser() {
-      drinkApi.patch('/users' + this.mockUserID, {
+      drinkApi.patch('/users/' + this.mockUserID, {
         email: this.email,
-        ProfilePicture: this.ProfilePicture,
-        userName: this.UserName,
+        profilePicture: this.profilePicture,
+        userName: this.userName,
         street: this.street,
         streetNumber: this.streetNumber,
         postalCode: this.postalCode,
@@ -147,25 +146,17 @@ export default {
       console.log('User edited: ' + this.userName + ' ' + ' Email: ' + this.email)
     },
     async resetFields() {
-      this.userInfo = this.getUserById(this.mockUserID)
+      const response = await drinkApi.get('/users/' + this.mockUserID)
+      this.userInfo = response.data
       this.email = this.userInfo.email
-      this.ProfilePicture = this.userInfo.ProfilePicture
-      this.UserName = this.userInfo.UserName
+      this.profilePicture = this.userInfo.profilePicture
+      this.userName = this.userInfo.userName
       this.street = this.userInfo.street
       this.streetNumber = this.userInfo.streetNumber
       this.postalCode = this.userInfo.postalCode
       this.city = this.userInfo.city
       this.longitude = this.userInfo.longitude
       this.latitude = this.userInfo.latitude
-    },
-    getUserById(id) {
-      drinkApi.get('/users/' + id)
-        .then(response => {
-          this.userInfo = response.data
-        })
-        .catch(error => {
-          this.message = error
-        })
     }
   }
 }
