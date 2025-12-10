@@ -376,9 +376,6 @@ export default {
       list-style: none;
       text-align: left;
     }
-    .filter-list li {
-      text-align: left;
-    }
     .drinks-list {
       margin-top: 1rem;
       padding-left: 2rem;
@@ -392,16 +389,10 @@ export default {
     .sub-filter label {
       margin-right: 1rem;
     }
+    .sort-button,
     .filter-button {
       margin-left: 2rem;
       display: block;
-    }
-    .sort-button {
-      margin-left: 2rem;
-      display: block;
-    }
-    .sort-list li {
-      text-align: left;
     }
     .popup-overlay {
       position: fixed;
@@ -411,18 +402,12 @@ export default {
       align-items: flex-start;
       justify-content: center;
     }
-    .drink-popup {
-      background: white;
-      padding: 2rem;
-      text-align: left;
-    }
+    .drink-popup,
     .review-popup {
       background: white;
       padding: 2rem;
       text-align: left;
-      width: 60%;
-      max-width: 700px;
-      min-height: 50vh;
+      width: 40%;
       box-sizing: border-box;
     }
     .review-button {
