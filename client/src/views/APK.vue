@@ -130,8 +130,8 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <div class="popup-buttons">
-                      <button class="check-reviews-button" @click="getReviewRating();">Check reviews</button>
                       <button class="review-button" @click="getReviewRating();">Review drink</button>
+                      <button class="check-reviews-button" @click="getAllReviewRating();">Check reviews</button>
                       <button @click="closeDrinkPopup">Close</button>
                     </div>
                 </div>
@@ -200,7 +200,8 @@ export default {
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
       mockUserId: '6938ab2cd7166063b9b70254',
-      oldReview: null
+      oldReview: null,
+      allReviews: null
     }
   },
   methods: {
@@ -367,6 +368,19 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    getAllReviewRating() {
+      drinkApi.get('/reviews')
+        .then(response => {
+          this.allReviews = response.data.review
+
+          /* Extract names of the people who have done reviews */
+          this.allReviews.forEach(review => {
+            if (review.productID === this.chosenDrink._id) {
+              console.log(review.comment)
+            }
+          })
+        })
     }
   }
 }
@@ -474,9 +488,6 @@ export default {
   .review-buttons {
     gap: 0.5rem;
     padding-top: 20px;
-  }
-  .review-button {
-    margin-left: 10rem;
   }
   .sort-list {
     padding-top: 5px;
