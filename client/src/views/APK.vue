@@ -129,9 +129,11 @@
                         <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
-                    <button @click="closeDrinkPopup">Close</button>
-                    <button class="check-reviews-button" @click="getReviewRating();">Check reviews</button>
-                    <button class="review-button" @click="getReviewRating();">Review drink</button>
+                    <div class="popup-buttons">
+                      <button class="check-reviews-button" @click="getReviewRating();">Check reviews</button>
+                      <button class="review-button" @click="getReviewRating();">Review drink</button>
+                      <button @click="closeDrinkPopup">Close</button>
+                    </div>
                 </div>
             </div>
             <div v-if="showReviewPopup" class="popup-overlay">
@@ -163,7 +165,7 @@
                                 <input type="radio" name="rating" value="5" v-model="rating">
                             </label>
                         </p>
-                        <div class="review-buttons">
+                        <div class="popup-buttons">
                             <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
                             <button v-if="oldReview" class="submit-review-button" @click="updateReviewRating()">Update your review</button>
                             <button v-if="oldReview" class="delete-review-button" @click="deleteReview">Delete review</button>
@@ -197,7 +199,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '6938ab8bd7166063b9b7025f',
+      mockUserId: '6938ab2cd7166063b9b70254',
       oldReview: null
     }
   },
@@ -412,14 +414,8 @@ export default {
       width: 32%;
       box-sizing: border-box;
     }
-    .review-button {
-      margin-left: 12rem
-    }
     .review-buttons {
       display: flex;
-    }
-    .close-review-button {
-      margin-left: auto;
     }
     .review-input-field {
       width: 60%;
@@ -428,15 +424,15 @@ export default {
     .rating-label {
       margin-right: 20px
     }
-    .delete-review-button {
-      margin-left: 1rem;
-    }
     .delete-all-reviews-button {
       color: red;
     }
-    .check-reviews-button {
-      position: relative;
-      left: 100px;
+    .popup-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 1rem;
     }
 
   /* Iphone 14 pro max media query */
