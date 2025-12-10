@@ -136,6 +136,17 @@
                     </div>
                 </div>
             </div>
+            <div v-if="showAllReviewsPopup" class="popup-overlay">
+              <div class="review-popup">
+                <div class="all-reviews" v-for="(review, index) in reviewsForChosenDrink" :key="index">
+                  <h4>Review number: {{index+1}}</h4>
+                  <p>Reviewer: {{ review.userName }}</p>
+                  <p>Rating: {{ review.rating }}</p>
+                  <p>Comment: {{ review.comment }}</p>
+                </div>
+                <button class="close-review-button" @click="closeAllReviewsPopup">Close</button>
+              </div>
+            </div>
             <div v-if="showReviewPopup" class="popup-overlay">
                 <div class="review-popup">
                     <div>
@@ -199,10 +210,11 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '6938ab2cd7166063b9b70254',
+      mockUserId: '69399ba79213e56b20e4e9cc',
       oldReview: null,
       allReviews: null,
-      reviewsForChosenDrink: null
+      reviewsForChosenDrink: [],
+      showAllReviewsPopup: false
     }
   },
   methods: {
@@ -303,7 +315,9 @@ export default {
     },
     closeReviewPopup() {
       this.showReviewPopup = false
-      console.log(this.showReviewPopup)
+    },
+    closeAllReviewsPopup() {
+      this.showAllReviewsPopup = false
     },
     getReviewRating() {
       drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
@@ -371,22 +385,32 @@ export default {
         })
     },
     getAllReviewRating() {
+      this.showAllReviewsPopup = true
+      this.reviewsForChosenDrink = []
       drinkApi.get('/reviews')
         .then(response => {
           this.allReviews = response.data.review
 
           this.allReviews.forEach(review => {
             if (review.productID === this.chosenDrink._id) {
-              /* Extract names and review/rating of the people who have done reviews on the drink */
+              /* Store names and review/rating of the people who have done reviews on the chosen drink */
               drinkApi.get('/users/' + review.userID)
                 .then(response => {
                   this.user = response.data
-                  console.log('Rating: ' + review.rating)
-                  console.log('Comment: ' + review.comment)
-                  console.log('Username: ' + this.user.userName)
+                  this.reviewsForChosenDrink.push({
+                    userName: this.user.userName,
+                    comment: review.comment,
+                    rating: review.rating
+                  })
+                })
+                .catch(err => {
+                  console.error('User fetch failed', err)
                 })
             }
           })
+        })
+        .catch(err => {
+          console.error('Reviews fetch failed', err)
         })
     }
   }
@@ -454,6 +478,9 @@ export default {
       align-items: flex-start;
       gap: 0.75rem;
       margin-top: 1rem;
+    }
+    .all-reviews {
+      margin-top: 2rem;
     }
 
   /* Iphone 14 pro max media query */
