@@ -196,7 +196,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '693829765bf1f5e8e4ac7518',
+      mockUserId: '693951b9ff9d517c50d72ff1',
       oldReview: null
     }
   },
