@@ -382,6 +382,7 @@ export default {
       list-style: none;
       text-align: left;
     }
+
     .sub-filter {
       margin-left: 2rem;
       margin-top: 0.25rem;
@@ -394,6 +395,7 @@ export default {
       margin-left: 2rem;
       display: block;
     }
+
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -407,11 +409,11 @@ export default {
       background: white;
       padding: 2rem;
       text-align: left;
-      width: 40%;
+      width: 32%;
       box-sizing: border-box;
     }
     .review-button {
-      margin-left: 20rem
+      margin-left: 12rem
     }
     .review-buttons {
       display: flex;
@@ -434,7 +436,7 @@ export default {
     }
     .check-reviews-button {
       position: relative;
-      left: 150px;
+      left: 100px;
     }
 
   /* Iphone 14 pro max media query */
