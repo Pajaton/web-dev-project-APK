@@ -1,6 +1,7 @@
 <template>
   <div>
     <div v-if="user">
+      <b-img :src="user.profilePicture" fluid alt="Profile Picture"></b-img>
       <ul class="user-info-list">
         <li>Username: {{user.userName}}</li>
         <li>Email: {{user.email}}</li>
