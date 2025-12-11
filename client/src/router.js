@@ -7,6 +7,7 @@ import APK from './views/APK.vue'
 import Users from './views/Users.vue'
 import UserProfile from './views/UserProfile.vue'
 import FindSystembolag from './views/FindSystembolag.vue'
+import EditUserProfile from './views/EditUserProfile.vue'
 
 const routes = [
   { path: '/home', name: 'home', component: Home },
@@ -16,7 +17,8 @@ const routes = [
   { path: '/login', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register },
   { path: '/home', name: 'home', component: Home },
-  { path: '/systembolag', name: 'findSystembolag', component: FindSystembolag }
+  { path: '/systembolag', name: 'findSystembolag', component: FindSystembolag },
+  { path: '/users/:id/edit', name: 'edit', component: EditUserProfile }
 ]
 
 const router = createRouter({
