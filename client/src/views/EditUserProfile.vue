@@ -99,6 +99,8 @@
         placeholder="latitude"
       />
       </BFormFloatingLabel>
+      <b-button @click="modalShow = !modalShow">Choose profile picture</b-button>
+      <b-modal v-model="modalShow">Choose profile picture</b-modal>
     </BForm>
     <b-button block variant="danger" @click="resetFields()">Reset</b-button>
     <b-button block @click="editUser()">Edit Profile</b-button>
@@ -127,7 +129,10 @@ export default {
       longitude: '',
       latitude: '',
       mockUserID: '693951b9ff9d517c50d72ff1',
-      userInfo: []
+      userInfo: [],
+      profilePicture: '',
+      modalShow: false
+
     }
   },
   methods: {
