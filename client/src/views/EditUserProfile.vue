@@ -4,112 +4,110 @@
     <p>Edit Profile</p>
     <BForm>
       <BFormFloatingLabel
-        label="Email address"
-        label-for="floatingEmail"
-        class="my-2"
+      label="Email address"
+      label-for="floatingEmail"
+      class="my-2"
       >
       <BFormInput
-        id="floatingEmail"
-        v-model="email"
-        type="email"
-        placeholder="Email address"
+      id="floatingEmail"
+      v-model="email"
+      type="email"
       />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="User Name"
-        label-for="floatingUserName"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatingName"
-        v-model="userName"
-        type="text"
-        placeholder="UserName"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="Street"
-        label-for="floatingStreet"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatingStreet"
-        v-model="street"
-        type="text"
-        placeholder="street"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="StreetNumber"
-        label-for="floatingStreetNumber"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatingStreetNumber"
-        v-model="streetNumber"
-        type="text"
-        placeholder="streetNumber"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="postalCode"
-        label-for="floatingpostalCode"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatingpostalCode"
-        v-model="postalCode"
-        type="text"
-        placeholder="postalCode"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="city"
-        label-for="floatingcity"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatingcity"
-        v-model="city"
-        type="text"
-        placeholder="city"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="longitude"
-        label-for="floatinglongitude"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatinglongitude"
-        v-model="longitude"
-        type="text"
-        placeholder="longitude"
-      />
-      </BFormFloatingLabel>
-      <BFormFloatingLabel
-        label="latitude"
-        label-for="floatinglatitude"
-        class="my-2"
-      >
-      <BFormInput
-        id="floatinglatitude"
-        v-model="latitude"
-        type="text"
-        placeholder="latitude"
-      />
-      </BFormFloatingLabel>
-       <b-img :src="this.profilePicture" fluid alt="Profile Picture"></b-img>
-      <b-button @click="modalShow = !modalShow">Choose profile picture</b-button>
-      <b-modal v-model="modalShow" title="Choose profile picture">
-        <b-img v-for="(picture, index) in profilePictureList"
-        :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
-      </b-img>
-      </b-modal>
-    </BForm>
-    <b-button block variant="danger" @click="resetFields()">Reset</b-button>
-    <b-button block @click="editUser()">Edit Profile</b-button>
-  </div>
+    </BFormFloatingLabel>
+    <BFormFloatingLabel
+    label="User Name"
+    label-for="floatingUserName"
+    class="my-2"
+    >
+    <BFormInput
+    id="floatingName"
+    v-model="userName"
+    type="text"
+    />
+  </BFormFloatingLabel>
+  <BFormFloatingLabel
+  label="Street"
+  label-for="floatingStreet"
+  class="my-2"
+  >
+  <BFormInput
+  id="floatingStreet"
+  v-model="street"
+  type="text"
+  />
+</BFormFloatingLabel>
+<BFormFloatingLabel
+label="StreetNumber"
+label-for="floatingStreetNumber"
+class="my-2"
+>
+<BFormInput
+id="floatingStreetNumber"
+v-model="streetNumber"
+type="text"
+/>
+</BFormFloatingLabel>
+<BFormFloatingLabel
+label="postalCode"
+label-for="floatingpostalCode"
+class="my-2"
+>
+<BFormInput
+id="floatingpostalCode"
+v-model="postalCode"
+type="text"
+/>
+</BFormFloatingLabel>
+<BFormFloatingLabel
+label="city"
+label-for="floatingcity"
+class="my-2"
+>
+<BFormInput
+id="floatingcity"
+v-model="city"
+type="text"
+/>
+</BFormFloatingLabel>
+<BFormFloatingLabel
+label="longitude"
+label-for="floatinglongitude"
+class="my-2"
+>
+<BFormInput
+id="floatinglongitude"
+v-model="longitude"
+type="text"
+/>
+</BFormFloatingLabel>
+<BFormFloatingLabel
+label="latitude"
+label-for="floatinglatitude"
+class="my-2"
+>
+<BFormInput
+id="floatinglatitude"
+v-model="latitude"
+type="text"
+/>
+</BFormFloatingLabel>
+</BForm>
+<b-row>
+  <b-col cols="4">
+<b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture"></b-img>
+<b-button @click="modalShow = !modalShow">Choose profile picture</b-button>
+<b-modal v-model="modalShow" title="Choose profile picture">
+  <b-img class="images" v-for="(picture, index) in profilePictureList"
+  :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
+</b-img>
+</b-modal>
+</b-col>
+<b-col cols="12">
+<b-button block variant="danger" @click="resetFields()">Reset</b-button>
+<b-button block @click="editUser()">Edit Profile</b-button>
+</b-col>
+</b-row>
+</div>
 </template>
 
 <script>
@@ -193,4 +191,10 @@ export default {
 
 <style>
     /* EditUserProfile CSS styles */
+    .images {
+      max-width: 150px !important;
+    }
+    .my-2 {
+      max-width: 500px;
+    }
 </style>
