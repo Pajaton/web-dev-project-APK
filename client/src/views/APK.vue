@@ -129,9 +129,23 @@
                         <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
-                    <button @click="closeDrinkPopup">Close</button>
-                    <button class="review-button" @click="getReviewRating();">Review drink</button>
+                    <div class="popup-buttons">
+                      <button class="review-button" @click="getReviewRating();">Review drink</button>
+                      <button class="check-reviews-button" @click="getAllReviewRating();">Check reviews</button>
+                      <button @click="closeDrinkPopup">Close</button>
+                    </div>
                 </div>
+            </div>
+            <div v-if="showAllReviewsPopup" class="popup-overlay">
+              <div class="review-popup">
+                <div class="all-reviews" v-for="(review, index) in reviewsForChosenDrink" :key="index">
+                  <h4>Review number: {{index+1}}</h4>
+                  <p>Reviewer: {{ review.userName }}</p>
+                  <p>Rating: {{ review.rating }}</p>
+                  <p>Comment: {{ review.comment }}</p>
+                </div>
+                <button class="close-review-button" @click="closeAllReviewsPopup">Close</button>
+              </div>
             </div>
             <div v-if="showReviewPopup" class="popup-overlay">
                 <div class="review-popup">
@@ -162,7 +176,7 @@
                                 <input type="radio" name="rating" value="5" v-model="rating">
                             </label>
                         </p>
-                        <div class="review-buttons">
+                        <div class="popup-buttons">
                             <button v-if="!oldReview" class="submit-review-button" @click="sendReviewRating()">Add review</button>
                             <button v-if="oldReview" class="submit-review-button" @click="updateReviewRating()">Update your review</button>
                             <button v-if="oldReview" class="delete-review-button" @click="deleteReview">Delete review</button>
@@ -196,8 +210,11 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '693951b9ff9d517c50d72ff1',
-      oldReview: null
+      mockUserId: '69399ba79213e56b20e4e9cc',
+      oldReview: null,
+      allReviews: null,
+      reviewsForChosenDrink: [],
+      showAllReviewsPopup: false
     }
   },
   methods: {
@@ -298,7 +315,9 @@ export default {
     },
     closeReviewPopup() {
       this.showReviewPopup = false
-      console.log(this.showReviewPopup)
+    },
+    closeAllReviewsPopup() {
+      this.showAllReviewsPopup = false
     },
     getReviewRating() {
       drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
@@ -364,21 +383,44 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    getAllReviewRating() {
+      this.showAllReviewsPopup = true
+      this.reviewsForChosenDrink = []
+      drinkApi.get('/reviews')
+        .then(response => {
+          this.allReviews = response.data.review
+
+          this.allReviews.forEach(review => {
+            if (review.productID === this.chosenDrink._id) {
+              /* Store names and review/rating of the people who have done reviews on the chosen drink */
+              drinkApi.get('/users/' + review.userID)
+                .then(response => {
+                  this.user = response.data
+                  this.reviewsForChosenDrink.push({
+                    userName: this.user.userName,
+                    comment: review.comment,
+                    rating: review.rating
+                  })
+                })
+                .catch(err => {
+                  console.error('User fetch failed', err)
+                })
+            }
+          })
+        })
+        .catch(err => {
+          console.error('Reviews fetch failed', err)
+        })
     }
   }
 }
 </script>
 
 <style>
-    .filter-list label {
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .sort-list,
     .filter-list {
       list-style: none;
-      text-align: left;
-    }
-    .filter-list li {
       text-align: left;
     }
     .drinks-list {
@@ -387,6 +429,7 @@ export default {
       list-style: none;
       text-align: left;
     }
+
     .sub-filter {
       margin-left: 2rem;
       margin-top: 0.25rem;
@@ -394,20 +437,12 @@ export default {
     .sub-filter label {
       margin-right: 1rem;
     }
+    .sort-button,
     .filter-button {
       margin-left: 2rem;
       display: block;
     }
-    .sort-button {
-      margin-left: 2rem;
-      display: block;
-    }
-    .sort-list {
-      list-style: none;
-    }
-    .sort-list li {
-      text-align: left;
-    }
+
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -416,28 +451,16 @@ export default {
       align-items: flex-start;
       justify-content: center;
     }
-    .drink-popup {
-      background: white;
-      padding: 2rem;
-      text-align: left;
-    }
+    .drink-popup,
     .review-popup {
       background: white;
       padding: 2rem;
       text-align: left;
-      width: 60%;
-      max-width: 700px;
-      min-height: 50vh;
+      width: 32%;
       box-sizing: border-box;
-    }
-    .review-button {
-      margin-left: 20rem
     }
     .review-buttons {
       display: flex;
-    }
-    .close-review-button {
-      margin-left: auto;
     }
     .review-input-field {
       width: 60%;
@@ -446,11 +469,18 @@ export default {
     .rating-label {
       margin-right: 20px
     }
-    .delete-review-button {
-      margin-left: 1rem;
-    }
     .delete-all-reviews-button {
       color: red;
+    }
+    .popup-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .all-reviews {
+      margin-top: 2rem;
     }
 
   /* Iphone 14 pro max media query */
@@ -492,9 +522,6 @@ export default {
   .review-buttons {
     gap: 0.5rem;
     padding-top: 20px;
-  }
-  .review-button {
-    margin-left: 10rem;
   }
   .sort-list {
     padding-top: 5px;
