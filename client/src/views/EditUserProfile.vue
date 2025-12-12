@@ -99,8 +99,13 @@
         placeholder="latitude"
       />
       </BFormFloatingLabel>
+       <b-img :src="this.profilePicture" fluid alt="Profile Picture"></b-img>
       <b-button @click="modalShow = !modalShow">Choose profile picture</b-button>
-      <b-modal v-model="modalShow">Choose profile picture</b-modal>
+      <b-modal v-model="modalShow" title="Choose profile picture">
+        <b-img v-for="(picture, index) in profilePictureList"
+        :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
+      </b-img>
+      </b-modal>
     </BForm>
     <b-button block variant="danger" @click="resetFields()">Reset</b-button>
     <b-button block @click="editUser()">Edit Profile</b-button>
@@ -131,8 +136,24 @@ export default {
       mockUserID: '693951b9ff9d517c50d72ff1',
       userInfo: [],
       profilePicture: '',
-      modalShow: false
-
+      modalShow: false,
+      profilePictureList: [
+        '/profilePictures/greger.jpg',
+        '/profilePictures/bacchus.jpg',
+        '/profilePictures/dionysos.jpg',
+        '/profilePictures/freya.jpg',
+        '/profilePictures/ellie.jpg',
+        '/profilePictures/jules.jpg',
+        '/profilePictures/tyrion.jpg',
+        '/profilePictures/penny.jpg',
+        '/profilePictures/zoro.jpg',
+        '/profilePictures/kapten_haddock.jpeg',
+        '/profilePictures/malory_archer.jpg',
+        '/profilePictures/sterling_archer.jpg',
+        '/profilePictures/pam.jpg',
+        '/profilePictures/patsy.jpg',
+        '/profilePictures/tom.png'
+      ]
     }
   },
   methods: {
@@ -162,6 +183,9 @@ export default {
       this.city = this.userInfo.city
       this.longitude = this.userInfo.longitude
       this.latitude = this.userInfo.latitude
+    },
+    setProfilePicture(picture) {
+      this.profilePicture = picture
     }
   }
 }
