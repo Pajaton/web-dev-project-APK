@@ -63,15 +63,13 @@ export default {
   },
   methods: {
     async userVerification() {
-      const response = await drinkApi('/users/')
-      const data = response.data
-      data.users.forEach(user => {
-        if (user.email === this.email) {
-          this.$router.push({ path: '/home' })
-          this.verifiedUser = true
-        }
-      })
-      if (this.verifiedUser === false) {
+      try {
+        const res = await drinkApi.post('/sessions', {
+          email: this.email
+        })
+        console.log('LOGIN SUCCESS:', res.data)
+        this.$router.push({ path: '/home' })
+      } catch (err) {
         this.show = true
       }
     },

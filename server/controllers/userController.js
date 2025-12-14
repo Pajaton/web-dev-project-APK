@@ -172,12 +172,12 @@ router.post("/sessions", async (req, res, next) => {
             });
         }
 
-        req.session.user = user;
+        req.session.userId = user._id.toString();
         req.session.save();
 
         return res.status(201).json({
             "message": "Logged in successfully",
-            "user": user,
+            "user": req.session.userId,
         });
     } catch(err) { next(err) };
 });
