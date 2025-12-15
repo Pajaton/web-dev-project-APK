@@ -130,7 +130,7 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <div class="popup-buttons">
-                      <button class="review-button" @click="getReviewRating();">Review drink</button>
+                      <button class="review-button" v-if="currentUserId" @click="getReviewRating();">Review drink</button>
                       <button class="check-reviews-button" @click="getAllReviewRating();">Check reviews</button>
                       <button @click="closeDrinkPopup">Close</button>
                     </div>

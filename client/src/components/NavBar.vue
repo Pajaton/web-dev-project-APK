@@ -12,8 +12,7 @@
                 <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/login">Login</b-button></b-col>
-
+                <b-col><b-button block variant="navbar" to="/login" v-if="!currentUserId">Login</b-button></b-col>
               </b-collapse>
             </b-row>
           </b-container>
@@ -22,8 +21,31 @@
 </template>
 
 <script>
+
+import { drinkApi } from '@/Api'
+
 export default {
-  name: 'navbar'
+  name: 'navbar',
+  data() {
+    return {
+      currentUserId: null
+    }
+  },
+  mounted() {
+    this.fetchCurrentUser()
+  },
+  methods: {
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+          console.log(this.currentUserId)
+        })
+        .catch(error => {
+          this.message = error
+        })
+    }
+  }
 }
 </script>
 
