@@ -118,7 +118,7 @@ import { drinkApi } from '@/Api'
 export default {
   name: 'Register',
   mounted() {
-    this.resetFields()
+    this.fetchCurrentUser()
   },
   data() {
     return {
@@ -131,7 +131,7 @@ export default {
       city: '',
       longitude: '',
       latitude: '',
-      mockUserID: '693951b9ff9d517c50d72ff1',
+      currentUserId: null,
       userInfo: [],
       profilePicture: '',
       modalShow: false,
@@ -156,7 +156,7 @@ export default {
   },
   methods: {
     async editUser() {
-      drinkApi.patch('/users/' + this.mockUserID, {
+      drinkApi.patch('/users/' + this.currentUserId, {
         email: this.email,
         profilePicture: this.profilePicture,
         userName: this.userName,
@@ -170,7 +170,7 @@ export default {
       console.log('User edited: ' + this.userName + ' ' + ' Email: ' + this.email)
     },
     async resetFields() {
-      const response = await drinkApi.get('/users/' + this.mockUserID)
+      const response = await drinkApi.get('/users/' + this.currentUserId)
       this.userInfo = response.data
       this.email = this.userInfo.email
       this.profilePicture = this.userInfo.profilePicture
@@ -184,6 +184,16 @@ export default {
     },
     setProfilePicture(picture) {
       this.profilePicture = picture
+    },
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+          return this.resetFields()
+        })
+        .catch(error => {
+          this.message = error
+        })
     }
   }
 }
