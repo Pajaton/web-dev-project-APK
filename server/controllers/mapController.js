@@ -72,14 +72,24 @@ function buildGraph(elements) {
 
 // var MapLocation = require("../models/MapSchema");
 async function getLocationMapData(userLat, userLng, locations) {
-    const locationCoordinates = locations.map(location => {
+    const targetLocationData = locations.map(location => {
         return {
+            name: location.tags.name,
+            branch: location.tags.branch || null,
+            openHours: location.tags.opening_hours,
+            wheelchair: location.tags.wheelchair,
+            address: {
+                city: location.tags['addr:city'],
+                street: location.tags['addr:street'],
+                streetNumber: location.tags['addr:housenumber'],
+                postalCode: location.tags['addr:postcode']
+            },
             lat: location.lat || (location.center && location.center.lat),
             lon: location.lon || (location.center && location.center.lon)
         };
     })
 
-    const {south, north, west, east} = getBoundingBox(userLat, userLng, locationCoordinates);
+    const {south, north, west, east} = getBoundingBox(userLat, userLng, targetLocationData);
 
     if (isNaN(south) || isNaN(north) || isNaN(west) || isNaN(east)) {
         throw new Error("Invalid bounding box coordinates");
@@ -97,7 +107,7 @@ async function getLocationMapData(userLat, userLng, locations) {
         const rawMapData = await axios.post(baseURL, params);
         const graphData = buildGraph(rawMapData.data.elements);
         return {
-            'targetLocations': locationCoordinates,
+            'targetLocations': targetLocationData,
             'nodes': graphData.nodes,
             'adjacencyList': graphData.adjacencyList,
         };
