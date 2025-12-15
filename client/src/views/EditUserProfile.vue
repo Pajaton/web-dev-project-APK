@@ -95,8 +95,8 @@ type="text"
 <b-row>
   <b-col cols="4">
 <b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture"></b-img>
-<b-button @click="modalShow = !modalShow">Choose profile picture</b-button>
-<b-modal v-model="modalShow" title="Choose profile picture">
+<b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
+<b-modal v-model="modalShowPicture" title="Choose profile picture">
   <b-img class="images" v-for="(picture, index) in profilePictureList"
   :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
 </b-img>
@@ -106,7 +106,16 @@ type="text"
 <b-button block variant="danger" @click="resetFields()">Reset</b-button>
 <b-button block @click="editUser()">Edit Profile</b-button>
 </b-col>
+<b-col cols="4">
+  <b-button @click="modalShowDelete = !modalShowDelete">Delete Account</b-button>
+  <b-modal v-model="modalShowDelete" title="Delete Account" @ok="deleteUser">
+    <p>Are you sure you want to delete your account?</p>
+  </b-modal>
+</b-col>
 </b-row>
+<b-modal v-model="modalShowConfirmation" title="Account Deleted" @ok="goHome" @hide="goHome">
+  <p>You have successfully deleted your account</p>
+</b-modal>
 </div>
 </template>
 
@@ -131,10 +140,12 @@ export default {
       city: '',
       longitude: '',
       latitude: '',
-      mockUserID: '693951b9ff9d517c50d72ff1',
+      mockUserID: '693fe8a24267be762a44dd38',
       userInfo: [],
       profilePicture: '',
-      modalShow: false,
+      modalShowPicture: false,
+      modalShowDelete: false,
+      modalShowConfirmation: false,
       profilePictureList: [
         '/profilePictures/greger.jpg',
         '/profilePictures/bacchus.jpg',
@@ -167,7 +178,7 @@ export default {
         longitude: this.longitude,
         latitude: this.latitude
       })
-      console.log('User edited: ' + this.userName + ' ' + ' Email: ' + this.email)
+      console.log('User edited: ' + this.userName + ' Email: ' + this.email)
     },
     async resetFields() {
       const response = await drinkApi.get('/users/' + this.mockUserID)
@@ -184,6 +195,15 @@ export default {
     },
     setProfilePicture(picture) {
       this.profilePicture = picture
+    },
+    async deleteUser() {
+      drinkApi.delete('/users/' + this.mockUserID)
+      console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
+      this.modalShowConfirmation = true
+    },
+    async goHome() {
+      this.modalShowConfirmation = false
+      this.$router.push({ path: '/home' })
     }
   }
 }
