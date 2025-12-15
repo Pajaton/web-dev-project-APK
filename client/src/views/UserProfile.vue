@@ -1,6 +1,7 @@
 <template>
   <div>
     <div v-if="user">
+      <b-img :src="user.profilePicture" fluid alt="Profile Picture" style="max-width: 400px; margin-left: 0px; display:block;"></b-img>
       <ul class="user-info-list">
         <li>Username: {{user.userName}}</li>
         <li>Email: {{user.email}}</li>
@@ -13,6 +14,7 @@
         <li>How many drinks tried: {{user.triedDrinks.length}}</li>
         <li v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</li>
       </ul>
+      <b-button block v-if="id === mockUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
     </div>
   </div>
 </template>
@@ -26,7 +28,8 @@ export default {
     return {
       user: null,
       userFollowingList: [],
-      mockUserId: '69315df03496883746342df8'
+      mockUserId: '693951b9ff9d517c50d72ff1',
+      show: false
     }
   },
   props: {
@@ -51,6 +54,9 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    goToEdit() {
+      this.$router.push({ path: '/users/' + this.mockUserId + '/edit' })
     }
   },
   created() {

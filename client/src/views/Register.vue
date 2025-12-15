@@ -4,7 +4,7 @@
     <p>Register</p>
     <BForm>
         <BFormFloatingLabel
-        label="Email address"
+        label="Email Address"
         label-for="floatingEmail"
         class="my-2"
       >
@@ -40,7 +40,7 @@
         />
         </BFormFloatingLabel>
         <BFormFloatingLabel
-        label="StreetNumber"
+        label="Street Number"
         label-for="floatingStreetNumber"
         class="my-2"
       >
@@ -52,7 +52,7 @@
         />
         </BFormFloatingLabel>
         <BFormFloatingLabel
-        label="postalCode"
+        label="Postal Code"
         label-for="floatingpostalCode"
         class="my-2"
       >
@@ -64,7 +64,7 @@
         />
         </BFormFloatingLabel>
         <BFormFloatingLabel
-        label="city"
+        label="City"
         label-for="floatingcity"
         class="my-2"
       >
