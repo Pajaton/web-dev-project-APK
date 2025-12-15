@@ -12,7 +12,8 @@
                 <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/login" v-if="!currentUserId">Login</b-button></b-col>
+                <b-col><b-button block variant="navbar" @click="loginLogout">{{ currentUserId ? 'Logout' : 'Login' }}</b-button></b-col>
+
               </b-collapse>
             </b-row>
           </b-container>
@@ -34,16 +35,31 @@ export default {
   mounted() {
     this.fetchCurrentUser()
   },
+  // Re-fetch the current user when the route changes (navbar is not remounted)
+  watch: {
+    $route() {
+      this.fetchCurrentUser()
+    }
+  },
   methods: {
     fetchCurrentUser() {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
         })
         .catch(error => {
           this.message = error
         })
+    },
+    loginLogout() {
+      if (!this.currentUserId) {
+        this.$router.push('/login')
+        return
+      }
+      drinkApi.delete('/sessions/' + this.currentUserId)
+      console.log('Logged out successfully: ' + this.currentUserId)
+      this.currentUserId = null
+      this.$router.push('/login')
     }
   }
 }
