@@ -210,7 +210,7 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '69399ba79213e56b20e4e9cc',
+      mockUserId: '693fe8a24267be762a44dd38',
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
@@ -405,6 +405,11 @@ export default {
                 })
                 .catch(err => {
                   console.error('User fetch failed', err)
+                  this.reviewsForChosenDrink.push({
+                    userName: 'Account deleted',
+                    comment: review.comment,
+                    rating: review.rating
+                  })
                 })
             }
           })
