@@ -139,21 +139,6 @@ function getBoundingBox(userLat, userLng, locationCoordinates) {
     return { south, north, west, east };
 }
 
-function createNodeLookupMap(elements) {
-    const nodeLookup = {};
-
-    elements.forEach(element => {
-        if (element.type === 'node') {
-            nodeLookup[element.id] = {
-                lat: element.lat,
-                lon: element.lon
-            };
-        }
-    });
-
-    return nodeLookup;
-}
-
 async function findSystembolag(userLat, userLng) {
     const query = `[out:json];
         nwr
