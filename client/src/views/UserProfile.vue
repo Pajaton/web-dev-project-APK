@@ -61,6 +61,7 @@ export default {
         .then(response => {
           this.user = response.data
           this.getUserFollowingList()
+          this.getAllUserReviews()
         })
         .catch(error => {
           this.message = error
@@ -90,12 +91,12 @@ export default {
     },
     getAllUserReviews() {
       this.reviewsByUser = []
-      drinkApi.get('/users/' + this.mockUserId + '/reviews')
+      drinkApi.get('/users/' + this.user._id + '/reviews')
         .then(response => {
           this.allReviews = response.data.reviewedBy
 
           this.allReviews.forEach(review => {
-            if (review.userID === this.mockUserId) {
+            if (review.userID === this.user._id) {
               drinkApi.get('/drinks/' + review.productID)
                 .then(response => {
                   this.drink = response.data
@@ -117,10 +118,9 @@ export default {
       event.target.src = '/drinkPictures/default_drink.jpg'
     }
   },
-  created() {
+  mounted() {
     this.fetchCurrentUser()
     this.getUserInfo()
-    this.getAllUserReviews()
   }
 }
 </script>

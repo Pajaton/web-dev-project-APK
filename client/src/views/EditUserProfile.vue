@@ -197,7 +197,7 @@ export default {
       this.profilePicture = picture
     },
     async deleteUser() {
-      drinkApi.delete('/users/' + this.mockUserID)
+      drinkApi.delete('/users/' + this.currentUserId)
       console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
       this.modalShowConfirmation = true
     },
