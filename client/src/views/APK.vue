@@ -130,7 +130,7 @@
                         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
                     </div>
                     <div class="popup-buttons">
-                      <button class="review-button" @click="getReviewRating();">Review drink</button>
+                      <button class="review-button" v-if="currentUserId" @click="getReviewRating();">Review drink</button>
                       <button class="check-reviews-button" @click="getAllReviewRating();">Check reviews</button>
                       <button @click="closeDrinkPopup">Close</button>
                     </div>
@@ -210,12 +210,15 @@ export default {
       reviewText: '',
       rating: null,
       /* When testing functionality with user, check for a user in your current database, and paste the _id-number in the mock user variable */
-      mockUserId: '6941541a09e3545a7a970fdf',
+      currentUserId: null,
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
       showAllReviewsPopup: false
     }
+  },
+  mounted() {
+    this.fetchCurrentUser()
   },
   methods: {
     getDrinklist(filterUrl) {
@@ -320,7 +323,7 @@ export default {
       this.showAllReviewsPopup = false
     },
     getReviewRating() {
-      drinkApi.get('/users/' + this.mockUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
+      drinkApi.get('/users/' + this.currentUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
           const reviews = response.data.reviews || []
           if (reviews.length === 0) {
@@ -338,7 +341,7 @@ export default {
     sendReviewRating() {
       drinkApi.post('/reviews', {
         // Change the mock data for the user who is currently logged in.
-        userID: this.mockUserId,
+        userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText
@@ -350,7 +353,7 @@ export default {
     },
     updateReviewRating() {
       drinkApi.put('/reviews/' + this.oldReview._id, {
-        userID: this.mockUserId,
+        userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText
@@ -416,6 +419,16 @@ export default {
         })
         .catch(err => {
           console.error('Reviews fetch failed', err)
+        })
+    },
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+          console.log(this.currentUserId)
+        })
+        .catch(error => {
+          this.message = error
         })
     }
   }

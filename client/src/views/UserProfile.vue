@@ -33,7 +33,7 @@
           </b-row>
         </b-card>
       </b-list-group>
-      <b-button block v-if="id === mockUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+      <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
     </div>
   </div>
 </template>
@@ -48,7 +48,7 @@ export default {
       user: null,
       userFollowingList: [],
       reviewsByUser: [],
-      mockUserId: '6941541a09e3545a7a970fdf',
+      currentUserId: null,
       show: false
     }
   },
@@ -76,7 +76,17 @@ export default {
         })
     },
     goToEdit() {
-      this.$router.push({ path: '/users/' + this.mockUserId + '/edit' })
+      this.$router.push({ path: '/users/' + this.currentUserId + '/edit' })
+    },
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+          console.log(this.currentUserId)
+        })
+        .catch(error => {
+          this.message = error
+        })
     },
     getAllUserReviews() {
       this.reviewsByUser = []
@@ -108,6 +118,7 @@ export default {
     }
   },
   created() {
+    this.fetchCurrentUser()
     this.getUserInfo()
     this.getAllUserReviews()
   }

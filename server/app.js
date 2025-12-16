@@ -40,14 +40,29 @@ app.use(session({
     secret: 'apekå', // In production, use .env variable for this
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, },
+    
+    // Cookie only sent over https, allow cookie to be sent between front and backend, 
+    // cookie expires after 30 mins.
+    cookie: { secure: true,
+        sameSite: 'none',
+        maxAge: cookieTtl
+
+    },
     store: MongoStore.create({ mongoUrl: mongoURI })
 }));
 // HTTP request logger
 app.use(morgan('dev'));
 // Enable cross-origin resource sharing for frontend must be registered before api
-app.options('*', cors());
-app.use(cors());
+app.options('*', cors({
+    origin: 'https://localhost:5173',
+    credentials: true
+}));
+
+// 
+app.use(cors({
+    origin: 'https://localhost:5173',
+    credentials: true
+}));
 
 // Import routes
 app.get('/api', function(req, res) {

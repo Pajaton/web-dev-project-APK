@@ -138,6 +138,20 @@ router.get("/users/:userId/alcoholConsumed", async (req, res) => {
     } catch(err) { next(err) };
 });
 
+router.get('/sessions/currentlyLoggedin', async (req, res, next) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ message: 'Not logged in' });
+        }
+
+    const user = await User.findById(req.session.userId);
+        return res.json({ user });
+    } catch (err) {
+        next(err);
+    }
+});
+
+
 // POST ROUTE DEFINITIONS
 
 
@@ -172,12 +186,12 @@ router.post("/sessions", async (req, res, next) => {
             });
         }
 
-        req.session.user = user;
+        req.session.userId = user._id.toString();
         req.session.save();
 
         return res.status(201).json({
             "message": "Logged in successfully",
-            "user": user,
+            "user": req.session.userId,
         });
     } catch(err) { next(err) };
 });
