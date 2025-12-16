@@ -94,7 +94,7 @@ type="text"
 </BForm>
 <b-row>
   <b-col cols="4">
-<b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture"></b-img>
+<b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
 <b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
 <b-modal v-model="modalShowPicture" title="Choose profile picture">
   <b-img class="images" v-for="(picture, index) in profilePictureList"
@@ -140,7 +140,7 @@ export default {
       city: '',
       longitude: '',
       latitude: '',
-      mockUserID: '693fe8a24267be762a44dd38',
+      mockUserID: '6941541a09e3545a7a970fdf',
       userInfo: [],
       profilePicture: '',
       modalShowPicture: false,
@@ -204,6 +204,9 @@ export default {
     async goHome() {
       this.modalShowConfirmation = false
       this.$router.push({ path: '/home' })
+    },
+    profilePictureError(event) {
+      event.target.src = '/profilePictures/default_user.jpg'
     }
   }
 }
