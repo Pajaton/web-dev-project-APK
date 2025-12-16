@@ -190,9 +190,4 @@ router.get("/maps/coordinates", async (req, res, next) => {
     } catch(err) {next(err)};
 });
 
-router.get("/maps", async (req, res, next) => {
-    
-    return res.json({"message": "Map API is working"});
-});
-
 module.exports = router;
