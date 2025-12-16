@@ -12,7 +12,7 @@
                 <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/login">Login</b-button></b-col>
+                <b-col><b-button block variant="navbar" @click="loginLogout">{{ currentUserId ? 'Logout' : 'Login' }}</b-button></b-col>
 
               </b-collapse>
             </b-row>
@@ -22,8 +22,53 @@
 </template>
 
 <script>
+
+import { drinkApi } from '@/Api'
+
 export default {
-  name: 'navbar'
+  name: 'navbar',
+  data() {
+    return {
+      currentUserId: null
+    }
+  },
+  mounted() {
+    this.fetchCurrentUser()
+  },
+  // Re-fetch the current user when the route changes (navbar is not remounted)
+  watch: {
+    $route() {
+      this.fetchCurrentUser()
+      console.log('Current user ID: ' + this.currentUserId)
+    }
+  },
+  methods: {
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    async loginLogout() {
+      if (!this.currentUserId) {
+        this.$router.push('/login')
+        return
+      }
+
+      try {
+        await drinkApi.delete('/sessions/' + this.currentUserId)
+      } catch (error) {
+        this.message = error
+      }
+
+      this.currentUserId = null
+      await this.fetchCurrentUser()
+      this.$router.push('/login')
+    }
+  }
 }
 </script>
 

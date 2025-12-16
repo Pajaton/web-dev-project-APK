@@ -14,7 +14,7 @@
         <li>How many drinks tried: {{user.triedDrinks.length}}</li>
         <li v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</li>
       </ul>
-      <b-button block v-if="id === mockUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+      <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
     </div>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
     return {
       user: null,
       userFollowingList: [],
-      mockUserId: '693951b9ff9d517c50d72ff1',
+      currentUserId: null,
       show: false
     }
   },
@@ -56,10 +56,21 @@ export default {
         })
     },
     goToEdit() {
-      this.$router.push({ path: '/users/' + this.mockUserId + '/edit' })
+      this.$router.push({ path: '/users/' + this.currentUserId + '/edit' })
+    },
+    fetchCurrentUser() {
+      drinkApi.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.currentUserId = response.data.user._id
+          console.log(this.currentUserId)
+        })
+        .catch(error => {
+          this.message = error
+        })
     }
   },
   created() {
+    this.fetchCurrentUser()
     this.getUserInfo()
   }
 }

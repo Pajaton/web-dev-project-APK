@@ -3,8 +3,8 @@
 		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50127910",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50127910"
+		"_exporter_id": "50143285",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50143285"
 	},
 	"item": [
 		{
@@ -105,13 +105,13 @@
 									"    pm.response.to.have.status(201);",
 									"});",
 									"",
-									"pm.test(\"Response follows schema\", () => {",
-									"    pm.expect(json.user).to.have.jsonSchema(userSchema);",
+									"pm.test(\"Response has user string\", () => {",
+									"  pm.expect(json.user).to.be.a(\"string\");",
 									"});",
 									"",
-									"pm.test(\"User Successfully logged in\", () => {",
-									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
-									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"userID\"));",
+									"pm.test(\"User successfully logged in\", () => {",
+									"  pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"  pm.expect(json.user).to.eq(pm.globals.get(\"userID\"));",
 									"});",
 									""
 								],
@@ -249,13 +249,13 @@
 									"    pm.response.to.have.status(201);",
 									"});",
 									"",
-									"pm.test(\"Response follows schema\", () => {",
-									"    pm.expect(json.user).to.have.jsonSchema(userSchema);",
+									"pm.test(\"Response has user string\", () => {",
+									"  pm.expect(json.user).to.be.a(\"string\");",
 									"});",
 									"",
-									"pm.test(\"User Successfully logged in\", () => {",
-									"    pm.expect(json.message).to.eq(\"Logged in successfully\");",
-									"    pm.expect(json.user._id).to.eq(pm.globals.get(\"targetID\"));",
+									"pm.test(\"User successfully logged in\", () => {",
+									"  pm.expect(json.message).to.eq(\"Logged in successfully\");",
+									"  pm.expect(json.user).to.eq(pm.globals.get(\"targetID\"));",
 									"});",
 									""
 								],
@@ -4816,7 +4816,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://localhost:3000"
+			"value": "https://localhost:3000"
 		},
 		{
 			"key": "userSchema",
