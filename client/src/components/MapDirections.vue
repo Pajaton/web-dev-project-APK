@@ -4,31 +4,52 @@
       <h1 class="display-5 fw-bold">Get directions to a {{ location }}</h1>
       <p class="fs-4">Click the button below to find the {{ location }} closest to you</p>
 
-      <!-- Map canvas -->
-      <div class="map-wrapper border mt-3" style="position: relative;">
-        <canvas
-          ref="mapCanvas"
-          width="800"
-          height="600"
-          style="width: 100%; background-color: #f8f9fa;"
-        ></canvas>
-        <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
-           <b-spinner label="Loading..."></b-spinner>
-        </div>
-      </div>
+      <!-- Map canvas wrapper -->
+      <b-row>
+        <b-col>
+          <div
+            class="map-wrapper border mt-3"
+            style="max-width: 800px; max-height: 600px; overflow: hidden;"
+            :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
+            @mousedown="handleMouseDown"
+            @mouseup="handleMouseUp"
+            @mouseleave="handleMouseUp"
+            @mousemove="handleMouseMove"
+            @click="handleMouseClick"
+            @wheel.prevent="handleScroll"
+          >
+            <canvas ref="mapCanvas"></canvas>
 
-      <!-- Temp button for testing -->
-      <b-button
-        class="btn_message"
-        variant="primary"
-        v-on:click="getLocation()"
-        :disabled="isLoading">
-        {{ isLoading ? 'Locating...' : 'Get directions to a ' + location }}
-      </b-button>
+            <div
+              v-if="isLoading"
+              class="position-absolute top-50 start-50 translate-middle"
+            >
+              <b-spinner label="Loading..."></b-spinner>
+            </div>
+          </div>
 
-      <p class="col-xl-9">
-        The {{ location }} closest to you is: <pre class="mt3 bg-light p-3 border">{{ fetchedSystembolag }}</pre>
-      </p>
+          <!-- Temp button for testing -->
+          <b-button
+            class="btn_message"
+            variant="primary"
+            v-on:click="getLocation()"
+            :disabled="isLoading"
+          >
+            {{ isLoading ? 'Locating...' : 'Get directions to a ' + location }}
+          </b-button>
+        </b-col>
+        <b-col
+          style="height: 600px; overflow-y: auto;"
+          class="mt-3 border-start"
+        >
+          <LocationCard
+            v-for="(target, index) in mapData.targetLocations"
+            :key="index"
+            :location="target"
+            @select-location="handleCardSelection"
+          />
+        </b-col>
+      </b-row>
     </b-container>
   </div>
 </template>
@@ -46,13 +67,34 @@ export default {
   data() {
     return {
       message: '',
-      fetchedSystembolag: [],
       coordinates: null,
+      mapData: {},
+      targetLocation: null,
+      shortestPath: [],
       isLoading: false,
-      ctx: null,
-      bounds: { minLat: 0, maxLat: 0, minLon: 0, maxLon: 0 },
-      canvasWidth: 800,
-      canvasHeight: 600
+
+      // canvas
+      ctx: null, // The visible screen
+      offscreenCanvas: null, // The buffered background
+
+      // viewport
+      view: {
+        x: 0,
+        y: 0,
+        scale: 1.0
+      },
+
+      isDraggingMap: false,
+      dragStart: { x: 0,y: 0 },
+      mouseWheelTimer: null,
+
+      // map configs
+      bounds: { minLat: 0,maxLat: 0,minLon: 0,maxLon: 0 },
+      canvasWidth: 800, // visible width
+      canvasHeight: 600, // visible height
+
+      canvasFullWidth: 3000, // rendered width
+      canvasFullHeight: 2400 // rendered height
     }
   },
   methods: {
@@ -62,56 +104,91 @@ export default {
         await this.getUserCoordinates()
       }
 
-      if (this.location.toLowerCase() === 'systembolag') {
-        const response = await Api.get('/maps/coordinates', {
-          params: {
-            userLat: this.coordinates.lat,
-            userLng: this.coordinates.lng,
-            type: this.location
-          }
-        })
+      let dataFetched = false
 
-        const mapData = response.data
-        const userNodeId = this.getNearestNodeId(
-          mapData,
-          this.coordinates.lat,
-          this.coordinates.lng
-        )
-        const targetNodeIds = mapData.targetLocations.map(target => {
-          return this.getNearestNodeId(mapData, target.lat, target.lon)
-        })
-        this.fetchedSystembolag = this.findShortestPath(userNodeId, targetNodeIds, mapData)
+      while (!dataFetched) {
+        try {
+          const response = await Api.get('/maps/coordinates', {
+            params: {
+              userLat: this.coordinates.lat,
+              userLng: this.coordinates.lng,
+              type: this.location
+            }
+          })
+          // Object.freeze to prevent Vue from making it reactive
+          this.mapData = Object.freeze(response.data)
+
+          dataFetched = true
+        } catch (error) {
+          console.log(`Error: ${error}`)
+
+          if (error.status === 429) timeout(5000)
+        }
+      }
+
+      // a user may not have the exact coords of a node, therefore
+      // we must find the nearest node id based on user location
+      this.userNodeId = this.getNearestNodeId(
+        this.coordinates.lat,
+        this.coordinates.lng
+      )
+
+      // same applies for a location, although in the case of systembolag
+      // there are proper nodes from OSM, but they may or may not be connected
+      // to any path or way
+      this.targetNodes = this.mapData.targetLocations.map(target => {
+        target.nodeId = this.getNearestNodeId(target.lat, target.lon)
+        const distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
+
+        if (!this.targetLocation || distance < this.targetLocation.distance) {
+          this.targetLocation = {
+            nodeId: target.nodeId,
+            distance: distance
+          }
+        }
+        return target
+      })
+
+      const shortestPathFound = this.findShortestPath(this.userNodeId)
+
+      if (shortestPathFound) {
+        this.calculateBounds(this.mapData.nodes)
+        this.prerenderMapBackground()
+
+        // roughly center the map in the viewport (for rendering purposes)
+        this.view.x = (this.canvasWidth - this.canvasFullWidth) / 2
+        this.view.y = (this.canvasHeight - this.canvasFullHeight) / 2
+        this.view.scale = 1.0
+
+        this.focusMapOnUserLocation()
 
         this.$nextTick(() => {
-          this.renderMap(mapData, this.fetchedSystembolag)
+          this.renderMap()
         })
 
-        this.isLoading = false
+      } else {
+        this.message = "No path found."
       }
+
+      this.isLoading = false
     },
 
+    // find user latitude and longitude via either GPS (if a gps receiver
+    // is installed on the device) or via network. Network is a lot less
+    // precise.
     getUserCoordinates() {
       return new Promise((resolve, reject) => {
-        // initialize state
         this.message = 'Waiting for user permission...'
         this.coordinates = null
 
-        // check if geolocation is supported
         if (!('geolocation' in navigator)) {
           this.message = 'Geolocation is not supported by this browser.'
           return
         }
 
-        const options = {
-          enableHighAccuracy: true, // Use WiFi scanning/GPS (more precise)
-          timeout: 20000 // Wait 20 seconds before failing
-        }
-
-        // Request geolocation from browser
         navigator.geolocation.getCurrentPosition(
           (position) => {
             this.message = 'Location successfully retrieved!'
-
             this.coordinates = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
@@ -122,38 +199,39 @@ export default {
             this.message = `Error: ${error.message}`
             reject(error)
           },
-          options
+          {
+            enableHighAccuracy: true,
+            timeout: 20000
+          }
         )
       })
     },
 
-    getNearestNodeId(mapData, lat, lng) {
-      const { nodes } = mapData
+    // gets the id of the node to the passed coordinate (latitude, longitude)
+    getNearestNodeId(lat, lng) {
       let nearestNodeId = null
       let minDistance = Infinity
 
-      for (const nodeId in nodes) {
-        if (!mapData.adjacencyList[nodeId] || mapData.adjacencyList[nodeId].length === 0) {
-          continue // skip isolated nodes
-        }
-        const node = nodes[nodeId]
-        const deltaLat = node.lat - lat
-        const deltaLng = node.lon - lng
-        const distance = (deltaLat * deltaLat) + (deltaLng * deltaLng)
+      for (const nodeId in this.mapData.nodes) {
+        const node = this.mapData.nodes[nodeId]
+        const dLat = node.lat - lat
+        const dLon = node.lon - lng
+        const distance = (dLat * dLat) + (dLon * dLon)
 
         if (distance < minDistance) {
           minDistance = distance
           nearestNodeId = nodeId
         }
+
       }
 
       return nearestNodeId ? String(nearestNodeId) : null
     },
 
-    // Shortest path algorithm implemented as A*
-    findShortestPath(startId, targets, mapData) {
-      const { nodes, adjacencyList } = mapData
-      const targetSet = new Set(targets)
+    // implemented shortest path algorithm with A*
+    findShortestPath(startId) {
+      const targetId = this.targetLocation.nodeId
+      const { nodes,adjacencyList } = this.mapData
 
       const nodesToVisit = [startId]
       const cameFrom = {}
@@ -166,21 +244,22 @@ export default {
       })
 
       costToHere[startId] = 0
-      estimatedTotalCost[startId] = this.getHeuristic(startId, targets, nodes)
+      estimatedTotalCost[startId] = this.getDistance(nodes[startId], nodes[targetId])
 
       while (nodesToVisit.length > 0) {
-        nodesToVisit.sort((a, b) => estimatedTotalCost[a] - estimatedTotalCost[b]) // Sort by estimated total cost (priority queue)
+        // If enough time left before deadline, implement min heap
+        // Sort by cost
+        nodesToVisit.sort((a,b) => estimatedTotalCost[a] - estimatedTotalCost[b])
+        // dequeue
         const currentNode = nodesToVisit.shift()
 
-        if (targetSet.has(currentNode)) {
-          return {
-            found: true,
-            targetId: currentNode,
-            path: this.reconstructPath(cameFrom, currentNode),
-            distance: costToHere[currentNode]
-          }
+        if (this.targetLocation.nodeId === currentNode) {
+          this.shortestPath = this.reconstructPath(cameFrom,currentNode)
+
+          return true
         }
 
+        // get a node's connected edges
         const neighbors = adjacencyList[currentNode] || []
 
         for (const edge of neighbors) {
@@ -191,7 +270,7 @@ export default {
             cameFrom[neighbor] = currentNode
             costToHere[neighbor] = costToNext
 
-            const estimatedNextCost = this.getHeuristic(neighbor, targets, nodes)
+            const estimatedNextCost = this.getDistance(nodes[neighbor], nodes[targetId])
             estimatedTotalCost[neighbor] = costToNext + estimatedNextCost
 
             if (!nodesToVisit.includes(neighbor)) {
@@ -201,53 +280,35 @@ export default {
         }
       }
 
-      return { found: false, distance: Infinity, path: [] }
+      return false
     },
 
-    getHeuristic(nodeId, targets, nodes) {
-      let minDistance = Infinity
-      const currentNode = nodes[nodeId]
-
-      for (const targetId of targets) {
-        const targetNode = nodes[targetId]
-
-        if (!targetNode) continue
-
-        const distance = this.getDistance(currentNode, targetNode)
-
-        if (distance < minDistance) {
-          minDistance = distance
-        }
-      }
-
-      return minDistance
-    },
-
+    // get the distance between node A and node B
     getDistance(nodeA, nodeB) {
-      const R = 6371e3 // radius of earth in meters
+      const R = 6371e3
       const toRadians = (degrees) => degrees * (Math.PI / 180)
       const latA = toRadians(nodeA.lat)
       const latB = toRadians(nodeB.lat)
-      const deltaLat = toRadians(nodeB.lat - nodeA.lat)
-      const deltaLon = toRadians(nodeB.lon - nodeA.lon)
-      const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-                  Math.cos(latA) * Math.cos(latB) *
-                  Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
+      const dLat = toRadians(nodeB.lat - nodeA.lat)
+      const dLon = toRadians(nodeB.lon - nodeA.lon)
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(latA) * Math.cos(latB) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
 
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     },
 
+    // build the shortest path
     reconstructPath(cameFrom, current) {
       const totalPath = [current]
-
       while (current in cameFrom) {
         current = cameFrom[current]
-        totalPath.unshift(current)
+        totalPath.unshift(current) // dequeue
       }
-
       return totalPath
     },
 
+    // gets the node bounds
     calculateBounds(nodes) {
       let minLat = Infinity
       let maxLat = -Infinity
@@ -256,132 +317,265 @@ export default {
 
       for (const nodeId in nodes) {
         const node = nodes[nodeId]
-        if (node.lat < minLat) minLat = node.lat
-        if (node.lat > maxLat) maxLat = node.lat
-        if (node.lon < minLon) minLon = node.lon
-        if (node.lon > maxLon) maxLon = node.lon
-      }
 
+        // the +- 0.001 is bounds padding
+        if (node.lat < minLat) minLat = node.lat - 0.001
+        if (node.lat > maxLat) maxLat = node.lat + 0.001
+        if (node.lon < minLon) minLon = node.lon - 0.001
+        if (node.lon > maxLon) maxLon = node.lon + 0.001
+      }
       this.bounds = { minLat, maxLat, minLon, maxLon }
     },
 
-    // converts lat/lon to x/y on canvas
+    // translates latitude and longitude coordinates into x and y values
     project(lat, lon) {
       const { minLat, maxLat, minLon, maxLon } = this.bounds
+      if (maxLon === minLon || maxLat === minLat) return { x: 0, y: 0 }
+
       const percentageX = ((lon - minLon) / (maxLon - minLon))
       const percentageY = ((lat - minLat) / (maxLat - minLat))
 
-      const x = percentageX * this.canvasWidth
-      const y = this.canvasHeight - (percentageY * this.canvasHeight) // Invert
-
+      const x = percentageX * this.canvasFullWidth
+      const y = this.canvasFullHeight - (percentageY * this.canvasFullHeight)
       return { x, y }
     },
 
-    renderMap(mapData, pathResult) {
-      const canvas = this.$refs.mapCanvas
-      const dpr = window.devicePixelRatio || 1
-      const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      this.ctx = canvas.getContext('2d')
-      this.canvasWidth = rect.width
-      this.canvasHeight = rect.height
-      this.ctx.scale(dpr, dpr)
-
-      this.ctx.globalAlpha = 1.0
-      this.ctx.lineCap = 'round'
-      this.ctx.lineJoin = 'round'
-
-      this.ctx.fillStyle = '#ffffff'
-      this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
-
-      this.calculateBounds(mapData.nodes)
-
-      this.drawRoads(mapData)
-
-      if (pathResult && pathResult.found) {
-        this.drawPath(mapData.nodes, pathResult.path)
-
-        const startNodeId = pathResult.path[0]
-        const targetNodeId = pathResult.path[pathResult.path.length - 1]
-        this.drawMarker(mapData.nodes[startNodeId], 'blue') // Start
-        this.drawMarker(mapData.nodes[targetNodeId], 'blue') // Target
+    // renders all roads (not shortest path)
+    prerenderMapBackground() {
+      if (!this.offscreenCanvas) {
+        this.offscreenCanvas = new OffscreenCanvas(this.canvasFullWidth, this.canvasFullHeight)
       }
-    },
+      const ctxOffscreen = this.offscreenCanvas.getContext('2d')
 
-    drawRoads(mapData) {
-      const { adjacencyList, nodes } = mapData
+      // init map backgroun by setting background to white
+      ctxOffscreen.fillStyle = '#ffffff' // white
+      ctxOffscreen.fillRect(0, 0, this.canvasFullWidth, this.canvasFullHeight)
 
-      this.ctx.beginPath()
-      this.ctx.strokeStyle = 'lightblue'
-      this.ctx.lineWidth = 1
+      // init drawing
+      ctxOffscreen.beginPath()
+      ctxOffscreen.strokeStyle = 'darkgray'
+      ctxOffscreen.lineWidth = 1 / this.view.scale
 
-      let counter = 0
-      const batchSize = 500
+      const { adjacencyList, nodes } = this.mapData
+      const processedEdges = new Set()
 
       for (const fromId in adjacencyList) {
         const fromNode = nodes[fromId]
+
         if (!fromNode) continue
 
         const neighbors = adjacencyList[fromId]
-
         neighbors.forEach(edge => {
           const toNode = nodes[edge.node]
-          if (toNode) {
+          const edgeKey = [fromId,edge.node].sort().join('-') // Ensure edges are drawn once (A->B === B->A)
+
+          if (toNode && !processedEdges.has(edgeKey)) {
             const p1 = this.project(fromNode.lat, fromNode.lon)
             const p2 = this.project(toNode.lat, toNode.lon)
+            ctxOffscreen.moveTo(p1.x, p1.y) // move "brush" to x, y of p1
+            ctxOffscreen.lineTo(p2.x, p2.y) // draw a line to x, y of p2, starting at x, y of p1
 
-            // draw line
-            this.ctx.moveTo(p1.x, p1.y)
-            this.ctx.lineTo(p2.x, p2.y)
-            counter++
+            processedEdges.add(edgeKey)
           }
         })
-
-        if (counter >= batchSize) {
-          this.ctx.stroke()
-          this.ctx.beginPath()
-          counter = 0
-        }
       }
-      this.ctx.stroke()
+
+      // draw the map
+      ctxOffscreen.stroke()
     },
+
+    renderMap() {
+      if (!this.$refs.mapCanvas || !this.offscreenCanvas) return
+
+      const canvas = this.$refs.mapCanvas
+      this.ctx = canvas.getContext('2d')
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+      this.ctx.save()
+
+      // apply pan and zoom to the canvas and map
+      this.ctx.translate(this.view.x, this.view.y)
+      this.ctx.scale(this.view.scale, this.view.scale)
+
+      this.ctx.drawImage(this.offscreenCanvas,0,0)
+
+      if (this.shortestPath.length>0) {
+        this.drawPath(this.mapData.nodes, this.shortestPath)
+
+        const startNodeId = this.shortestPath[0]
+        const targetNodeId = this.shortestPath[this.shortestPath.length - 1]
+        this.drawMarker(this.mapData.nodes[startNodeId], '#005885') // Start
+
+        this.targetNodes.forEach(targetNode => {
+          this.drawMarker(this.mapData.nodes[targetNode.nodeId], '#76B07E')
+        })
+      }
+
+      this.ctx.restore()
+    },
+
+    // on fetched map, center view on user
+    focusMapOnUserLocation() {
+      if (!this.coordinates) return
+
+      const userCoords = this.project(this.coordinates.lat, this.coordinates.lng)
+
+      const viewportCenterX = this.canvasWidth / 2
+      const viewportCenterY = this.canvasHeight / 2
+
+      this.view.x = viewportCenterX - (userCoords.x * this.view.scale)
+      this.view.y = viewportCenterY - (userCoords.y * this.view.scale)
+    },
+
+    // draws the shortest path
     drawPath(nodes, pathIds) {
       this.ctx.beginPath()
-      this.ctx.strokeStyle = 'blue'
-      this.ctx.lineWidth = 4
+      this.ctx.strokeStyle = '#FF9494'
+      this.ctx.lineWidth = 5 / this.view.scale // keep consistent visual width
       this.ctx.lineCap = 'round'
       this.ctx.lineJoin = 'round'
 
       if (pathIds.length < 2) return
 
       const start = nodes[pathIds[0]]
-      const startProj = this.project(start.lat, start.lon)
-      this.ctx.moveTo(startProj.x, startProj.y)
+      const startProj = this.project(start.lat,start.lon)
+      this.ctx.moveTo(startProj.x,startProj.y)
 
-      for (let i = 1; i < pathIds.length; i++) {
-        const node = nodes[pathIds[i]]
-        const proj = this.project(node.lat, node.lon)
-        this.ctx.lineTo(proj.x, proj.y)
-      }
+      pathIds.forEach(id => {
+        const node = nodes[id]
+        const locationOnMap = this.project(node.lat, node.lon)
+        this.ctx.lineTo(locationOnMap.x, locationOnMap.y)
+      })
+
       this.ctx.stroke()
     },
+
     drawMarker(node, color) {
       if (!node) return
-
       const proj = this.project(node.lat, node.lon)
+      const radius = 8 / this.view.scale // keep consistent size
 
       this.ctx.beginPath()
-      this.ctx.arc(proj.x, proj.y, 6, 0, 2 * Math.PI)
+      this.ctx.arc(proj.x,proj.y, radius, 0, 2 * Math.PI)
       this.ctx.fillStyle = color
       this.ctx.fill()
       this.ctx.strokeStyle = 'white'
-      this.ctx.lineWidth = 2
+      this.ctx.lineWidth = 2 / this.view.scale
       this.ctx.stroke()
+    },
+
+    handleMouseDown(event) {
+      this.isDraggingMap = true
+      this.dragStart.x = event.clientX
+      this.dragStart.y = event.clientY
+    },
+
+    handleMouseUp() {
+      this.isDraggingMap = false
+    },
+
+    handleMouseMove(event) {
+      if (!this.isDraggingMap) return
+
+      const dx = event.clientX - this.dragStart.x
+      const dy = event.clientY - this.dragStart.y
+
+      this.view.x += dx
+      this.view.y += dy
+
+      this.dragStart.x = event.clientX
+      this.dragStart.y = event.clientY
+
+      requestAnimationFrame(this.renderMap)
+    },
+
+    handleMouseClick(event) {
+      // prevent accidental clicks if moving mouse while clicking
+      const distMoved = Math.hypot(
+        event.clientX - this.dragStart.x,
+        event.clientY - this.dragStart.y
+      )
+      if (distMoved > 5) return // user panning, not clicking
+
+      const rect = this.$refs.mapCanvas.getBoundingClientRect()
+      const mouseX = event.clientX - rect.left
+      const mouseY = event.clientY - rect.top
+
+      // we have to check if the mouse's location aligns with
+      // the location of a location marker
+      this.targetNodes.forEach(targetNode => {
+        const node = this.mapData.nodes[targetNode.nodeId]
+
+        if (node) {
+          const proj = this.project(node.lat, node.lon)
+
+          const screenX = (proj.x * this.view.scale) + this.view.x
+          const screenY = (proj.y * this.view.scale) + this.view.y
+
+          const dx = mouseX - screenX
+          const dy = mouseY - screenY
+          const distance = Math.sqrt(dx ** 2 + dy ** 2)
+
+          if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
+            this.targetLocation.nodeId = targetNode.nodeId
+            this.findShortestPath(this.userNodeId)
+            this.$nextTick(() => this.renderMap())
+          }
+        }
+      })
+    },
+
+    // another way of selecting target location
+    handleCardSelection(locationData) {
+      if (!this.userNodeId || !this.mapData.nodes) return
+
+      const targetNodeId = this.getNearestNodeId(locationData.lat, locationData.lon)
+
+      if (!targetNodeId) return
+
+      this.targetLocation = {
+        nodeId: targetNodeId,
+        distance: 0
+      }
+
+      this.findShortestPath(this.userNodeId)
+
+      this.$nextTick(() => {
+        this.renderMap()
+      })
+    },
+
+    // relates to zooming the map
+    handleScroll(event) {
+      const zoomSensitivity = 0.001
+      const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
+      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+
+      const rect = this.$refs.mapCanvas.getBoundingClientRect()
+      const mouseX = event.clientX - rect.left
+      const mouseY = event.clientY - rect.top
+
+      this.view.x = mouseX - (mouseX - this.view.x) * (newScale / this.view.scale)
+      this.view.y = mouseY - (mouseY - this.view.y) * (newScale / this.view.scale)
+      this.view.scale = newScale
+
+      requestAnimationFrame(this.renderMap)
+    },
+
+    resizeCanvas() {
+      const canvas = this.$refs.mapCanvas
+      if (!canvas) return
+
+      canvas.width = this.canvasWidth
+      canvas.height = this.canvasHeight
+
+      if (this.offscreenCanvas) {
+        this.renderMap()
+      }
     }
   },
-  created() {
-    this.getUserCoordinates() // Pre-fetch coordinates on component creation (page load)
+  mounted() {
+    this.resizeCanvas()
+    this.getUserCoordinates()
   }
 }
 </script>
