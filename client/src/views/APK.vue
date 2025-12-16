@@ -408,6 +408,11 @@ export default {
                 })
                 .catch(err => {
                   console.error('User fetch failed', err)
+                  this.reviewsForChosenDrink.push({
+                    userName: 'Account deleted',
+                    comment: review.comment,
+                    rating: review.rating
+                  })
                 })
             }
           })
