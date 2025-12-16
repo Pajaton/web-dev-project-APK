@@ -3,83 +3,62 @@
   <div>
     <p>Register</p>
     <BForm>
-        <BFormFloatingLabel
-        label="Email Address"
-        label-for="floatingEmail"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingEmail"
-          v-model="email"
-          type="email"
-          placeholder="Email address"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
-        label="User Name"
-        label-for="floatingUserName"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingName"
-          v-model="UserName"
-          type="text"
-          placeholder="UserName"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
-        label="Street"
-        label-for="floatingStreet"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingStreet"
-          v-model="street"
-          type="text"
-          placeholder="street"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="Street Number"
-        label-for="floatingStreetNumber"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingStreetNumber"
-          v-model="streetNumber"
-          type="text"
-          placeholder="streetNumber"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="Postal Code"
-        label-for="floatingpostalCode"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingpostalCode"
-          v-model="postalCode"
-          type="text"
-          placeholder="postalCode"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="City"
-        label-for="floatingcity"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingcity"
-          v-model="city"
-          type="text"
-          placeholder="city"
-        />
-        </BFormFloatingLabel>
+      <BFormFloatingLabel label="Email Address" label-for="floatingEmail" class="my-2">
+      <BFormInput
+        id="floatingEmail"
+        v-model="email"
+        type="email"
+        placeholder="Email address"
+        :state="emailState"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="User Name" label-for="floatingUserName" class="my-2">
+      <BFormInput
+        id="floatingName"
+        v-model="userName"
+        type="text"
+        placeholder="UserName"
+        :state="nameState"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Street" label-for="floatingStreet" class="my-2">
+      <BFormInput
+        id="floatingStreet"
+        v-model="street"
+        type="text"
+        placeholder="street"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Street Number" label-for="floatingStreetNumber" class="my-2">
+      <BFormInput
+        id="floatingStreetNumber"
+        v-model="streetNumber"
+        type="text"
+        placeholder="streetNumber"
+        :state="numberState(streetNumber)"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Postal Code" label-for="floatingpostalCode" class="my-2">
+      <BFormInput
+        id="floatingpostalCode"
+        v-model="postalCode"
+        type="text"
+        placeholder="postalCode"
+        :state="numberState(postalCode)"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="City" label-for="floatingcity" class="my-2">
+      <BFormInput
+        id="floatingcity"
+        v-model="city"
+        type="text"
+        placeholder="city"
+      />
+      </BFormFloatingLabel>
     </BForm>
     <b-button block variant="danger" @click="resetFields()">Reset</b-button>
     <b-button block @click="registerUser()">Register</b-button>
-
-    </div>
+  </div>
 </template>
 
 <script>
@@ -89,11 +68,19 @@ import { drinkApi } from '@/Api'
 
 export default {
   name: 'Register',
+  computed: {
+    emailState() {
+      return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.email)
+    },
+    nameState() {
+      return this.userName.length > 4
+    }
+  },
   data() {
     return {
       message: 'none',
       email: '',
-      UserName: '',
+      userName: '',
       street: '',
       streetNumber: '',
       postalCode: '',
@@ -108,7 +95,7 @@ export default {
         drinkApi.post('/users', {
           email: this.email,
           ProfilePicture: null,
-          userName: this.UserName,
+          userName: this.userName,
           street: this.street,
           streetNumber: this.streetNumber,
           postalCode: this.postalCode,
@@ -121,7 +108,7 @@ export default {
     },
     resetFields() {
       this.email = ''
-      this.UserName = ''
+      this.userName = ''
       this.street = ''
       this.streetNumber = ''
       this.postalCode = ''
@@ -135,6 +122,9 @@ export default {
           this.userExist = true
         }
       })
+    },
+    numberState(number) {
+      return /^\d*$/.test(number)
     }
   }
 }
