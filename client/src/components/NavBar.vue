@@ -39,6 +39,7 @@ export default {
   watch: {
     $route() {
       this.fetchCurrentUser()
+      console.log('Current user ID: ' + this.currentUserId)
     }
   },
   methods: {
@@ -51,14 +52,20 @@ export default {
           this.message = error
         })
     },
-    loginLogout() {
+    async loginLogout() {
       if (!this.currentUserId) {
         this.$router.push('/login')
         return
       }
-      drinkApi.delete('/sessions/' + this.currentUserId)
-      console.log('Logged out successfully: ' + this.currentUserId)
+
+      try {
+        await drinkApi.delete('/sessions/' + this.currentUserId)
+      } catch (error) {
+        this.message = error
+      }
+
       this.currentUserId = null
+      await this.fetchCurrentUser()
       this.$router.push('/login')
     }
   }
