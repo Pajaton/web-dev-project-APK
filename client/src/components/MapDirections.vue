@@ -46,6 +46,7 @@
             v-for="(target, index) in mapData.targetLocations"
             :key="index"
             :location="target"
+            :userId="userId"
             @select-location="handleCardSelection"
           />
         </b-col>
@@ -66,6 +67,7 @@ export default {
   },
   data() {
     return {
+      userId: null,
       message: '',
       coordinates: null,
       mapData: {},
@@ -138,12 +140,15 @@ export default {
       // to any path or way
       this.targetNodes = this.mapData.targetLocations.map(target => {
         target.nodeId = this.getNearestNodeId(target.lat, target.lon)
-        const distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
 
-        if (!this.targetLocation || distance < this.targetLocation.distance) {
-          this.targetLocation = {
-            nodeId: target.nodeId,
-            distance: distance
+        if (this.userNodeId && target.nodeId && this.mapData.nodes[this.userNodeId] && this.mapData.nodes[target.nodeId]) {
+          const distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
+
+          if (!this.targetLocation || distance < this.targetLocation.distance) {
+            this.targetLocation = {
+              nodeId: target.nodeId,
+              distance: distance
+            }
           }
         }
         return target
@@ -571,9 +576,20 @@ export default {
       if (this.offscreenCanvas) {
         this.renderMap()
       }
+    },
+    fetchCurrentUser() {
+      Api.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.userId = response.data.user._id
+          console.log(this.userId)
+        })
+        .catch(error => {
+          this.message = error
+        })
     }
   },
   mounted() {
+    this.fetchCurrentUser()
     this.resizeCanvas()
     this.getUserCoordinates()
   }
