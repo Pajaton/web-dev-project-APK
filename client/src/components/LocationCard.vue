@@ -17,16 +17,27 @@
         variant="primary">
         Get directions
       </b-button>
+      <b-button
+          id="fav-button"
+          @click="favoriteSystembolag()"
+          variant="primary">
+        Favorite
+      </b-button>
     </b-card>
   </div>
 </template>
 
 <script>
+  import { Api } from '@/Api'
   export default {
     props: {
       location: {
         type: Object,
         default: () => ({})
+      },
+      userId: {
+        type: String,
+        default: ''
       }
     },
     data() {
@@ -40,6 +51,10 @@
       this.formatAddress()
     },
     methods: {
+      favoriteSystembolag() {
+        Api.put(`/users/${this.userId}/favorites/systembolag/${this.location.id}`)
+      },
+
       setTargetLocation() {
         this.$emit('select-location', this.location)
       },
@@ -56,7 +71,7 @@
       },
 
       formatAddress() {
-        if (this.location.address.street !== undefined) {
+        if (this.location.address && this.location.address.street !== undefined) {
           const address = this.location.address
           this.locationAddress += `Address:\n${address.street} ${address.streetNumber}\n${address.city}, ${address.postalCode}`
         }

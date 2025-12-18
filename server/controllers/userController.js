@@ -3,6 +3,7 @@ var session = require("express-session");
 var router = express.Router();
 
 var User = require("../models/UserSchema");
+const Systembolag = require("../models/SystembolagSchema.js")
 // GET ROUTE DEFINITIONS
 
 // Get a list of users
@@ -308,19 +309,24 @@ router.patch("/users/:userId/favorites/drinks/:drinkId", async (req, res, next) 
 });
 
 // Favorite a Systembolag store
-router.patch("/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
+router.put("/users/:userId/favorites/systembolag/:systembolagId", async (req, res, next) => {
     try {
+        const systembolagToFavorite = await Systembolag.findOne({ systembolagID: req.params.systembolagId })
+
+        if (!systembolagToFavorite) {
+          return res.status(404).json({"message": "Systembolag not found" })
+        }
+
         const user = await User
             .findByIdAndUpdate(
                 req.params.userId,
-                { $set: { favoriteSystembolag: req.params.systembolagId } }, // set the favoriteSystembolag field
+                { $set: { favoriteSystembolag: systembolagToFavorite._id } }, // set the favoriteSystembolag field
                 { new: true });
         if (!user) {
+          console.log(":)")
             return res.status(404).json({"message": "User was not found"});
         }
-        else if (!req.params.systembolagId) {
-            return res.status(404).json({"message": "Systembolag was not found"});
-        }
+
         return res.json(user);
     } catch(err) { next(err) };
 });

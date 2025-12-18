@@ -14,6 +14,7 @@
             <b-list-group-item flush variant="primary">Alcoholic intake: {{user.alcoholConsumed.length}}</b-list-group-item>
             <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
             <b-list-group-item flush variant="primary" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
+            <b-list-group-item flush variant="primary" v-if="this.favoriteSystembolag">Favorite systembolag: {{ this.favoriteSystembolag }}</b-list-group-item>
           </b-list-group>
         </b-card>
         <b-list-group>
@@ -49,6 +50,7 @@ export default {
       userFollowingList: [],
       reviewsByUser: [],
       currentUserId: null,
+      favoriteSystembolag: null,
       show: false
     }
   },
@@ -65,6 +67,7 @@ export default {
           }
           this.getUserFollowingList()
           this.getAllUserReviews()
+          this.getFavoriteSystembolag()
         })
         .catch(error => {
           this.message = error
@@ -74,6 +77,16 @@ export default {
       drinkApi.get(this.user._links.follows)
         .then(response => {
           this.userFollowingList = response.data.follows
+        })
+        .catch(error => {
+          this.message = error
+        })
+    },
+    getFavoriteSystembolag() {
+      drinkApi.get(this.user._links.favoritesSystembolag)
+        .then(response => {
+          const systembolag = response.data
+          this.favoriteSystembolag = systembolag.favoriteSystembolag.name
         })
         .catch(error => {
           this.message = error
