@@ -94,7 +94,7 @@ type="text"
 </BForm>
 <b-row>
   <b-col cols="4">
-<b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture"></b-img>
+<b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
 <b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
 <b-modal v-model="modalShowPicture" title="Choose profile picture">
   <b-img class="images" v-for="(picture, index) in profilePictureList"
@@ -197,7 +197,7 @@ export default {
       this.profilePicture = picture
     },
     async deleteUser() {
-      drinkApi.delete('/users/' + this.mockUserID)
+      drinkApi.delete('/users/' + this.currentUserId)
       console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
       this.modalShowConfirmation = true
     },
@@ -214,6 +214,9 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    profilePictureError(event) {
+      event.target.src = '/profilePictures/default_user.jpg'
     }
   }
 }
