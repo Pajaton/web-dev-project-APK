@@ -3,7 +3,7 @@
     <b-container>
       <b-row>
         <!-- Filters -->
-        <b-col cols="12">
+        <b-col cols="12" md="6">
           <b-card>
             <h1>Filter drinks:</h1>
 
@@ -54,7 +54,7 @@
         </b-col>
 
         <!-- Sorting -->
-        <b-col cols="12">
+        <b-col cols="12" md="6">
           <b-card>
             <h1>Sort drinks:</h1>
             <b-form @submit.prevent="submitSort">
