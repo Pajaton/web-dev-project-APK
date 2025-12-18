@@ -1,10 +1,11 @@
 <template>
   <!-- Register HTML template -->
   <div>
+    <BFormGroup class="my-2">
     <h2>Register</h2>
     <BForm style="padding-left: 2rem;">
-      <BFormFloatingLabel label="Email Address" label-for="floatingEmail" class="my-2">
-      <BFormInput
+      <BFormFloatingLabel label="Email Address" label-for="floatingEmail">
+        <BFormInput
         id="floatingEmail"
         v-model="email"
         type="email"
@@ -16,7 +17,7 @@
         Enter a valid email
       </b-form-invalid-feedback>
     </BFormFloatingLabel>
-      <BFormFloatingLabel label="User Name" label-for="floatingUserName" class="my-2">
+      <BFormFloatingLabel label="User Name" label-for="floatingUserName">
       <BFormInput
         id="floatingUserName"
         v-model="userName"
@@ -29,7 +30,7 @@
         Enter at least 5 characters
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="Street" label-for="floatingStreet" class="my-2">
+      <BFormFloatingLabel label="Street" label-for="floatingStreet">
       <BFormInput
         id="floatingStreet"
         v-model="street"
@@ -37,7 +38,7 @@
         placeholder="street"
       />
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="Street Number" label-for="floatingStreetNumber" class="my-2">
+      <BFormFloatingLabel label="Street Number" label-for="floatingStreetNumber">
       <BFormInput
         id="floatingStreetNumber"
         v-model="streetNumber"
@@ -50,7 +51,7 @@
         Only numbers are alowed
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="Postal Code" label-for="floatingPostalCode" class="my-2">
+      <BFormFloatingLabel label="Postal Code" label-for="floatingPostalCode">
       <BFormInput
         id="floatingPostalCode"
         v-model="postalCode"
@@ -63,7 +64,7 @@
         Only numbers are allowed
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="City" label-for="floatingCity" class="my-2">
+      <BFormFloatingLabel label="City" label-for="floatingCity">
       <BFormInput
         id="floatingCity"
         v-model="city"
@@ -71,11 +72,12 @@
         placeholder="city"
       />
       </BFormFloatingLabel>
-      <b-form-checkbox v-model="ageCheck">I confirm that I am over 20 years old</b-form-checkbox>
-      <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''" class="my-2"> {{ message }} </BAlert>
-      <b-button  variant="danger" block @click="resetFields()">Reset</b-button>
-      <b-button variant="primary" block @click="registerUser()" :disabled="!validForm">Register</b-button>
+      <b-form-checkbox v-model="ageCheck" inline>I confirm that I am over 20 years old</b-form-checkbox>
+      <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''"> {{ message }} </BAlert>
     </BForm>
+    <b-button  variant="danger" block @click="resetFields()" class="my-2">Reset</b-button>
+    <b-button variant="primary" block @click="registerUser()" :disabled="!validForm" class="my-2">Register</b-button>
+    </BFormGroup>
   </div>
 </template>
 
@@ -183,5 +185,7 @@ export default {
 </script>
 
 <style>
-    /* register user CSS styles */
+.my-2 {
+      max-width: 500px;
+    }
 </style>
