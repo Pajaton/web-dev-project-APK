@@ -18,7 +18,7 @@
     </BFormFloatingLabel>
       <BFormFloatingLabel label="User Name" label-for="floatingUserName" class="my-2">
       <BFormInput
-        id="floatingName"
+        id="floatingUserName"
         v-model="userName"
         type="text"
         placeholder="UserName"
@@ -50,9 +50,9 @@
         Only numbers are alowed
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="Postal Code" label-for="floatingpostalCode" class="my-2">
+      <BFormFloatingLabel label="Postal Code" label-for="floatingPostalCode" class="my-2">
       <BFormInput
-        id="floatingpostalCode"
+        id="floatingPostalCode"
         v-model="postalCode"
         type="text"
         placeholder="postalCode"
@@ -60,23 +60,21 @@
         aria-describedby="postalCode-feedback"
       />
       <b-form-invalid-feedback id="postalCode-feedback">
-        Only numbers are alowed
+        Only numbers are allowed
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
-      <BFormFloatingLabel label="City" label-for="floatingcity" class="my-2">
+      <BFormFloatingLabel label="City" label-for="floatingCity" class="my-2">
       <BFormInput
-        id="floatingcity"
+        id="floatingCity"
         v-model="city"
         type="text"
         placeholder="city"
       />
       </BFormFloatingLabel>
       <b-form-checkbox v-model="ageCheck">I confirm that I am over 20 years old</b-form-checkbox>
+      <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''" class="my-2"> {{ message }} </BAlert>
       <b-button  variant="danger" block @click="resetFields()">Reset</b-button>
-      <b-button variant="primary" block @click="modalShowConfirmation = true" :disabled="!validForm">Register</b-button>
-      <b-modal v-model="modalShowConfirmation" title="Registration Confirmation" @ok="registerUser()">
-        <p>Click ok to confirm your registration</p>
-      </b-modal>
+      <b-button variant="primary" block @click="registerUser()" :disabled="!validForm">Register</b-button>
     </BForm>
   </div>
 </template>
@@ -101,7 +99,7 @@ export default {
   },
   data() {
     return {
-      message: 'none',
+      message: '',
       email: '',
       userName: '',
       street: '',
@@ -110,14 +108,25 @@ export default {
       city: '',
       userExist: false,
       ageCheck: false,
-      modalShowConfirmation: false
+      alertVariant: 'info'
     }
   },
   methods: {
+    showAlert(message, variant = 'info') {
+      this.message = ''
+      this.$nextTick(() => {
+        this.message = message
+        this.alertVariant = variant
+      })
+    },
     async registerUser() {
-      this.userVerification()
-      if (this.userExist === false) {
-        drinkApi.post('/users', {
+      await this.userVerification()
+      if (this.userExist) {
+        this.showAlert('This email already exist', 'warning')
+        return
+      }
+      try {
+        const response = await drinkApi.post('/users', {
           email: this.email,
           ProfilePicture: '/profilePictures/default_user.jpg',
           userName: this.userName,
@@ -128,9 +137,18 @@ export default {
           longitude: null,
           latitude: null
         })
+        if (response.status === 201) {
+          this.showAlert('Registration Successfull', 'success')
+          setTimeout(() => {
+            this.$router.push({ path: '/home' })
+          }, 3000)
+        } else {
+          this.showAlert('Registration failed', 'danger')
+        }
+      } catch (error) {
+        console.error(error)
+        this.showAlert('Registration failed', 'danger')
       }
-      this.$router.push({ path: '/home' })
-      console.log('User added: ' + this.userName + ' ' + ' Email: ' + this.email)
     },
     resetFields() {
       this.email = ''
@@ -139,15 +157,23 @@ export default {
       this.streetNumber = ''
       this.postalCode = ''
       this.city = ''
+      this.ageCheck = false
     },
     async userVerification() {
-      const response = await drinkApi('/users/')
-      const data = response.data
-      data.users.forEach(user => {
-        if (user.email === this.email) {
-          this.userExist = true
-        }
-      })
+      this.userExist = false
+      try {
+        const response = await drinkApi('/users/')
+        const data = response.data
+        data.users.forEach(user => {
+          console.log('Checking user email:', user.email)
+
+          if (user.email === this.email) {
+            this.userExist = true
+          }
+        })
+      } catch (error) {
+        console.error('User verification failer:', error)
+      }
     },
     numberState(number) {
       return /^\d*$/.test(number)
@@ -157,5 +183,5 @@ export default {
 </script>
 
 <style>
-    /* Find Systembolag CSS styles */
+    /* register user CSS styles */
 </style>
