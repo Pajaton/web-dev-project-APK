@@ -3,8 +3,8 @@
 		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50143285",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50143285"
+		"_exporter_id": "50199247",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50199247"
 	},
 	"item": [
 		{
@@ -317,7 +317,7 @@
 									"    pm.expect(40).to.eq(json.percentage);\r",
 									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(json.colour);\r",
 									"    pm.expect(519).to.eq(json.price);\r",
-									"    pm.expect(\"bottle.jpg\").to.eq(json.image);\r",
+									"    pm.expect(\"/drinkPictures/laphroaig_10_years.jpg\").to.eq(json.image);\r",
 									"    pm.expect(66).to.eq(json.apk);\r",
 									"})\r",
 									"\r",
@@ -340,7 +340,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"productNumber\": \"some number\",\r\n    \"name\":\"Laphroaig 10 Years\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 40,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 519,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 66\r\n}",
+							"raw": "{\r\n    \"productNumber\": \"some number\",\r\n    \"name\":\"Laphroaig 10 Years\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 40,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 519,\r\n    \"image\": \"/drinkPictures/laphroaig_10_years.jpg\",\r\n    \"apk\": 66\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -387,7 +387,7 @@
 									"    pm.expect(0).to.eq(json.percentage);\r",
 									"    pm.expect(\"Shrek-grön\").to.eq(json.colour);\r",
 									"    pm.expect(25).to.eq(json.price);\r",
-									"    pm.expect(\"bottle.jpg\").to.eq(json.image);\r",
+									"    pm.expect(\"/drinkPictures/festis_kaktus_lime.jpg\").to.eq(json.image);\r",
 									"    pm.expect(0).to.eq(json.apk);\r",
 									"})\r",
 									"\r",
@@ -410,7 +410,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"productNumber\": \"Festis\",\r\n    \"name\":\"Festis Kaktus Lime\",\r\n    \"type\": \"Saft\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 500,\r\n    \"percentage\": 0,\r\n    \"colour\": \"Shrek-grön\",\r\n    \"price\": 25,\r\n    \"image\": \"bottle.jpg\",\r\n    \"apk\": 0\r\n}",
+							"raw": "{\r\n    \"productNumber\": \"Festis\",\r\n    \"name\":\"Festis Kaktus Lime\",\r\n    \"type\": \"Saft\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 500,\r\n    \"percentage\": 0,\r\n    \"colour\": \"Shrek-grön\",\r\n    \"price\": 25,\r\n    \"image\": \"/drinkPictures/festis_kaktus_lime.jpg\",\r\n    \"apk\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -453,8 +453,8 @@
 									"    pm.expect(1).to.eq(json.systembolagID);\r",
 									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
 									"    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
-									"    pm.expect(75).to.eq(json.streetNumber);\r",
-									"    pm.expect(45687).to.eq(json.postalCode);\r",
+									"    pm.expect('75').to.eq(json.streetNumber);\r",
+									"    pm.expect('45687').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
 									"    pm.expect(654987).to.eq(json.longitude);\r",
 									"    pm.expect(465132).to.eq(json.latitude);\r",
@@ -535,8 +535,8 @@
 									"    pm.expect(json.systembolagID).to.be.a(\"number\");\r",
 									"    pm.expect(json.name).to.be.a(\"string\");\r",
 									"    pm.expect(json.street).to.be.a(\"string\");\r",
-									"    pm.expect(json.streetNumber).to.be.a(\"number\");\r",
-									"    pm.expect(json.postalCode).to.be.a(\"number\");\r",
+									"    pm.expect(json.streetNumber).to.be.a(\"string\");\r",
+									"    pm.expect(json.postalCode).to.be.a(\"string\");\r",
 									"    pm.expect(json.city).to.be.a(\"string\");\r",
 									"    pm.expect(json.latitude).to.be.a(\"number\");\r",
 									"    pm.expect(json.longitude).to.be.a(\"number\");\r",
@@ -548,8 +548,8 @@
 									"    pm.expect(2).to.eq(json.systembolagID);\r",
 									"    pm.expect(\"Sydbyn\").to.eq(json.name);\r",
 									"    pm.expect(\"Suedegatan\").to.eq(json.street);\r",
-									"    pm.expect(57).to.eq(json.streetNumber);\r",
-									"    pm.expect(78654).to.eq(json.postalCode);\r",
+									"    pm.expect('57').to.eq(json.streetNumber);\r",
+									"    pm.expect('78654').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Bötegorg\").to.eq(json.city);\r",
 									"    pm.expect(465132).to.eq(json.longitude);\r",
 									"    pm.expect(654987).to.eq(json.latitude);\r",
@@ -1425,7 +1425,7 @@
 									"    pm.expect(drink.percentage).to.eq(0);\r",
 									"    pm.expect(drink.colour).to.eq('Shrek-grön');\r",
 									"    pm.expect(drink.price).to.eq(25);\r",
-									"    pm.expect(drink.image).to.eq('bottle.jpg');\r",
+									"    pm.expect(drink.image).to.eq(\"/drinkPictures/festis_kaktus_lime.jpg\");\r",
 									"    pm.expect(drink.apk).to.eq(0);\r",
 									"    pm.expect(drink.hasReviews.length).to.eq(1);\r",
 									"    pm.expect(drink.availableAt).to.be.empty;\r",
@@ -1564,7 +1564,7 @@
 									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(40);\r",
 									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Mörk, gyllengul färg');\r",
 									"    pm.expect(json.favoriteDrinks[0].price).to.eq(519);\r",
-									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq(\"/drinkPictures/laphroaig_10_years.jpg\");\r",
 									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(66);\r",
 									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.include(reviewID);\r",
 									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
@@ -1705,7 +1705,7 @@
 									"    pm.expect(json.favoriteDrinks[0].percentage).to.eq(0);\r",
 									"    pm.expect(json.favoriteDrinks[0].colour).to.eq('Shrek-grön');\r",
 									"    pm.expect(json.favoriteDrinks[0].price).to.eq(25);\r",
-									"    pm.expect(json.favoriteDrinks[0].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[0].image).to.eq(\"/drinkPictures/festis_kaktus_lime.jpg\");\r",
 									"    pm.expect(json.favoriteDrinks[0].apk).to.eq(0);\r",
 									"    pm.expect(json.favoriteDrinks[0].hasReviews).to.include(anotherReviewID)\r",
 									"    pm.expect(json.favoriteDrinks[0].availableAt).to.be.empty;\r",
@@ -1720,7 +1720,7 @@
 									"    pm.expect(json.favoriteDrinks[1].percentage).to.eq(40);\r",
 									"    pm.expect(json.favoriteDrinks[1].colour).to.eq('Mörk, gyllengul färg');\r",
 									"    pm.expect(json.favoriteDrinks[1].price).to.eq(519);\r",
-									"    pm.expect(json.favoriteDrinks[1].image).to.eq('bottle.jpg');\r",
+									"    pm.expect(json.favoriteDrinks[1].image).to.eq(\"/drinkPictures/laphroaig_10_years.jpg\");\r",
 									"    pm.expect(json.favoriteDrinks[1].apk).to.eq(66);\r",
 									"    pm.expect(json.favoriteDrinks[1].hasReviews).to.include(reviewID);\r",
 									"    pm.expect(json.favoriteDrinks[1].availableAt).to.be.empty;\r",
@@ -1853,7 +1853,7 @@
 						}
 					],
 					"request": {
-						"method": "PATCH",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1862,7 +1862,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag/{{systembolagID}}",
+							"raw": "{{host}}/api/v1/users/{{userID}}/favorites/systembolag/1",
 							"host": [
 								"{{host}}"
 							],
@@ -1873,7 +1873,7 @@
 								"{{userID}}",
 								"favorites",
 								"systembolag",
-								"{{systembolagID}}"
+								"1"
 							]
 						}
 					},
@@ -1906,8 +1906,8 @@
 									"pm.test(\"Fields of favorite systembolag is correct\", () => {\r",
 									"    pm.expect(json.favoriteSystembolag.name).to.eq('Nordstan');\r",
 									"    pm.expect(json.favoriteSystembolag.street).to.eq('Velourvägen');\r",
-									"    pm.expect(json.favoriteSystembolag.streetNumber).to.eq(75);\r",
-									"    pm.expect(json.favoriteSystembolag.postalCode).to.eq(45687);\r",
+									"    pm.expect(json.favoriteSystembolag.streetNumber).to.eq('75');\r",
+									"    pm.expect(json.favoriteSystembolag.postalCode).to.eq('45687');\r",
 									"    pm.expect(json.favoriteSystembolag.city).to.eq('Göteborg');\r",
 									"    pm.expect(json.favoriteSystembolag.longitude).to.eq(654987);\r",
 									"    pm.expect(json.favoriteSystembolag.latitude).to.eq(465132);\r",
@@ -2400,8 +2400,8 @@
 									"    pm.expect(1).to.eq(json.systembolag[0].systembolagID);\r",
 									"    pm.expect(\"Nordstan\").to.eq(json.systembolag[0].name);\r",
 									"    pm.expect(\"Velourvägen\").to.eq(json.systembolag[0].street);\r",
-									"    pm.expect(75).to.eq(json.systembolag[0].streetNumber);\r",
-									"    pm.expect(45687).to.eq(json.systembolag[0].postalCode);\r",
+									"    pm.expect('75').to.eq(json.systembolag[0].streetNumber);\r",
+									"    pm.expect('45687').to.eq(json.systembolag[0].postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.systembolag[0].city);\r",
 									"    pm.expect(654987).to.eq(json.systembolag[0].longitude);\r",
 									"    pm.expect(465132).to.eq(json.systembolag[0].latitude); \r",
@@ -2412,8 +2412,8 @@
 									"    pm.expect(2).to.eq(json.systembolag[1].systembolagID);\r",
 									"    pm.expect(\"Sydbyn\").to.eq(json.systembolag[1].name);\r",
 									"    pm.expect(\"Suedegatan\").to.eq(json.systembolag[1].street);\r",
-									"    pm.expect(57).to.eq(json.systembolag[1].streetNumber);\r",
-									"    pm.expect(78654).to.eq(json.systembolag[1].postalCode);\r",
+									"    pm.expect('57').to.eq(json.systembolag[1].streetNumber);\r",
+									"    pm.expect('78654').to.eq(json.systembolag[1].postalCode);\r",
 									"    pm.expect(\"Bötegorg\").to.eq(json.systembolag[1].city);\r",
 									"    pm.expect(465132).to.eq(json.systembolag[1].longitude);\r",
 									"    pm.expect(654987).to.eq(json.systembolag[1].latitude); \r",
@@ -2465,8 +2465,8 @@
 									"    pm.expect(1).to.eq(json.systembolagID);\r",
 									"    pm.expect(\"Nordstan\").to.eq(json.name);\r",
 									"    pm.expect(\"Velourvägen\").to.eq(json.street);\r",
-									"    pm.expect(75).to.eq(json.streetNumber);\r",
-									"    pm.expect(45687).to.eq(json.postalCode);\r",
+									"    pm.expect('75').to.eq(json.streetNumber);\r",
+									"    pm.expect('45687').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
 									"    pm.expect(654987).to.eq(json.longitude);\r",
 									"    pm.expect(465132).to.eq(json.latitude); \r",
@@ -2512,8 +2512,8 @@
 									"pm.test(\"Successfully fetched systembolags address\", () => {\r",
 									"    pm.expect(json).to.have.property(\"address\");\r",
 									"    pm.expect(\"Velourvägen\").to.eq(json.address.street);\r",
-									"    pm.expect(75).to.eq(json.address.streetNumber);\r",
-									"    pm.expect(45687).to.eq(json.address.postalCode);\r",
+									"    pm.expect('75').to.eq(json.address.streetNumber);\r",
+									"    pm.expect('45687').to.eq(json.address.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.address.city);\r",
 									"    pm.expect(654987).to.eq(json.address.longitude);\r",
 									"    pm.expect(465132).to.eq(json.address.latitude); \r",
@@ -2672,7 +2672,7 @@
 									"    pm.expect(product.percentage).to.eq(40);\r",
 									"    pm.expect(product.colour).to.eq(\"Mörk, gyllengul färg\");\r",
 									"    pm.expect(product.price).to.eq(519);\r",
-									"    pm.expect(product.image).to.eq(\"bottle.jpg\");\r",
+									"    pm.expect(product.image).to.eq(\"/drinkPictures/laphroaig_10_years.jpg\");\r",
 									"    pm.expect(product.apk).to.eq(66);\r",
 									"    pm.expect(product.hasReviews).to.include(reviewID);\r",
 									"    pm.expect(product.availableAt).to.be.empty;\r",
@@ -2727,8 +2727,8 @@
 									"    pm.expect(5).to.eq(json.systembolagID);\r",
 									"    pm.expect(\"Krogen Skogen\").to.eq(json.name);\r",
 									"    pm.expect(\"Stigen\").to.eq(json.street);\r",
-									"    pm.expect(2).to.eq(json.streetNumber);\r",
-									"    pm.expect(12354).to.eq(json.postalCode);\r",
+									"    pm.expect('2').to.eq(json.streetNumber);\r",
+									"    pm.expect('12354').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Hisingen\").to.eq(json.city);\r",
 									"    pm.expect(631321).to.eq(json.longitude);\r",
 									"    pm.expect(411558).to.eq(json.latitude);\r",
@@ -3708,7 +3708,7 @@
 									"    pm.expect(59.6).to.eq(drink.percentage);\r",
 									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
 									"    pm.expect(1899).to.eq(drink.price);\r",
-									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(\"/drinkPictures/laphroaig.jpg\").to.eq(drink.image);\r",
 									"    pm.expect(32).to.eq(drink.apk);\r",
 									"})\r",
 									""
@@ -3730,7 +3730,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"Laphroaig Elements 2.0\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 59.6,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 1899,\r\n    \"image\": \"bottle34.jpg\",\r\n    \"apk\": 32\r\n}",
+							"raw": "{\r\n    \"name\":\"Laphroaig Elements 2.0\",\r\n    \"type\": \"Maltwhisky\",\r\n    \"container\": \"Flaska\",\r\n    \"volume\": 700,\r\n    \"percentage\": 59.6,\r\n    \"colour\": \"Mörk, gyllengul färg\",\r\n    \"price\": 1899,\r\n    \"image\": \"/drinkPictures/laphroaig.jpg\",\r\n    \"apk\": 32\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3778,7 +3778,7 @@
 									"    pm.expect(59.6).to.eq(drink.percentage);\r",
 									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
 									"    pm.expect(1899).to.eq(drink.price);\r",
-									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(\"/drinkPictures/laphroaig.jpg\").to.eq(drink.image);\r",
 									"    pm.expect(32).to.eq(drink.apk);\r",
 									"    pm.expect(1).to.eq(drink.availableAt.length);\r",
 									"})\r",
@@ -3851,7 +3851,7 @@
 									"    pm.expect(59.6).to.eq(drink.percentage);\r",
 									"    pm.expect(\"Mörk, gyllengul färg\").to.eq(drink.colour);\r",
 									"    pm.expect(1899).to.eq(drink.price);\r",
-									"    pm.expect(\"bottle34.jpg\").to.eq(drink.image);\r",
+									"    pm.expect(\"/drinkPictures/laphroaig.jpg\").to.eq(drink.image);\r",
 									"    pm.expect(32).to.eq(drink.apk);\r",
 									"    pm.expect(2).to.eq(drink.availableAt.length);\r",
 									"})\r",
@@ -4832,7 +4832,7 @@
 		},
 		{
 			"key": "systembolagSchema",
-			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"systembolagID\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"hasInStock\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"isFavoriteOf\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"systembolagID\",\"name\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"hasInStock\",\"isFavoriteOf\",\"__v\"],\"additionalProperties\":false}"
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"systembolagID\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"string\"},\"postalCode\":{\"type\":\"string\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"hasInStock\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"isFavoriteOf\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"systembolagID\",\"name\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"hasInStock\",\"isFavoriteOf\",\"__v\"],\"additionalProperties\":false}"
 		}
 	]
 }
