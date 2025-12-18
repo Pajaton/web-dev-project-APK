@@ -202,6 +202,7 @@ export default {
   },
   mounted() {
     this.fetchCurrentUser()
+    this.getDrinklist('')
   },
   methods: {
     getDrinklist(filterUrl) {
