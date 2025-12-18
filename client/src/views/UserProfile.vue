@@ -60,6 +60,9 @@ export default {
       drinkApi.get('/users/' + this.id)
         .then(response => {
           this.user = response.data
+          if (!this.user.profilePicture) {
+            this.user.profilePicture = '/profilePictures/default_user.jpg'
+          }
           this.getUserFollowingList()
           this.getAllUserReviews()
         })
