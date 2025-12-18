@@ -1,85 +1,84 @@
 <template>
   <!-- Register HTML template -->
   <div>
-    <p>Register</p>
-    <BForm>
-        <BFormFloatingLabel
-        label="Email Address"
-        label-for="floatingEmail"
-        class="my-2"
-      >
+    <BFormGroup class="my-2">
+    <h2>Register</h2>
+    <BForm style="padding-left: 2rem;">
+      <BFormFloatingLabel label="Email Address" label-for="floatingEmail">
         <BFormInput
-          id="floatingEmail"
-          v-model="email"
-          type="email"
-          placeholder="Email address"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
-        label="User Name"
-        label-for="floatingUserName"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingName"
-          v-model="UserName"
-          type="text"
-          placeholder="UserName"
-        />
-        </BFormFloatingLabel>
-                <BFormFloatingLabel
-        label="Street"
-        label-for="floatingStreet"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingStreet"
-          v-model="street"
-          type="text"
-          placeholder="street"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="Street Number"
-        label-for="floatingStreetNumber"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingStreetNumber"
-          v-model="streetNumber"
-          type="text"
-          placeholder="streetNumber"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="Postal Code"
-        label-for="floatingpostalCode"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingpostalCode"
-          v-model="postalCode"
-          type="text"
-          placeholder="postalCode"
-        />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel
-        label="City"
-        label-for="floatingcity"
-        class="my-2"
-      >
-        <BFormInput
-          id="floatingcity"
-          v-model="city"
-          type="text"
-          placeholder="city"
-        />
-        </BFormFloatingLabel>
+        id="floatingEmail"
+        v-model="email"
+        type="email"
+        placeholder="Email address"
+        :state="emailState"
+        aria-describedby="email-feedback"
+      />
+      <b-form-invalid-feedback id="email-feedback">
+        Enter a valid email
+      </b-form-invalid-feedback>
+    </BFormFloatingLabel>
+      <BFormFloatingLabel label="User Name" label-for="floatingUserName">
+      <BFormInput
+        id="floatingUserName"
+        v-model="userName"
+        type="text"
+        placeholder="UserName"
+        :state="nameState"
+        aria-describedby="userName-feedback"
+      />
+      <b-form-invalid-feedback id="userName-feedback">
+        Enter at least 5 characters
+      </b-form-invalid-feedback>
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Street" label-for="floatingStreet">
+      <BFormInput
+        id="floatingStreet"
+        v-model="street"
+        type="text"
+        placeholder="street"
+      />
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Street Number" label-for="floatingStreetNumber">
+      <BFormInput
+        id="floatingStreetNumber"
+        v-model="streetNumber"
+        type="text"
+        placeholder="streetNumber"
+        :state="numberState(streetNumber)"
+        aria-describedby="streetNumber-feedback"
+      />
+      <b-form-invalid-feedback id="streetNumber-feedback">
+        Only numbers are alowed
+      </b-form-invalid-feedback>
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="Postal Code" label-for="floatingPostalCode">
+      <BFormInput
+        id="floatingPostalCode"
+        v-model="postalCode"
+        type="text"
+        placeholder="postalCode"
+        :state="numberState(postalCode)"
+        aria-describedby="postalCode-feedback"
+      />
+      <b-form-invalid-feedback id="postalCode-feedback">
+        Only numbers are allowed
+      </b-form-invalid-feedback>
+      </BFormFloatingLabel>
+      <BFormFloatingLabel label="City" label-for="floatingCity">
+      <BFormInput
+        id="floatingCity"
+        v-model="city"
+        type="text"
+        placeholder="city"
+      />
+      </BFormFloatingLabel>
+      <b-form-checkbox v-model="ageCheck" inline>I confirm that I am over 20 years old</b-form-checkbox>
+      <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''"> {{ message }} </BAlert>
     </BForm>
-    <b-button block variant="danger" @click="resetFields()">Reset</b-button>
-    <b-button block @click="registerUser()">Register</b-button>
-
-    </div>
+    <b-button  variant="danger" block @click="resetFields()" class="my-2">Reset</b-button>
+    <b-button variant="primary" block @click="registerUser()" :disabled="!validForm" class="my-2">Register</b-button>
+    </BFormGroup>
+  </div>
 </template>
 
 <script>
@@ -89,26 +88,50 @@ import { drinkApi } from '@/Api'
 
 export default {
   name: 'Register',
+  computed: {
+    emailState() {
+      return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.email)
+    },
+    nameState() {
+      return this.userName.length > 4
+    },
+    validForm() {
+      return (this.emailState && this.nameState && this.numberState(this.streetNumber) && this.numberState(this.postalCode) && this.ageCheck)
+    }
+  },
   data() {
     return {
-      message: 'none',
+      message: '',
       email: '',
-      UserName: '',
+      userName: '',
       street: '',
       streetNumber: '',
       postalCode: '',
       city: '',
-      userExist: false
+      userExist: false,
+      ageCheck: false,
+      alertVariant: 'info'
     }
   },
   methods: {
+    showAlert(message, variant = 'info') {
+      this.message = ''
+      this.$nextTick(() => {
+        this.message = message
+        this.alertVariant = variant
+      })
+    },
     async registerUser() {
-      this.userVerification()
-      if (this.userExist === false) {
-        drinkApi.post('/users', {
+      await this.userVerification()
+      if (this.userExist) {
+        this.showAlert('This email already exist', 'warning')
+        return
+      }
+      try {
+        const response = await drinkApi.post('/users', {
           email: this.email,
-          ProfilePicture: null,
-          userName: this.UserName,
+          ProfilePicture: '/profilePictures/default_user.jpg',
+          userName: this.userName,
           street: this.street,
           streetNumber: this.streetNumber,
           postalCode: this.postalCode,
@@ -116,30 +139,53 @@ export default {
           longitude: null,
           latitude: null
         })
+        if (response.status === 201) {
+          this.showAlert('Registration Successfull', 'success')
+          setTimeout(() => {
+            this.$router.push({ path: '/home' })
+          }, 3000)
+        } else {
+          this.showAlert('Registration failed', 'danger')
+        }
+      } catch (error) {
+        console.error(error)
+        this.showAlert('Registration failed', 'danger')
       }
-      console.log('User added: ' + this.userName + ' ' + ' Email: ' + this.email)
     },
     resetFields() {
       this.email = ''
-      this.UserName = ''
+      this.userName = ''
       this.street = ''
       this.streetNumber = ''
       this.postalCode = ''
       this.city = ''
+      this.ageCheck = false
     },
     async userVerification() {
-      const response = await drinkApi('/users/')
-      const data = response.data
-      data.users.forEach(user => {
-        if (user.email === this.email) {
-          this.userExist = true
-        }
-      })
+      this.userExist = false
+      try {
+        const response = await drinkApi('/users/')
+        const data = response.data
+        data.users.forEach(user => {
+          console.log('Checking user email:', user.email)
+
+          if (user.email === this.email) {
+            this.userExist = true
+          }
+        })
+      } catch (error) {
+        console.error('User verification failer:', error)
+      }
+    },
+    numberState(number) {
+      return /^\d*$/.test(number)
     }
   }
 }
 </script>
 
 <style>
-    /* Find Systembolag CSS styles */
+.my-2 {
+      max-width: 500px;
+    }
 </style>
