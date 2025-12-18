@@ -74,12 +74,21 @@ function buildGraph(elements) {
 // var MapLocation = require("../models/MapSchema");
 async function getLocationMapData(userLat, userLng, locations) {
   const targetLocationData = await Promise.all(locations.map(async location => {
-    const count = await Systembolag.countDocuments({ systembolagID: location.id })
 
+    const count = await Systembolag.countDocuments({ systembolagID: location.id })
+    let systembolagsName = 'Systembolaget'
+
+    if (location.tags.branch) {
+      systembolagsName += ` ${location.tags.branch}`
+    } else if (location.tags['addr:street']) {
+      systembolagsName += ` ${location.tags['addr:street']} ${location.tags['addr:housenumber']}`
+    }
+
+    // unify the data format to increase readability
     if (count == 0) {
       const newSystembolag = new Systembolag({
         systembolagID: location.id,
-        name: location.brand,
+        name: systembolagsName,
         street: location.tags['addr:street'],
         streetNumber: location.tags['addr:housenumber'],
         postalCode: location.tags['addr:postcode'],
@@ -87,13 +96,12 @@ async function getLocationMapData(userLat, userLng, locations) {
         latitude: location.lat || (location.center && location.center.lat),
         longitude: location.lon || (location.center && location.center.lon)
       })
-      const addedSuccessfully = await newSystembolag.save()
-      console.log(addedSuccessfully)
+      const addedSuccessfully = await newSystembolag.save() // can remove variable assignment if unused?
     }
     return {
       id: location.id,
       name: location.tags.name,
-      branch: location.tags.branch || null,
+      branch: location.tags.branch,
       openHours: location.tags.opening_hours,
       wheelchair: location.tags.wheelchair,
       address: {
