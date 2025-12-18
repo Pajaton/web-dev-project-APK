@@ -1,19 +1,38 @@
 <template>
   <div>
     <div v-if="user">
-      <b-img :src="user.profilePicture" fluid alt="Profile Picture" style="max-width: 400px; margin-left: 0px; display:block;"></b-img>
-      <ul class="user-info-list">
-        <li>Username: {{user.userName}}</li>
-        <li>Email: {{user.email}}</li>
-        <li>Adress: {{user.street}} {{ user.streetNumber}}</li>
-        <li>Postal code: {{user.postalCode}}</li>
-        <li>City: {{user.city}}</li>
-        <li>Following: {{user.follows.length}} people</li>
-        <li>Number of review written: {{user.reviewsWritten.length}}</li>
-        <li>Alcoholic intake: {{user.alcoholConsumed.length}}</li>
-        <li>How many drinks tried: {{user.triedDrinks.length}}</li>
-        <li v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</li>
-      </ul>
+      <b-img :src="user.profilePicture" fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
+        <b-card style="max-width: 400px" horizontal header="User Info">
+          <b-list-group >
+            <b-list-group-item flush variant="primary">Username: {{user.userName}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">Email: {{user.email}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">Adress: {{user.street}} {{ user.streetNumber}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">Postal code: {{user.postalCode}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">City: {{user.city}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">Following: {{user.follows.length}} people</b-list-group-item>
+            <b-list-group-item flush variant="primary">Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">Alcoholic intake: {{user.alcoholConsumed.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
+          </b-list-group>
+        </b-card>
+        <b-list-group>
+        <h2 style="text-align: left">Reviews</h2>
+        <b-card v-for="review in reviewsByUser" :key="review._id" style="max-width: 600px">
+          <b-row>
+          <b-col>
+            <b-img :src="review.image" fluid alt="bottle image"  style="max-width: 300px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+          </b-col>
+          <b-col>
+            <b-list-group style="max-width: 300px">
+              <b-list-group-item flush variant="primary">Name: {{ review.drink }}</b-list-group-item>
+              <b-list-group-item flush variant="primary">Rating: {{ review.rating }}</b-list-group-item>
+              <b-list-group-item flush variant="primary">Review: {{ review.comment }}</b-list-group-item>
+            </b-list-group>
+          </b-col>
+          </b-row>
+        </b-card>
+      </b-list-group>
       <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
     </div>
   </div>
@@ -28,6 +47,7 @@ export default {
     return {
       user: null,
       userFollowingList: [],
+      reviewsByUser: [],
       currentUserId: null,
       show: false
     }
@@ -41,6 +61,7 @@ export default {
         .then(response => {
           this.user = response.data
           this.getUserFollowingList()
+          this.getAllUserReviews()
         })
         .catch(error => {
           this.message = error
@@ -67,9 +88,37 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    getAllUserReviews() {
+      this.reviewsByUser = []
+      drinkApi.get('/users/' + this.user._id + '/reviews')
+        .then(response => {
+          this.allReviews = response.data.reviewedBy
+
+          this.allReviews.forEach(review => {
+            if (review.userID === this.user._id) {
+              drinkApi.get('/drinks/' + review.productID)
+                .then(response => {
+                  this.drink = response.data
+                  this.reviewsByUser.push({
+                    drink: this.drink.name,
+                    image: this.drink.image,
+                    comment: review.comment,
+                    rating: review.rating
+                  })
+                })
+            }
+          })
+        })
+    },
+    profilePictureError(event) {
+      event.target.src = '/profilePictures/default_user.jpg'
+    },
+    drinkPictureError(event) {
+      event.target.src = '/drinkPictures/default_drink.jpg'
     }
   },
-  created() {
+  mounted() {
     this.fetchCurrentUser()
     this.getUserInfo()
   }
@@ -77,7 +126,13 @@ export default {
 </script>
 
 <style>
-  .user-info-list {
+  .list-group-item {
     text-align: left;
-}
+  }
+  .profile-picture {
+    max-width: 600px;
+    max-height: 450px;
+    margin-left: 0px;
+    display:block;
+  }
 </style>
