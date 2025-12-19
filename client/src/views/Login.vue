@@ -65,7 +65,8 @@ export default {
     async userVerification() {
       try {
         const res = await drinkApi.post('/sessions', {
-          email: this.email
+          email: this.email,
+          password: this.password
         })
         console.log('LOGIN SUCCESS:', res.data)
         this.$router.push({ path: '/home' })
