@@ -30,6 +30,19 @@
         Enter at least 5 characters
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
+      <BFormFloatingLabel label="Password" label-for="floatingPassword">
+        <BFormInput
+          id="floatingPassword"
+          v-model="password"
+          type="password"
+          placeholder="Password"
+          :state="passwordState"
+          aria-describedby="password-feedback"
+        />
+        <b-form-invalid-feedback id="password-feedback">
+          Password needs to be at least 8 characters long, with uppercase, lowercase, numbers and special characters.
+        </b-form-invalid-feedback>
+      </BFormFloatingLabel>
       <BFormFloatingLabel label="Street" label-for="floatingStreet">
       <BFormInput
         id="floatingStreet"
@@ -48,7 +61,7 @@
         aria-describedby="streetNumber-feedback"
       />
       <b-form-invalid-feedback id="streetNumber-feedback">
-        Only numbers are alowed
+        Only numbers are allowed
       </b-form-invalid-feedback>
       </BFormFloatingLabel>
       <BFormFloatingLabel label="Postal Code" label-for="floatingPostalCode">
@@ -95,8 +108,11 @@ export default {
     nameState() {
       return this.userName.length > 4
     },
+    passwordState() {
+      return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(this.password)
+    },
     validForm() {
-      return (this.emailState && this.nameState && this.numberState(this.streetNumber) && this.numberState(this.postalCode) && this.ageCheck)
+      return (this.emailState && this.nameState && this.passwordState && this.numberState(this.streetNumber) && this.numberState(this.postalCode) && this.ageCheck)
     }
   },
   data() {
@@ -104,6 +120,7 @@ export default {
       message: '',
       email: '',
       userName: '',
+      password: '',
       street: '',
       streetNumber: '',
       postalCode: '',
@@ -132,6 +149,7 @@ export default {
           email: this.email,
           ProfilePicture: '/profilePictures/default_user.jpg',
           userName: this.userName,
+          password: this.password,
           street: this.street,
           streetNumber: this.streetNumber,
           postalCode: this.postalCode,
@@ -155,6 +173,7 @@ export default {
     resetFields() {
       this.email = ''
       this.userName = ''
+      this.password = ''
       this.street = ''
       this.streetNumber = ''
       this.postalCode = ''
