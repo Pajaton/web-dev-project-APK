@@ -58,6 +58,88 @@
 <script>
 import { Api } from '@/Api'
 
+class MinHeap {
+  constructor(estimatedCost) {
+    this.heap = []
+    this.length = 0
+    this.estimatedCost = estimatedCost // reference
+  }
+
+  // return and remove min value
+  pop() {
+    if (this.heap.length === 0) return null
+    if (this.heap.length === 1) return this.heap.pop()
+
+    const min = this.heap[0]
+    this.heap[0] = this.heap.pop()
+    this.length -= 1
+
+    this.bubbleDown()
+
+    return min
+  }
+
+  // insert a new node
+  insert(nodeId) {
+    this.heap.push(nodeId)
+    this.bubbleUp()
+    this.length += 1
+  }
+
+  // checks if a node is already in the heap
+  includes(nodeId) {
+    return this.heap.includes(nodeId)
+  }
+
+  // swaps a parent node with its child node
+  swap(parentIndex, index) {
+    [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]]
+  }
+
+  // moves node down in heap
+  bubbleDown() {
+    let index = 0
+    let leftIndex = 1
+    let rightIndex = 2
+
+    while (leftIndex <= this.heap.length - 1) {
+      leftIndex = index * 2 + 1
+      rightIndex = index * 2 + 2
+      let minIndex = index
+
+      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[leftIndex]]) {
+        minIndex = leftIndex
+      }
+      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[rightIndex]]) {
+        minIndex = rightIndex
+      }
+
+      if (minIndex !== index) {
+        this.swap(index, minIndex)
+        index = minIndex
+      } else {
+        break
+      }
+    }
+  }
+
+  // moves node up in heap
+  bubbleUp() {
+    let index = this.heap.length - 1
+
+    while (index > 0) {
+      let parentIndex = Math.floor((index - 1) / 2)
+
+      if (this.estimatedCost[this.heap[parentIndex]] > this.estimatedCost[this.heap[index]]) {
+        this.swap(parentIndex, index)
+        index = parentIndex
+      } else {
+        break
+      }
+    }
+  }
+}
+
 export default {
   props: {
     location: {
@@ -235,13 +317,14 @@ export default {
 
     // implemented shortest path algorithm with A*
     findShortestPath(startId) {
+      const estimatedTotalCost = {}
+      const nodesToVisit = new MinHeap(estimatedTotalCost)
       const targetId = this.targetLocation.nodeId
       const { nodes,adjacencyList } = this.mapData
 
-      const nodesToVisit = [startId]
+      nodesToVisit.insert(startId)
       const cameFrom = {}
       const costToHere = {}
-      const estimatedTotalCost = {}
 
       Object.keys(nodes).forEach(nodeId => {
         costToHere[nodeId] = Infinity
@@ -252,11 +335,8 @@ export default {
       estimatedTotalCost[startId] = this.getDistance(nodes[startId], nodes[targetId])
 
       while (nodesToVisit.length > 0) {
-        // If enough time left before deadline, implement min heap
-        // Sort by cost
-        nodesToVisit.sort((a,b) => estimatedTotalCost[a] - estimatedTotalCost[b])
         // dequeue
-        const currentNode = nodesToVisit.shift()
+        const currentNode = nodesToVisit.pop()
 
         if (this.targetLocation.nodeId === currentNode) {
           this.shortestPath = this.reconstructPath(cameFrom,currentNode)
@@ -279,7 +359,7 @@ export default {
             estimatedTotalCost[neighbor] = costToNext + estimatedNextCost
 
             if (!nodesToVisit.includes(neighbor)) {
-              nodesToVisit.push(neighbor)
+              nodesToVisit.insert(neighbor)
             }
           }
         }
