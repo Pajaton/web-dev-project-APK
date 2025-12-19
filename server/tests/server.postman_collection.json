@@ -32,6 +32,7 @@
 									"    pm.expect(\"greger@hawkwind.com\").to.eq(json.email);\r",
 									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);\r",
 									"    pm.expect(\"Greger\").to.eq(json.userName);\r",
+									"    pm.expect(json.password).to.not.eq(pm.request.body.password);\r",
 									"    pm.expect(\"Herkulesvägen\").to.eq(json.street);\r",
 									"    pm.expect(42).to.eq(json.streetNumber);\r",
 									"    pm.expect(55555).to.eq(json.postalCode);\r",
@@ -70,7 +71,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
+							"raw": "{\r\n    \"email\":\"greger@hawkwind.com\",\r\n    \"profilePicture\":\"face.jpg\",\r\n    \"userName\":\"Greger\",\r\n    \"password\":\"Verysecurepassword123!\",\r\n    \"street\":\"Herkulesvägen\",\r\n    \"streetNumber\":42,\r\n    \"postalCode\":55555,\r\n    \"city\":\"Göteborg\",\r\n    \"longitude\":654654,\r\n    \"latitude\":123123\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -126,7 +127,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"greger@hawkwind.com\"\n}",
+							"raw": "{\n    \"email\": \"greger@hawkwind.com\",\n    \"password\":\"Verysecurepassword123!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -169,6 +170,7 @@
 									"    pm.expect(\"bobthefob@majkrosowft.com\").to.eq(json.email);",
 									"    pm.expect(\"face.jpg\").to.eq(json.profilePicture);",
 									"    pm.expect(\"Bob\").to.eq(json.userName);",
+									"    pm.expect(json.password).to.not.eq(pm.request.body.password)",
 									"});",
 									"",
 									"pm.test(\"Correct user address\", () => {",
@@ -214,7 +216,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
+							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"profilePicture\": \"face.jpg\",\n    \"userName\": \"Bob\",\n    \"password\": \"Extremelygoodp4ssw0rd!\",\n    \"street\": \"Gatans väg\",\n    \"streetNumber\": 1337,\n    \"postalCode\": 66655,\n    \"city\": \"Göteborg\",\n    \"longitude\": 654652,\n    \"latitude\": 123124\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -270,7 +272,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\"\n}",
+							"raw": "{\n    \"email\": \"bobthefob@majkrosowft.com\",\n    \"password\": \"Extremelygoodp4ssw0rd!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4820,7 +4822,7 @@
 		},
 		{
 			"key": "userSchema",
-			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"},\"password\":{\"type\":\"string\"},\"settings\":{\"type\":\"object\",\"properties\":{\"darkMode\":{\"type\":\"boolean\"},\"notifications\":{\"type\":\"boolean\"},\"language\":{\"type\":\"string\"}},\"required\":[\"darkMode\",\"notifications\",\"language\"],\"additionalProperties\":false},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"number\"},\"postalCode\":{\"type\":\"number\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"follows\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"userID\":{\"type\":\"number\"},\"profilePicture\":{\"type\":\"string\"},\"userName\":{\"type\":\"string\"}},\"required\":[\"userID\",\"profilePicture\",\"userName\"],\"additionalProperties\":false}]}},\"favoriteSystembolag\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"},{\"type\":\"null\"}]},\"triedDrinks\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"reviewsWritten\":{\"type\":\"array\",\"items\":{\"oneOf\":[{\"type\":\"string\"},{\"type\":\"object\"}]}},\"__v\":{\"type\":\"number\"}},\"required\":[\"settings\",\"_id\",\"email\",\"profilePicture\",\"userName\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"follows\",\"triedDrinks\",\"reviewsWritten\",\"__v\"],\"additionalProperties\":true}"
 		},
 		{
 			"key": "reviewSchema",
