@@ -195,7 +195,7 @@ export default {
           const response = await Api.get('/maps/coordinates', {
             params: {
               userLat: this.coordinates.lat,
-              userLng: this.coordinates.lng,
+              userLon: this.coordinates.lng,
               type: this.location
             }
           })

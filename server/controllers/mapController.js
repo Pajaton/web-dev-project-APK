@@ -72,50 +72,40 @@ function buildGraph(elements) {
 }
 
 // var MapLocation = require("../models/MapSchema");
-async function getLocationMapData(userLat, userLng, locations) {
+async function getLocationMapData(userLat, userLon, locations, locationType) {
   const targetLocationData = await Promise.all(locations.map(async location => {
-
-    const count = await Systembolag.countDocuments({ systembolagID: location.id })
-    let systembolagsName = 'Systembolaget'
+    let locationName = locationType;
 
     if (location.tags.branch) {
-      systembolagsName += ` ${location.tags.branch}`
+      locationName += ` ${location.tags.branch}`
     } else if (location.tags['addr:street']) {
-      systembolagsName += ` ${location.tags['addr:street']} ${location.tags['addr:housenumber']}`
+      locationName += ` ${location.tags['addr:street']} ${location.tags['addr:housenumber']}`
     }
 
-    // unify the data format to increase readability
+    const locationData = {
+      id: location.id,
+      name: locationName,
+      street: location.tags['addr:street'],
+      streetNumber: location.tags['addr:housenumber'],
+      postalCode: location.tags['addr:postcode'],
+      city: location.tags['addr:city'],
+      lat: location.lat || (location.center && location.center.lat),
+      lon: location.lon || (location.center && location.center.lon),
+      openHours: location.tags.opening_hours,
+      accessibility: {
+        wheelchair: location.tags.wheelchair
+      }
+    }
+    const count = await Systembolag.countDocuments({ systembolagID: location.id })
+    
     if (count == 0) {
-      const newSystembolag = new Systembolag({
-        systembolagID: location.id,
-        name: systembolagsName,
-        street: location.tags['addr:street'],
-        streetNumber: location.tags['addr:housenumber'],
-        postalCode: location.tags['addr:postcode'],
-        city: location.tags['addr:city'],
-        latitude: location.lat || (location.center && location.center.lat),
-        longitude: location.lon || (location.center && location.center.lon)
-      })
+      const newSystembolag = new Systembolag(locationData)
       const addedSuccessfully = await newSystembolag.save() // can remove variable assignment if unused?
     }
-    return {
-      id: location.id,
-      name: location.tags.name,
-      branch: location.tags.branch,
-      openHours: location.tags.opening_hours,
-      wheelchair: location.tags.wheelchair,
-      address: {
-        city: location.tags['addr:city'],
-        street: location.tags['addr:street'],
-        streetNumber: location.tags['addr:housenumber'],
-        postalCode: location.tags['addr:postcode']
-      },
-      lat: location.lat || (location.center && location.center.lat),
-      lon: location.lon || (location.center && location.center.lon)
-    };
+    return locationData
   }))
 
-  const {south, north, west, east} = getBoundingBox(userLat, userLng, targetLocationData);
+  const {south, north, west, east} = getBoundingBox(userLat, userLon, targetLocationData);
 
   if (isNaN(south) || isNaN(north) || isNaN(west) || isNaN(east)) {
     throw new Error("Invalid bounding box coordinates");
@@ -144,11 +134,11 @@ async function getLocationMapData(userLat, userLng, locations) {
   }
 }
 
-function getBoundingBox(userLat, userLng, locationCoordinates) {
+function getBoundingBox(userLat, userLon, locationCoordinates) {
   let south = userLat;
   let north = userLat;
-  let west = userLng;
-  let east = userLng;
+  let west = userLon;
+  let east = userLon;
 
   locationCoordinates.forEach(location => {
     const lat = location.lat || (location.center && location.center.lat);
@@ -165,14 +155,16 @@ function getBoundingBox(userLat, userLng, locationCoordinates) {
   return { south, north, west, east };
 }
 
-async function findSystembolag(userLat, userLng) {
+// Gets the coordinates of nearby Systembolaget locations using Overpass API
+async function findSystembolag(userLat, userLon) {
   const query = `[out:json];
     nwr
     ["name"="Systembolaget"]
-    (around:5000,${userLat},${userLng});
+    (around:5000,${userLat},${userLon});
     out center;`;
+  const searchParams = new URLSearchParams({ data: query} );
 
-  const response = await axios.post(baseURL, new URLSearchParams({ data: query }));
+  const response = await axios.post(baseURL, searchParams);
   const elements = response.data.elements;
 
   if (elements.length === 0) {
@@ -184,17 +176,35 @@ async function findSystembolag(userLat, userLng) {
 
 // GET ROUTES DEFINITION
 
-// Gets the coordinates of nearby Systembolaget locations using Overpass API
 router.get("/maps/coordinates", async (req, res, next) => {
   try {
-    const { userLat, userLng, type} = req.query;
-
-    if (!userLat || !userLng) {
-      return res.status(400).json({ "message": "Missing required query parameters 'userLat' and 'userLng'" });
+    
+    let locations;
+    const { userLat, userLon, type} = req.query;
+    if (!userLat || !userLon || !type) {
+      return status(400).json({ "message": "Missing required query parameters." });
     }
 
-    const locations = type === "Systembolag" ? await findSystembolag(userLat, userLng) : await findToiletCoords(userLat, userLng);
-    const mapData = await getLocationMapData(parseFloat(userLat), parseFloat(userLng), locations);
+    switch (type.toLowerCase()) {
+      case "systembolag":
+        locations = await findSystembolag(userLat, userLon);
+        break;
+
+      case "toilets":
+        locations = await findToilets(userLat, userLon);
+        break;
+
+      default:
+        return res.status(400).json({ "message": "Invalid type parameter."});
+        break;
+    }
+
+    const mapData = await getLocationMapData(
+      parseFloat(userLat),
+      parseFloat(userLon),
+      locations,
+      type
+    );
         
     return res.json(mapData);
 
