@@ -1,57 +1,25 @@
 <template>
   <div>
-    <b-container fluid>
-      <h1 class="display-5 fw-bold">Get directions to a {{ location }}</h1>
-      <p class="fs-4">Click the button below to find the {{ location }} closest to you</p>
+    <div
+      class="map-wrapper border mt-3"
+      style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
+      @mousedown="handleMouseDown"
+      @mouseup="handleMouseUp"
+      @mouseleave="handleMouseUp"
+      @mousemove="handleMouseMove"
+      @click="handleMouseClick"
+      @wheel.prevent="handleScroll"
+    >
+      <canvas ref="mapCanvas"></canvas>
 
-      <!-- Map canvas wrapper -->
-      <b-row>
-        <b-col>
-          <div
-            class="map-wrapper border mt-3"
-            style="max-width: 800px; max-height: 600px; overflow: hidden;"
-            :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
-            @mousedown="handleMouseDown"
-            @mouseup="handleMouseUp"
-            @mouseleave="handleMouseUp"
-            @mousemove="handleMouseMove"
-            @click="handleMouseClick"
-            @wheel.prevent="handleScroll"
-          >
-            <canvas ref="mapCanvas"></canvas>
-
-            <div
-              v-if="isLoading"
-              class="position-absolute top-50 start-50 translate-middle"
-            >
-              <b-spinner label="Loading..."></b-spinner>
-            </div>
-          </div>
-
-          <!-- Temp button for testing -->
-          <b-button
-            class="btn_message"
-            variant="primary"
-            v-on:click="getLocation()"
-            :disabled="isLoading"
-          >
-            {{ isLoading ? 'Locating...' : 'Get directions to a ' + location }}
-          </b-button>
-        </b-col>
-        <b-col
-          style="height: 600px; overflow-y: auto;"
-          class="mt-3 border-start"
-        >
-          <LocationCard
-            v-for="(target, index) in mapData.targetLocations"
-            :key="index"
-            :location="target"
-            :userId="userId"
-            @select-location="handleCardSelection"
-          />
-        </b-col>
-      </b-row>
-    </b-container>
+      <div
+        v-if="isLoading"
+        class="position-absolute top-50 start-50 translate-middle"
+      >
+        <b-spinner label="Loading..."></b-spinner>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -147,6 +115,7 @@ export default {
       default: 'location'
     }
   },
+  emits: ['loading-change', 'targets-loaded'],
   data() {
     return {
       userId: null,
@@ -184,6 +153,7 @@ export default {
   methods: {
     async getLocation() {
       this.isLoading = true
+      this.$emit('loading-change', true)
       if (this.coordinates === null) {
         await this.getUserCoordinates()
       }
@@ -258,6 +228,8 @@ export default {
       }
 
       this.isLoading = false
+      this.$emit('loading-change', false)
+      this.$emit('targets-loaded', this.mapData.targetLocations || [])
     },
 
     // find user latitude and longitude via either GPS (if a gps receiver
