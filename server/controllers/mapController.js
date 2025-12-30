@@ -2,7 +2,8 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 
-const baseURL = "https://overpass-api.de/api/interpreter";
+const baseMapURL = "https://overpass-api.de/api/interpreter";
+const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 
 function getDistance(nodeA, nodeB) {
@@ -75,29 +76,36 @@ function buildGraph(elements) {
 async function getLocationMapData(userLat, userLon, locations, locationType) {
   const targetLocationData = await Promise.all(locations.map(async location => {
     let locationName = locationType;
+    const tags = location.tags || {};
 
-    if (location.tags.branch) {
-      locationName += ` ${location.tags.branch}`
-    } else if (location.tags['addr:street']) {
-      locationName += ` ${location.tags['addr:street']} ${location.tags['addr:housenumber']}`
+    if (tags.branch !== undefined) {
+      locationName += ` ${tags.branch}`
+    } else if (tags['addr:street']) {
+      locationName += ` ${tags['addr:street']}`
+    } else if (location.street) {
+      locationName += ` ${location.street}`
+    } else if (location.name) {
+      locationName = location.name
     }
 
     const locationData = {
       id: location.id,
       name: locationName,
-      street: location.tags['addr:street'],
-      streetNumber: location.tags['addr:housenumber'],
-      postalCode: location.tags['addr:postcode'],
-      city: location.tags['addr:city'],
-      lat: location.lat || (location.center && location.center.lat),
-      lon: location.lon || (location.center && location.center.lon),
-      openHours: location.tags.opening_hours,
-      accessibility: {
-        wheelchair: location.tags.wheelchair
-      }
+      street: tags['addr:street'] || location.street,
+      streetNumber: tags['addr:housenumber'],
+      postalCode: tags['addr:postcode'],
+      city: tags['addr:city'] || location.city,
+      lat: location.lat || (location.center && location.center.lat) || location.latitude,
+      lon: location.lon || (location.center && location.center.lon) || location.longitude,
+      openHours: tags.opening_hours,
+      accessible: tags.wheelchair || location.accessible,
+      changingTable: location.changing_table,
+      unisex: location.unisex,
+      upvotes: location.upvote,
+      downvotes: location.downvote
     }
     const count = await Systembolag.countDocuments({ systembolagID: location.id })
-    
+
     if (count == 0) {
       const newSystembolag = new Systembolag(locationData)
       const addedSuccessfully = await newSystembolag.save() // can remove variable assignment if unused?
@@ -120,7 +128,7 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     const params = new URLSearchParams();
     params.append('data', query);
 
-    const rawMapData = await axios.post(baseURL, params);
+    const rawMapData = await axios.post(baseMapURL, params);
     const graphData = buildGraph(rawMapData.data.elements);
     return {
       'targetLocations': targetLocationData,
@@ -155,7 +163,7 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   return { south, north, west, east };
 }
 
-// Gets the coordinates of nearby Systembolaget locations using Overpass API
+// Gets the coordinates and general info of nearby Systembolaget locations using Overpass API
 async function findSystembolag(userLat, userLon) {
   const query = `[out:json];
     nwr
@@ -164,7 +172,7 @@ async function findSystembolag(userLat, userLon) {
     out center;`;
   const searchParams = new URLSearchParams({ data: query} );
 
-  const response = await axios.post(baseURL, searchParams);
+  const response = await axios.post(baseMapURL, searchParams);
   const elements = response.data.elements;
 
   if (elements.length === 0) {
@@ -174,13 +182,24 @@ async function findSystembolag(userLat, userLon) {
   return response.data.elements;
 }
 
+async function findToilets(userLat, userLon) {
+  const query = `?page=1&per_page=5&offset=0&lat=${userLat}&lng=${userLon}`
+
+  const response = await axios.get(baseToiletURL + query)
+  const toiletLocations = response.data.filter(location => {
+    return location.latitude !== undefined && location.longitude !== undefined
+  })
+
+  return toiletLocations
+}
+
 // GET ROUTES DEFINITION
 
 router.get("/maps/coordinates", async (req, res, next) => {
   try {
-    
     let locations;
     const { userLat, userLon, type} = req.query;
+
     if (!userLat || !userLon || !type) {
       return status(400).json({ "message": "Missing required query parameters." });
     }
