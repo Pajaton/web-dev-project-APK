@@ -3,112 +3,114 @@
   <div>
     <BFormGroup class="my-2">
       <h2>Edit Profile</h2>
-      <BForm style="padding-left: 2rem;">
-        <BFormFloatingLabel label="Email address" label-for="floatingEmail" class="my-2">
-         <BFormInput
-            id="floatingEmail"
-            v-model="email"
-            type="email"
-            :state="emailState"
-            aria-describedby="email-feedback"
-          />
-          <b-form-invalid-feedback id="email-feedback">
-            Enter a valid email
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="User Name" label-for="floatingUserName" class="my-2">
-          <BFormInput
-            id="floatingUserName"
-            v-model="userName"
-            type="text"
-            :state="nameState"
-            aria-describedby="userName-feedback"
-          />
-          <b-form-invalid-feedback id="userName-feedback">
-            Enter at least 5 characters
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="Street" label-for="floatingStreet" class="my-2">
-          <BFormInput
-            id="floatingStreet"
-            v-model="street"
-            type="text"
-          />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="StreetNumber" label-for="floatingStreetNumber" class="my-2">
-          <BFormInput
-            id="floatingStreetNumber"
-            v-model="streetNumber"
-            type="text"
-            :state="numberState(streetNumber)"
-            aria-describedby="streetNumber-feedback"
-          />
-          <b-form-invalid-feedback id="streetNumber-feedback">
-            Only numbers are alowed
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="postalCode" label-for="floatingpostalCode" class="my-2">
-          <BFormInput
-            id="floatingpostalCode"
-            v-model="postalCode"
-            type="text"
-            :state="numberState(postalCode)"
-            aria-describedby="postalCode-feedback"
-          />
-          <b-form-invalid-feedback id="postalCode-feedback">
-            Only numbers are allowed
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="city" label-for="floatingcity" class="my-2">
-          <BFormInput
-            id="floatingcity"
-            v-model="city"
-            type="text"
-          />
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="longitude" label-for="floatinglongitude" class="my-2">
-          <BFormInput
-            id="floatinglongitude"
-            v-model="longitude"
-            type="text"
-            :state="numberState(longitude)"
-            aria-describedby="latitude-feedback"
-          />
-          <b-form-invalid-feedback id="longitude-feedback">
-            Only numbers are allowed
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <BFormFloatingLabel label="latitude" label-for="floatinglatitude" class="my-2">
-          <BFormInput
-            id="floatinglatitude"
-            v-model="latitude"
-            type="text"
-            :state="numberState(latitude)"
-            aria-describedby="latitude-feedback"
-          />
-          <b-form-invalid-feedback id="longitude-feedback">
-            Only numbers are allowed
-          </b-form-invalid-feedback>
-        </BFormFloatingLabel>
-        <b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
-        <b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
-        <b-modal v-model="modalShowPicture" title="Choose profile picture">
-          <b-img class="images" v-for="(picture, index) in profilePictureList"
-          :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
-        </b-img>
-      </b-modal>
-      </BForm>
-      <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''"> {{ message }} </BAlert>
       <b-row>
-      <b-col cols="12">
-        <b-button block variant="danger" @click="resetFields()">Reset</b-button>
-        <b-button block variant="primary" @click="editUser()" :disabled="!validForm">Edit Profile</b-button>
-      </b-col>
-      <b-col cols="4">
+        <BForm style="padding-left: 2rem;">
+          <BFormFloatingLabel label="Email address" label-for="floatingEmail" class="my-2">
+           <BFormInput
+              id="floatingEmail"
+              v-model="email"
+              type="email"
+              :state="emailState"
+              aria-describedby="email-feedback"
+            />
+            <b-form-invalid-feedback id="email-feedback">
+              Enter a valid email
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="User Name" label-for="floatingUserName" class="my-2">
+            <BFormInput
+              id="floatingUserName"
+              v-model="userName"
+              type="text"
+              :state="nameState"
+              aria-describedby="userName-feedback"
+            />
+            <b-form-invalid-feedback id="userName-feedback">
+              Enter at least 5 characters
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="Street" label-for="floatingStreet" class="my-2">
+            <BFormInput
+              id="floatingStreet"
+              v-model="street"
+              type="text"
+            />
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="StreetNumber" label-for="floatingStreetNumber" class="my-2">
+            <BFormInput
+              id="floatingStreetNumber"
+              v-model="streetNumber"
+              type="text"
+              :state="numberState(streetNumber)"
+              aria-describedby="streetNumber-feedback"
+            />
+            <b-form-invalid-feedback id="streetNumber-feedback">
+              Only numbers are alowed
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="postalCode" label-for="floatingpostalCode" class="my-2">
+            <BFormInput
+              id="floatingpostalCode"
+              v-model="postalCode"
+              type="text"
+              :state="numberState(postalCode)"
+              aria-describedby="postalCode-feedback"
+            />
+            <b-form-invalid-feedback id="postalCode-feedback">
+              Only numbers are allowed
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="city" label-for="floatingcity" class="my-2">
+            <BFormInput
+              id="floatingcity"
+              v-model="city"
+              type="text"
+            />
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="longitude" label-for="floatinglongitude" class="my-2">
+            <BFormInput
+              id="floatinglongitude"
+              v-model="longitude"
+              type="text"
+              :state="numberState(longitude)"
+              aria-describedby="latitude-feedback"
+            />
+            <b-form-invalid-feedback id="longitude-feedback">
+              Only numbers are allowed
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <BFormFloatingLabel label="latitude" label-for="floatinglatitude" class="my-2">
+            <BFormInput
+              id="floatinglatitude"
+              v-model="latitude"
+              type="text"
+              :state="numberState(latitude)"
+              aria-describedby="latitude-feedback"
+            />
+            <b-form-invalid-feedback id="longitude-feedback">
+              Only numbers are allowed
+            </b-form-invalid-feedback>
+          </BFormFloatingLabel>
+          <b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
+          <b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
+          <b-modal v-model="modalShowPicture" title="Choose profile picture">
+            <b-img class="images" v-for="(picture, index) in profilePictureList"
+            :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
+            </b-img>
+          </b-modal>
+        </BForm>
+        <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''"> {{ message }} </BAlert>
+      </b-row>
+      <b-row cols="md" align-h="between">
+      <b-col >
         <b-button @click="modalShowDelete = !modalShowDelete">Delete Account</b-button>
         <b-modal v-model="modalShowDelete" title="Delete Account" @ok="deleteUser">
           <p>Are you sure you want to delete your account?</p>
         </b-modal>
+      </b-col>
+      <b-col >
+        <b-button block variant="danger" @click="resetFields()">Reset</b-button>
+        <b-button block variant="primary" @click="editUser()" :disabled="!validForm">Edit Profile</b-button>
       </b-col>
     </b-row>
     <b-modal v-model="modalShowConfirmation" title="Account Deleted" @ok="goHome" @hide="goHome">
@@ -206,6 +208,9 @@ export default {
         })
         if (response.status === 200) {
           this.showAlert('Update Successfull', 'success')
+          setTimeout(() => {
+            this.$router.push({ path: '/users/' + this.currentUserId })
+          }, 3000)
         } else {
           this.showAlert('Update failed', 'danger')
         }
