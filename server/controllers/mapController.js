@@ -2,10 +2,33 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 
-const baseMapURL = "https://overpass-api.de/api/interpreter";
+// const baseMapURL = "https://overpass-api.de/api/interpreter";
+const baseMapURL = "https://overpass.private.coffee/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 
+// Retry helper for Overpass API
+async function retryMapDataFetch(requestFunction, maxRetries = 3, delayMs = 1000) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await requestFunction();
+    } catch (error) {
+      const status = error.response?.status;
+      const isRetryable = status === 504 || status === 502 || status === 503 || error.code === 'ECONNRESET';
+      
+      if (!isRetryable || attempt === maxRetries) {
+        throw error;
+      }
+      
+      console.warn(`Overpass API attempt ${attempt}/${maxRetries} failed (${status || error.code}), retrying in ${delayMs}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2; // exponential backoff
+    }
+  }
+}
+
+// Haversine formula to calculate distance between two lat/lon points
+// possibly a bit overkill
 function getDistance(nodeA, nodeB) {
   const R = 6371e3; // radius of earth in meters
   const latA = toRadians(nodeA.lat);
@@ -105,12 +128,11 @@ async function formatLocationData(locations, locationType) {
       downvotes: location.downvote
     };
 
-    const exists = await Systembolag.exists({ systembolagID: location.id });
-
-    if (!exists) {
-      const newSystembolag = new Systembolag(locationData);
-      await newSystembolag.save();
-    }
+    await Systembolag.updateOne(
+      { systembolagID: location.id },
+      { $setOnInsert: locationData },
+      { upsert: true }
+    );
 
     return locationData;
   }));
@@ -127,7 +149,7 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     throw new Error("Invalid bounding box coordinates");
   }
 
-  const query = `[out:json][timeout:25];
+  const query = `[out:json][timeout:60];
     (way["highway"](${south},${west},${north},${east}););
     (._;>;);
     out body;`;
@@ -136,7 +158,9 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     const params = new URLSearchParams();
     params.append('data', query);
 
-    const rawMapData = await axios.post(baseMapURL, params);
+    const rawMapData = await retryMapDataFetch(
+      () => axios.post(baseMapURL, params, { timeout: 65000 })
+    );
     const graphData = buildGraph(rawMapData.data.elements);
     
     return {
@@ -176,14 +200,16 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
 
 // Gets the coordinates and general info of nearby Systembolaget locations using Overpass API
 async function findSystembolag(userLat, userLon) {
-  const query = `[out:json];
+  const query = `[out:json][timeout:60];
     nwr
     ["name"="Systembolaget"]
     (around:5000,${userLat},${userLon});
     out center;`;
   const searchParams = new URLSearchParams({ data: query} );
 
-  const response = await axios.post(baseMapURL, searchParams);
+  const response = await retryMapDataFetch(
+    () => axios.post(baseMapURL, searchParams, { timeout: 65000 })
+  );
   const elements = response.data.elements;
 
   if (elements.length === 0) {
