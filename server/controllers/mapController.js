@@ -72,47 +72,55 @@ function buildGraph(elements) {
   };
 }
 
-// var MapLocation = require("../models/MapSchema");
-async function getLocationMapData(userLat, userLon, locations, locationType) {
+function formatLocationName(location, locationType) {
+  let locationName = locationType
+  const tags = location.tags || {}
+
+  if (tags.branch !== undefined) locationName += ` ${tags.branch}`
+  else if (tags['addr:street']) locationName += ` ${tags['addr:street']}`
+  else if (location.street) locationName += ` ${location.street}`
+  else if (location.name) locationName = location.name
+
+  return locationName
+}
+
+async function formatLocationData(locations, locationType) {
   const targetLocationData = await Promise.all(locations.map(async location => {
-    let locationName = locationType;
     const tags = location.tags || {};
-
-    if (tags.branch !== undefined) {
-      locationName += ` ${tags.branch}`
-    } else if (tags['addr:street']) {
-      locationName += ` ${tags['addr:street']}`
-    } else if (location.street) {
-      locationName += ` ${location.street}`
-    } else if (location.name) {
-      locationName = location.name
-    }
-
+    
     const locationData = {
       id: location.id,
-      name: locationName,
+      name: formatLocationName(location, locationType),
       street: tags['addr:street'] || location.street,
       streetNumber: tags['addr:housenumber'],
       postalCode: tags['addr:postcode'],
       city: tags['addr:city'] || location.city,
-      lat: location.lat || (location.center && location.center.lat) || location.latitude,
-      lon: location.lon || (location.center && location.center.lon) || location.longitude,
+      lat: location.lat || location.center?.lat || location.latitude,
+      lon: location.lon || location.center?.lon || location.longitude,
       openHours: tags.opening_hours,
       accessible: tags.wheelchair || location.accessible,
       changingTable: location.changing_table,
       unisex: location.unisex,
       upvotes: location.upvote,
       downvotes: location.downvote
-    }
-    const count = await Systembolag.countDocuments({ systembolagID: location.id })
+    };
 
-    if (count == 0) {
-      const newSystembolag = new Systembolag(locationData)
-      const addedSuccessfully = await newSystembolag.save() // can remove variable assignment if unused?
-    }
-    return locationData
-  }))
+    const exists = await Systembolag.exists({ systembolagID: location.id });
 
+    if (!exists) {
+      const newSystembolag = new Systembolag(locationData);
+      await newSystembolag.save();
+    }
+
+    return locationData;
+  }));
+
+  return targetLocationData;
+}
+
+// fetch the map data (ways/edges) based on the user position and the locations
+async function getLocationMapData(userLat, userLon, locations, locationType) {
+  const targetLocationData = await formatLocationData(locations, locationType);
   const {south, north, west, east} = getBoundingBox(userLat, userLon, targetLocationData);
 
   if (isNaN(south) || isNaN(north) || isNaN(west) || isNaN(east)) {
@@ -130,6 +138,7 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
 
     const rawMapData = await axios.post(baseMapURL, params);
     const graphData = buildGraph(rawMapData.data.elements);
+    
     return {
       'targetLocations': targetLocationData,
       'nodes': graphData.nodes,
@@ -142,6 +151,8 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
   }
 }
 
+// based on a user's position and initially fetched locations, we
+// get the bounding box to fetch only the map data we need
 function getBoundingBox(userLat, userLon, locationCoordinates) {
   let south = userLat;
   let north = userLat;
@@ -182,10 +193,13 @@ async function findSystembolag(userLat, userLon) {
   return response.data.elements;
 }
 
+// based on a user's lat and lon values, gets the nearest few toilets
 async function findToilets(userLat, userLon) {
-  const query = `?page=1&per_page=5&offset=0&lat=${userLat}&lng=${userLon}`
+  const query = `?page=1&per_page=20&offset=0&lat=${userLat}&lng=${userLon}`
 
   const response = await axios.get(baseToiletURL + query)
+  
+  // ensure we only include toilets which have lat and lon values
   const toiletLocations = response.data.filter(location => {
     return location.latitude !== undefined && location.longitude !== undefined
   })
