@@ -183,6 +183,8 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   let west = userLon;
   let east = userLon;
 
+  const padding = 0.001; // roughly 100m
+
   locationCoordinates.forEach(location => {
     const lat = location.lat || (location.center && location.center.lat);
     const lon = location.lon || (location.center && location.center.lon);
@@ -195,7 +197,32 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
     }
   });
 
-  return { south, north, west, east };
+  // limit max bounding box size to prevent massive queries
+  const maxSpan = 0.20; // roughly 20km
+  const latSpan = north - south;
+  const lonSpan = east - west;
+  
+  if (latSpan > maxSpan || lonSpan > maxSpan) {
+    
+    console.warn(`Bounding box too large (${latSpan.toFixed(4)} x ${lonSpan.toFixed(4)}), clamping to ${maxSpan}`);
+    
+    // recenter
+    const centerLat = (north + south) / 2;
+    const centerLon = (east + west) / 2;
+
+    // set new bounds
+    south = centerLat - maxSpan / 2;
+    north = centerLat + maxSpan / 2;
+    west = centerLon - maxSpan / 2;
+    east = centerLon + maxSpan / 2;
+  }
+
+  return { 
+    south: south - padding, 
+    north: north + padding, 
+    west: west - padding, 
+    east: east + padding 
+  };
 }
 
 // Gets the coordinates and general info of nearby Systembolaget locations using Overpass API
