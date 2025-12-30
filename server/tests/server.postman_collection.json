@@ -458,8 +458,8 @@
 									"    pm.expect('75').to.eq(json.streetNumber);\r",
 									"    pm.expect('45687').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
-									"    pm.expect(654987).to.eq(json.longitude);\r",
-									"    pm.expect(465132).to.eq(json.latitude);\r",
+									"    pm.expect(654987).to.eq(json.lon);\r",
+									"    pm.expect(465132).to.eq(json.lat);\r",
 									"})\r",
 									"\r",
 									"pm.globals.set(\"systembolagID\",json._id);"
@@ -481,7 +481,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"systembolagID\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"longitude\": 654987,\r\n    \"latitude\": 465132\r\n}",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Nordstan\",\r\n    \"street\": \"Velourvägen\",\r\n    \"streetNumber\": 75,\r\n    \"postalCode\": 45687,\r\n    \"city\": \"Göteborg\",\r\n    \"lon\": 654987,\r\n    \"lat\": 465132\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -527,8 +527,8 @@
 									"    pm.expect(json).to.have.property(\"streetNumber\");\r",
 									"    pm.expect(json).to.have.property(\"postalCode\");\r",
 									"    pm.expect(json).to.have.property(\"city\");\r",
-									"    pm.expect(json).to.have.property(\"latitude\");\r",
-									"    pm.expect(json).to.have.property(\"longitude\");\r",
+									"    pm.expect(json).to.have.property(\"lat\");\r",
+									"    pm.expect(json).to.have.property(\"lon\");\r",
 									"    pm.expect(json).to.have.property(\"hasInStock\");\r",
 									"    pm.expect(json).to.have.property(\"isFavoriteOf\");\r",
 									"});\r",
@@ -540,8 +540,8 @@
 									"    pm.expect(json.streetNumber).to.be.a(\"string\");\r",
 									"    pm.expect(json.postalCode).to.be.a(\"string\");\r",
 									"    pm.expect(json.city).to.be.a(\"string\");\r",
-									"    pm.expect(json.latitude).to.be.a(\"number\");\r",
-									"    pm.expect(json.longitude).to.be.a(\"number\");\r",
+									"    pm.expect(json.lat).to.be.a(\"number\");\r",
+									"    pm.expect(json.lon).to.be.a(\"number\");\r",
 									"    pm.expect(json.hasInStock).to.be.an(\"array\");\r",
 									"    pm.expect(json.isFavoriteOf).to.be.an(\"array\");\r",
 									"})\r",
@@ -553,8 +553,8 @@
 									"    pm.expect('57').to.eq(json.streetNumber);\r",
 									"    pm.expect('78654').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Bötegorg\").to.eq(json.city);\r",
-									"    pm.expect(465132).to.eq(json.longitude);\r",
-									"    pm.expect(654987).to.eq(json.latitude);\r",
+									"    pm.expect(465132).to.eq(json.lon);\r",
+									"    pm.expect(654987).to.eq(json.lat);\r",
 									"})\r",
 									"\r",
 									"pm.globals.set(\"anotherSystembolagID\",json._id);"
@@ -576,7 +576,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"systembolagID\": 2,\r\n    \"name\": \"Sydbyn\",\r\n    \"street\": \"Suedegatan\",\r\n    \"streetNumber\": 57,\r\n    \"postalCode\": 78654,\r\n    \"city\": \"Bötegorg\",\r\n    \"longitude\": 465132,\r\n    \"latitude\": 654987\r\n}",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"name\": \"Sydbyn\",\r\n    \"street\": \"Suedegatan\",\r\n    \"streetNumber\": 57,\r\n    \"postalCode\": 78654,\r\n    \"city\": \"Bötegorg\",\r\n    \"lon\": 465132,\r\n    \"lat\": 654987\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1911,8 +1911,8 @@
 									"    pm.expect(json.favoriteSystembolag.streetNumber).to.eq('75');\r",
 									"    pm.expect(json.favoriteSystembolag.postalCode).to.eq('45687');\r",
 									"    pm.expect(json.favoriteSystembolag.city).to.eq('Göteborg');\r",
-									"    pm.expect(json.favoriteSystembolag.longitude).to.eq(654987);\r",
-									"    pm.expect(json.favoriteSystembolag.latitude).to.eq(465132);\r",
+									"    pm.expect(json.favoriteSystembolag.lon).to.eq(654987);\r",
+									"    pm.expect(json.favoriteSystembolag.lat).to.eq(465132);\r",
 									"    pm.expect(json.favoriteSystembolag.hasInStock).to.be.empty;\r",
 									"    pm.expect(json.favoriteSystembolag.isFavoriteOf).to.be.empty;\r",
 									"})\r",
@@ -2405,8 +2405,8 @@
 									"    pm.expect('75').to.eq(json.systembolag[0].streetNumber);\r",
 									"    pm.expect('45687').to.eq(json.systembolag[0].postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.systembolag[0].city);\r",
-									"    pm.expect(654987).to.eq(json.systembolag[0].longitude);\r",
-									"    pm.expect(465132).to.eq(json.systembolag[0].latitude); \r",
+									"    pm.expect(654987).to.eq(json.systembolag[0].lon);\r",
+									"    pm.expect(465132).to.eq(json.systembolag[0].lat); \r",
 									"});\r",
 									"\r",
 									"pm.test(\"The second systembolag's values are correct\", () => {\r",
@@ -2417,8 +2417,8 @@
 									"    pm.expect('57').to.eq(json.systembolag[1].streetNumber);\r",
 									"    pm.expect('78654').to.eq(json.systembolag[1].postalCode);\r",
 									"    pm.expect(\"Bötegorg\").to.eq(json.systembolag[1].city);\r",
-									"    pm.expect(465132).to.eq(json.systembolag[1].longitude);\r",
-									"    pm.expect(654987).to.eq(json.systembolag[1].latitude); \r",
+									"    pm.expect(465132).to.eq(json.systembolag[1].lon);\r",
+									"    pm.expect(654987).to.eq(json.systembolag[1].lat); \r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -2470,8 +2470,8 @@
 									"    pm.expect('75').to.eq(json.streetNumber);\r",
 									"    pm.expect('45687').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.city);\r",
-									"    pm.expect(654987).to.eq(json.longitude);\r",
-									"    pm.expect(465132).to.eq(json.latitude); \r",
+									"    pm.expect(654987).to.eq(json.lon);\r",
+									"    pm.expect(465132).to.eq(json.lat); \r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -2517,8 +2517,8 @@
 									"    pm.expect('75').to.eq(json.address.streetNumber);\r",
 									"    pm.expect('45687').to.eq(json.address.postalCode);\r",
 									"    pm.expect(\"Göteborg\").to.eq(json.address.city);\r",
-									"    pm.expect(654987).to.eq(json.address.longitude);\r",
-									"    pm.expect(465132).to.eq(json.address.latitude); \r",
+									"    pm.expect(654987).to.eq(json.address.lon);\r",
+									"    pm.expect(465132).to.eq(json.address.lat); \r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -2732,8 +2732,8 @@
 									"    pm.expect('2').to.eq(json.streetNumber);\r",
 									"    pm.expect('12354').to.eq(json.postalCode);\r",
 									"    pm.expect(\"Hisingen\").to.eq(json.city);\r",
-									"    pm.expect(631321).to.eq(json.longitude);\r",
-									"    pm.expect(411558).to.eq(json.latitude);\r",
+									"    pm.expect(631321).to.eq(json.lon);\r",
+									"    pm.expect(411558).to.eq(json.lat);\r",
 									"})\r",
 									""
 								],
@@ -2748,7 +2748,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"systembolagID\": 5,\r\n    \"name\": \"Krogen Skogen\",\r\n    \"street\": \"Stigen\",\r\n    \"streetNumber\": 2,\r\n    \"postalCode\": 12354,\r\n    \"city\": \"Hisingen\",\r\n    \"longitude\": 631321,\r\n    \"latitude\": 411558\r\n}",
+							"raw": "{\r\n    \"id\": 5,\r\n    \"name\": \"Krogen Skogen\",\r\n    \"street\": \"Stigen\",\r\n    \"streetNumber\": 2,\r\n    \"postalCode\": 12354,\r\n    \"city\": \"Hisingen\",\r\n    \"lon\": 631321,\r\n    \"lat\": 411558\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4834,7 +4834,7 @@
 		},
 		{
 			"key": "systembolagSchema",
-			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"systembolagID\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"string\"},\"postalCode\":{\"type\":\"string\"},\"city\":{\"type\":\"string\"},\"longitude\":{\"type\":\"number\"},\"latitude\":{\"type\":\"number\"},\"hasInStock\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"isFavoriteOf\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"systembolagID\",\"name\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"longitude\",\"latitude\",\"hasInStock\",\"isFavoriteOf\",\"__v\"],\"additionalProperties\":false}"
+			"value": "{\"type\":\"object\",\"properties\":{\"_id\":{\"type\":\"string\"},\"systembolagID\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"},\"street\":{\"type\":\"string\"},\"streetNumber\":{\"type\":\"string\"},\"postalCode\":{\"type\":\"string\"},\"city\":{\"type\":\"string\"},\"lon\":{\"type\":\"number\"},\"lat\":{\"type\":\"number\"},\"hasInStock\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"isFavoriteOf\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"__v\":{\"type\":\"number\"}},\"required\":[\"_id\",\"systembolagID\",\"name\",\"street\",\"streetNumber\",\"postalCode\",\"city\",\"lon\",\"lat\",\"hasInStock\",\"isFavoriteOf\",\"__v\"],\"additionalProperties\":false}"
 		}
 	]
 }

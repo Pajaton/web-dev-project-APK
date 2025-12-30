@@ -67,7 +67,7 @@ router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
     try {
         const systembolagAddress = await Systembolag
             .findById(req.params.systembolagId)
-            .select("street streetNumber postalCode city longitude latitude");
+            .select("street streetNumber postalCode city lon lat");
         if(!systembolagAddress) {
             return res.status(404).json({"message": "No adress found for this systembolag"});
         }
@@ -95,14 +95,14 @@ router.get("/systembolag/:systembolagId", async (req, res, next) => {
 router.post("/systembolag", async (req, res, next) => {
     try {
         var newSystembolag = new Systembolag({
-            "systembolagID": req.body.systembolagID,
+            "systembolagID": req.body.id,
             "name": req.body.name,
             "street": req.body.street,
             "streetNumber": req.body.streetNumber,
             "postalCode": req.body.postalCode,
             "city": req.body.city,
-            "longitude": req.body.longitude,
-            "latitude": req.body.latitude
+            "lon": req.body.lon,
+            "lat": req.body.lat
         });
         await newSystembolag.save();
         return res.status(201).json(newSystembolag);
@@ -142,14 +142,14 @@ router.patch("/systembolag/:systembolagId", async (req, res, next) => {
         }    
 
         // Update only the fields provided in the request body
-        updatedSystembolag.systembolagID = (req.body.systembolagID || updatedSystembolag.systembolagID);
+        updatedSystembolag.systembolagID = (req.body.id || updatedSystembolag.systembolagID);
         updatedSystembolag.name = (req.body.name || updatedSystembolag.name);
         updatedSystembolag.street = (req.body.street || updatedSystembolag.street);
         updatedSystembolag.streetNumber = (req.body.streetNumber || updatedSystembolag.streetNumber);
         updatedSystembolag.postalCode = (req.body.postalCode || updatedSystembolag.postalCode);
         updatedSystembolag.city = (req.body.city || updatedSystembolag.city);
-        updatedSystembolag.longitude = (req.body.longitude || updatedSystembolag.longitude);
-        updatedSystembolag.latitude = (req.body.latitude || updatedSystembolag.latitude);
+        updatedSystembolag.lon = (req.body.lon || updatedSystembolag.lon);
+        updatedSystembolag.lat = (req.body.lat || updatedSystembolag.lat);
 
         // Save the updated Systembolaget store to the database
         await updatedSystembolag.save().catch(err => { next(err) });

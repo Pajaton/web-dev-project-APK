@@ -71,9 +71,8 @@
       },
 
       formatAddress() {
-        if (this.location.address && this.location.address.street !== undefined) {
-          const address = this.location.address
-          this.locationAddress += `Address:\n${address.street} ${address.streetNumber}\n${address.city}, ${address.postalCode}`
+        if (this.location.street) {
+          this.locationAddress += `Address:\n${this.location.street} ${this.location.streetNumber}\n${this.location.city}, ${this.location.postalCode}`
         }
       }
     }
