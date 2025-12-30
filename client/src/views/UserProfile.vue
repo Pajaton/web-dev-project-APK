@@ -10,10 +10,10 @@
             <b-list-group-item flush variant="primary">Postal code: {{user.postalCode}}</b-list-group-item>
             <b-list-group-item flush variant="primary">City: {{user.city}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Following: {{user.follows.length}} people</b-list-group-item>
-            <b-list-group-item flush variant="primary">Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary">Alcoholic intake: {{user.alcoholConsumed.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" >Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button size="sm" class="ml-auto" @click=openAddEntryPopup()>Add alcoholic entry</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
             <b-list-group-item flush variant="primary" v-if="this.favoriteSystembolag">Favorite systembolag: {{ this.favoriteSystembolag }}</b-list-group-item>
           </b-list-group>
         </b-card>
@@ -35,6 +35,25 @@
         </b-card>
       </b-list-group>
       <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+      <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
+        <div v-if="showAlcEntryForm">
+
+          <p><strong>Product number:</strong> ALKO</p>
+
+
+          <b-button @click="getReviewRating">
+            Review drink
+          </b-button>
+
+          <b-button @click="getAllReviewRating">
+            Check reviews
+          </b-button>
+
+          <b-button @click="closeDrinkPopup">
+            Close
+          </b-button>
+        </div>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -51,7 +70,8 @@ export default {
       reviewsByUser: [],
       currentUserId: null,
       favoriteSystembolag: null,
-      show: false
+      show: false,
+      showAlcEntryForm: false
     }
   },
   props: {
@@ -132,6 +152,9 @@ export default {
     },
     drinkPictureError(event) {
       event.target.src = '/drinkPictures/default_drink.jpg'
+    },
+    openAddEntryPopup() {
+      this.showAlcEntryForm = true
     }
   },
   mounted() {
