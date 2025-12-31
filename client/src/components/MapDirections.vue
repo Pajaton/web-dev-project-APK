@@ -10,6 +10,9 @@
       @mousemove="handleMouseMove"
       @click="handleMouseClick"
       @wheel.prevent="handleScroll"
+      @touchstart.prevent="handleTouchStart"
+      @touchend="handleTouchEnd"
+      @touchmove.prevent="handleTouchMove"
     >
       <canvas ref="mapCanvas"></canvas>
 
@@ -137,9 +140,14 @@ export default {
         scale: 1.0
       },
 
+      // mouse events
       isDraggingMap: false,
       dragStart: { x: 0,y: 0 },
       mouseWheelTimer: null,
+
+      // touch events
+      touchStartPos: { x: 0,y: 0 },
+      lastTouchDistance: null,
 
       // map configs
       bounds: { minLat: 0,maxLat: 0,minLon: 0,maxLon: 0 },
@@ -616,6 +624,109 @@ export default {
       this.view.scale = newScale
 
       requestAnimationFrame(this.renderMap)
+    },
+
+    getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX
+      const dy = touches[0].clientY - touches[1].clientY
+      return Math.hypot(dx, dy)
+    },
+
+    handleTouchStart(event) {
+      if (event.touches.length === 1) {
+        // Single touch - start dragging
+        this.isDraggingMap = true
+        this.touchStartPos.x = event.touches[0].clientX
+        this.touchStartPos.y = event.touches[0].clientY
+        this.dragStart.x = event.touches[0].clientX
+        this.dragStart.y = event.touches[0].clientY
+      } else if (event.touches.length === 2) {
+        // Two fingers - start zooming
+        this.isDraggingMap = false
+        this.lastTouchDistance = this.getTouchDistance(event.touches)
+      }
+    },
+
+    handleTouchEnd(event) {
+      if (event.changedTouches.length === 1) {
+        const touch = event.changedTouches[0]
+        const distMoved = Math.hypot(
+          touch.clientX - this.touchStartPos.x,
+          touch.clientY - this.touchStartPos.y
+        )
+
+        if (distMoved < 10) {
+          this.handleTouchTap(touch)
+        }
+      }
+
+      this.isDraggingMap = false
+      this.lastTouchDistance = null
+    },
+
+    handleTouchMove(event) {
+      if (event.touches.length === 1 && this.isDraggingMap) {
+        // Single touch - dragging
+        const touch = event.touches[0]
+        const dx = touch.clientX - this.dragStart.x
+        const dy = touch.clientY - this.dragStart.y
+
+        this.view.x += dx
+        this.view.y += dy
+
+        this.dragStart.x = touch.clientX
+        this.dragStart.y = touch.clientY
+
+        requestAnimationFrame(this.renderMap)
+      } else if (event.touches.length === 2) {
+        // Two fingers - zooming
+        const currentDistance = this.getTouchDistance(event.touches)
+
+        if (this.lastTouchDistance) {
+          const zoomFactor = currentDistance / this.lastTouchDistance
+          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+
+          const centerX = (event.touches[0].clientX + event.touches[1].clientX) / 2 - rect.left
+          const centerY = (event.touches[0].clientY + event.touches[1].clientY) / 2 - rect.top
+          const rect = this.$refs.mapCanvas.getBoundingClientRect()
+
+          this.view.x = centerX - (centerX - this.view.x) * (newScale / this.view.scale)
+          this.view.y = centerY - (centerY - this.view.y) * (newScale / this.view.scale)
+          this.view.scale = newScale
+
+          requestAnimationFrame(this.renderMap)
+        }
+
+        this.lastTouchDistance = currentDistance
+      }
+    },
+
+    handleTouchTap(touch) {
+      const rect = this.$refs.mapCanvas.getBoundingClientRect()
+      const touchX = touch.clientX - rect.left
+      const touchY = touch.clientY - rect.top
+
+      // check if touch aligns with a location marker
+      this.targetNodes.forEach(targetNode => {
+        const node = this.mapData.nodes[targetNode.nodeId]
+
+        if (node) {
+          const proj = this.project(node.lat, node.lon)
+
+          const screenX = (proj.x * this.view.scale) + this.view.x
+          const screenY = (proj.y * this.view.scale) + this.view.y
+
+          const dx = touchX - screenX
+          const dy = touchY - screenY
+          const distance = Math.sqrt(dx ** 2 + dy ** 2)
+
+          if (distance < 15 && this.targetLocation.nodeId !== targetNode.nodeId) {
+            this.targetLocation.nodeId = targetNode.nodeId
+            this.findShortestPath(this.userNodeId)
+            this.$nextTick(() => this.renderMap())
+          }
+        }
+      })
     },
 
     resizeCanvas() {
