@@ -224,7 +224,7 @@ export default {
         const response = await drinkApi.get('/users/' + this.currentUserId)
         this.userInfo = response.data
         this.email = this.userInfo.email
-        this.profilePicture = this.userInfo.profilePicture
+        this.profilePicture = this.userInfo.profilePicture ?? '/profilePictures/default_user.jpg'
         this.userName = this.userInfo.userName
         this.street = this.userInfo.street
         this.streetNumber = this.userInfo.streetNumber
@@ -269,6 +269,7 @@ export default {
       event.target.src = '/profilePictures/default_user.jpg'
     },
     numberState(number) {
+      if (number === null) return true
       return /^\d*$/.test(number)
     }
   }
