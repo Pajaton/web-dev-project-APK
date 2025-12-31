@@ -18,6 +18,7 @@
         Get directions
       </b-button>
       <b-button
+          v-if=userId
           id="fav-button"
           @click="favoriteSystembolag()"
           variant="primary">
@@ -37,7 +38,7 @@
       },
       userId: {
         type: String,
-        default: ''
+        default: null
       }
     },
     data() {

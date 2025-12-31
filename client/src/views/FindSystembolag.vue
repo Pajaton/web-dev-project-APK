@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import {Api} from '@/Api.js'
 import MapDirections from '@/components/MapDirections.vue'
 
 export default {
@@ -54,7 +55,19 @@ export default {
       userId: null
     }
   },
+  mounted() {
+    this.fetchCurrentUser()
+  },
   methods: {
+    fetchCurrentUser() {
+      Api.get('/sessions/currentlyLoggedin/')
+        .then(response => {
+          this.userId = response.data.user._id
+        })
+        .catch(() => {
+          this.userId = null
+        })
+    },
     getDirections() {
       this.$refs.mapDirections.getLocation()
     },
