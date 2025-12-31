@@ -241,9 +241,15 @@ export default {
       this.profilePicture = picture
     },
     async deleteUser() {
-      drinkApi.delete('/users/' + this.currentUserId)
-      console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
-      this.modalShowConfirmation = true
+      try {
+        await drinkApi.delete('/sessions/' + this.currentUserId)
+        await drinkApi.delete('/users/' + this.currentUserId)
+        this.currentUserId = null
+        this.modalShowConfirmation = true
+        console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
+      } catch (error) {
+        this.message = error
+      }
     },
     async goHome() {
       this.modalShowConfirmation = false
