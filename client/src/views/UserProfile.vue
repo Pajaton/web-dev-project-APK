@@ -11,7 +11,7 @@
             <b-list-group-item flush variant="primary">City: {{user.city}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Following: {{user.follows.length}} people</b-list-group-item>
             <b-list-group-item flush variant="primary" >Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button size="sm" class="ml-auto" @click=openAddEntryPopup()>Add alcoholic entry</b-button></b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button size="sm" class="ml-auto" @click="openAddEntryPopup">Add alcoholic entry</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
             <b-list-group-item flush variant="primary" class="d-flex" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
             <b-list-group-item flush variant="primary" v-if="this.favoriteSystembolag">Favorite systembolag: {{ this.favoriteSystembolag }}</b-list-group-item>
@@ -34,26 +34,20 @@
           </b-row>
         </b-card>
       </b-list-group>
+      <!-- Add alcohol entry popup   -->
       <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
-      <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
-        <div v-if="showAlcEntryForm">
-
-          <p><strong>Product number:</strong> ALKO</p>
-
-
-          <b-button @click="getReviewRating">
-            Review drink
-          </b-button>
-
-          <b-button @click="getAllReviewRating">
-            Check reviews
-          </b-button>
-
-          <b-button @click="closeDrinkPopup">
-            Close
-          </b-button>
-        </div>
-      </b-modal>
+        <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
+          <b-form @submit.prevent="submitAlcoholEntry">
+            <b-form-group label="Volume (ml)">
+              <b-form-input v-model.number="alcVolume" type="number" min="0" required />
+            </b-form-group>
+            <b-form-group label="Alcohol % (0–100)">
+              <b-form-input v-model.number="alcPercent" type="number" min="0" max="100" required />
+            </b-form-group>
+            <b-button type="submit" variant="primary" class="mr-2">Save</b-button>
+            <b-button variant="secondary" @click="addEntryPopup = false">Cancel</b-button>
+          </b-form>
+        </b-modal>
     </div>
   </div>
 </template>
@@ -71,7 +65,9 @@ export default {
       currentUserId: null,
       favoriteSystembolag: null,
       show: false,
-      showAlcEntryForm: false
+      addEntryPopup: false,
+      alcVolume: null,
+      alcPercent: null
     }
   },
   props: {
@@ -154,7 +150,21 @@ export default {
       event.target.src = '/drinkPictures/default_drink.jpg'
     },
     openAddEntryPopup() {
-      this.showAlcEntryForm = true
+      this.addEntryPopup = true
+    },
+    submitAlcoholEntry() {
+      if (this.alcVolume <= 0 || this.alcPercent < 0 || this.alcPercent > 100) return
+      drinkApi.post(`/users/${this.user._id}/alcoholConsumed`, {
+        volume: this.alcVolume,
+        percent: this.alcPercent
+      })
+        .then(res => {
+          this.user.alcoholConsumed.push(res.data)
+          this.addEntryPopup = false
+        })
+        .catch(err => {
+          console.error('Failed to add alcohol entry', err)
+        })
     }
   },
   mounted() {
