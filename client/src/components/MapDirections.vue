@@ -289,7 +289,6 @@ export default {
           minDistance = distance
           nearestNodeId = nodeId
         }
-
       }
 
       return nearestNodeId ? String(nearestNodeId) : null
@@ -601,20 +600,13 @@ export default {
       }
     },
 
-    handleMouseClick(event) {
-      // prevent accidental clicks if moving mouse while clicking
-      const distMoved = Math.hypot(
-        event.clientX - this.dragStart.x,
-        event.clientY - this.dragStart.y
-      )
-      if (distMoved > 5) return // user panning, not clicking
-
+    handleMapSelection(event) {
       const rect = this.$refs.mapCanvas.getBoundingClientRect()
-      const mouseX = event.clientX - rect.left
-      const mouseY = event.clientY - rect.top
+      const eventX = event.clientX - rect.left
+      const eventY = event.clientY - rect.top
 
-      // we have to check if the mouse's location aligns with
-      // the location of a location marker
+      // we have to check if the "clicked" or "pressed" area on the map
+      // is over a locaiton marker
       this.targetNodes.forEach(targetNode => {
         const node = this.mapData.nodes[targetNode.nodeId]
 
@@ -624,17 +616,29 @@ export default {
           const screenX = (proj.x * this.view.scale) + this.view.x
           const screenY = (proj.y * this.view.scale) + this.view.y
 
-          const dx = mouseX - screenX
-          const dy = mouseY - screenY
+          const dx = eventX - screenX
+          const dy = eventY - screenY
+
           const distance = Math.sqrt(dx ** 2 + dy ** 2)
 
           if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
             this.targetLocation.nodeId = targetNode.nodeId
             this.findShortestPath(this.userNodeId)
-            this.$nextTick(() => this.renderMap())
+            requestAnimationFrame(this.renderMap)
           }
         }
       })
+    },
+
+    handleMouseClick(event) {
+      // prevent accidental clicks if moving mouse while clicking
+      const distMoved = Math.hypot(
+        event.clientX - this.dragStart.x,
+        event.clientY - this.dragStart.y
+      )
+      if (distMoved > 5) return // user panning, not clicking
+
+      this.handleMapSelection(event)
     },
 
     // another way of selecting target location
@@ -651,10 +655,7 @@ export default {
       }
 
       this.findShortestPath(this.userNodeId)
-
-      this.$nextTick(() => {
-        this.renderMap()
-      })
+      requestAnimationFrame(this.renderMap)
     },
 
     getTouchDistance(touches) {
@@ -665,14 +666,14 @@ export default {
 
     handleTouchStart(event) {
       if (event.touches.length === 1) {
-        // Single touch - start dragging
+        // One finger touch
         this.isDraggingMap = true
         this.touchStartPos.x = event.touches[0].clientX
         this.touchStartPos.y = event.touches[0].clientY
         this.dragStart.x = event.touches[0].clientX
         this.dragStart.y = event.touches[0].clientY
       } else if (event.touches.length === 2) {
-        // Two fingers - start zooming
+        // Two finger touch
         this.isDraggingMap = false
         this.lastTouchDistance = this.getTouchDistance(event.touches)
       }
@@ -687,40 +688,12 @@ export default {
         )
 
         if (distMoved < 10) {
-          this.handleTouchTap(touch)
+          this.handleMapSelection(touch)
         }
       }
 
       this.isDraggingMap = false
       this.lastTouchDistance = null
-    },
-
-    handleTouchTap(touch) {
-      const rect = this.$refs.mapCanvas.getBoundingClientRect()
-      const touchX = touch.clientX - rect.left
-      const touchY = touch.clientY - rect.top
-
-      // check if touch aligns with a location marker
-      this.targetNodes.forEach(targetNode => {
-        const node = this.mapData.nodes[targetNode.nodeId]
-
-        if (node) {
-          const proj = this.project(node.lat, node.lon)
-
-          const screenX = (proj.x * this.view.scale) + this.view.x
-          const screenY = (proj.y * this.view.scale) + this.view.y
-
-          const dx = touchX - screenX
-          const dy = touchY - screenY
-          const distance = Math.sqrt(dx ** 2 + dy ** 2)
-
-          if (distance < 15 && this.targetLocation.nodeId !== targetNode.nodeId) {
-            this.targetLocation.nodeId = targetNode.nodeId
-            this.findShortestPath(this.userNodeId)
-            this.$nextTick(() => this.renderMap())
-          }
-        }
-      })
     },
 
     resizeCanvas() {
