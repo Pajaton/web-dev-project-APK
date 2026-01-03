@@ -7,7 +7,7 @@
       @mousedown="handleMouseDown"
       @mouseup="handleMouseUp"
       @mouseleave="handleMouseUp"
-      @mousemove="handleMouseMove"
+      @mousemove="handleMapPan"
       @click="handleMouseClick"
       @wheel.prevent="handleScroll"
       @touchstart.prevent="handleTouchStart"
@@ -538,7 +538,7 @@ export default {
       this.isDraggingMap = false
     },
 
-    handleMouseMove(event) {
+    handleMapPan(event) {
       if (!this.isDraggingMap) return
 
       const dx = event.clientX - this.dragStart.x
@@ -551,6 +551,54 @@ export default {
       this.dragStart.y = event.clientY
 
       requestAnimationFrame(this.renderMap)
+    },
+
+    handleMapZoom(event, zoomFactor) {
+      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+
+      const rect = this.$refs.mapCanvas.getBoundingClientRect()
+      const eventX = event.clientX - rect.left
+      const eventY = event.clientY - rect.top
+
+      this.view.x = eventX - (eventX - this.view.x) * (newScale / this.view.scale)
+      this.view.y = eventY - (eventY - this.view.y) * (newScale / this.view.scale)
+
+      this.view.scale = newScale
+
+      requestAnimationFrame(this.renderMap)
+    },
+
+    // relates to zooming the map
+    handleScroll(event) {
+      const zoomSensitivity = 0.001
+      const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
+
+      this.handleMapZoom(event, zoomFactor)
+    },
+
+    handleTouchMove(event) {
+      if (event.touches.length === 1 && this.isDraggingMap) {
+        // Single touch - dragging
+        const touch = event.touches[0]
+        this.handleMapPan(touch)
+
+        requestAnimationFrame(this.renderMap)
+      } else if (event.touches.length === 2) {
+        // Two fingers - zooming
+        const currentDistance = this.getTouchDistance(event.touches)
+
+        if (this.lastTouchDistance) {
+          const zoomFactor = currentDistance / this.lastTouchDistance
+          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+
+          this.handleMapZoom({
+            clientX: (event.touches[0].clientX + event.touches[1].clientX) / 2,
+            clientY: (event.touches[0].clientY + event.touches[1].clientY) / 2
+          }, zoomFactor)
+        }
+
+        this.lastTouchDistance = currentDistance
+      }
     },
 
     handleMouseClick(event) {
@@ -609,23 +657,6 @@ export default {
       })
     },
 
-    // relates to zooming the map
-    handleScroll(event) {
-      const zoomSensitivity = 0.001
-      const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
-      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
-
-      const rect = this.$refs.mapCanvas.getBoundingClientRect()
-      const mouseX = event.clientX - rect.left
-      const mouseY = event.clientY - rect.top
-
-      this.view.x = mouseX - (mouseX - this.view.x) * (newScale / this.view.scale)
-      this.view.y = mouseY - (mouseY - this.view.y) * (newScale / this.view.scale)
-      this.view.scale = newScale
-
-      requestAnimationFrame(this.renderMap)
-    },
-
     getTouchDistance(touches) {
       const dx = touches[0].clientX - touches[1].clientX
       const dy = touches[0].clientY - touches[1].clientY
@@ -662,43 +693,6 @@ export default {
 
       this.isDraggingMap = false
       this.lastTouchDistance = null
-    },
-
-    handleTouchMove(event) {
-      if (event.touches.length === 1 && this.isDraggingMap) {
-        // Single touch - dragging
-        const touch = event.touches[0]
-        const dx = touch.clientX - this.dragStart.x
-        const dy = touch.clientY - this.dragStart.y
-
-        this.view.x += dx
-        this.view.y += dy
-
-        this.dragStart.x = touch.clientX
-        this.dragStart.y = touch.clientY
-
-        requestAnimationFrame(this.renderMap)
-      } else if (event.touches.length === 2) {
-        // Two fingers - zooming
-        const currentDistance = this.getTouchDistance(event.touches)
-
-        if (this.lastTouchDistance) {
-          const zoomFactor = currentDistance / this.lastTouchDistance
-          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
-
-          const centerX = (event.touches[0].clientX + event.touches[1].clientX) / 2 - rect.left
-          const centerY = (event.touches[0].clientY + event.touches[1].clientY) / 2 - rect.top
-          const rect = this.$refs.mapCanvas.getBoundingClientRect()
-
-          this.view.x = centerX - (centerX - this.view.x) * (newScale / this.view.scale)
-          this.view.y = centerY - (centerY - this.view.y) * (newScale / this.view.scale)
-          this.view.scale = newScale
-
-          requestAnimationFrame(this.renderMap)
-        }
-
-        this.lastTouchDistance = currentDistance
-      }
     },
 
     handleTouchTap(touch) {
