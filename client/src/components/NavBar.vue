@@ -74,11 +74,14 @@ export default {
 
 <style>
   .btn-navbar {
-    color: green !important;
-    font-family: Impact,'Arial Narrow Bold', sans-serif !important;
-    background: yellow !important;
-    border-color: green !important;
+    color: rgb(246,214,70) !important;
+    font-family: serif ,'Arial Narrow Bold', sans-serif !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    background: rgb(52,120,59)  !important;
+    border-color: rgb(246,214,70) !important;
     border-width: 5px !important;
     border-style: solid;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="user">
-      <b-img :src="user.profilePicture" fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
+      <b-img :src= imageUrl(user.profilePicture) fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
         <b-card style="max-width: 400px" horizontal header="User Info">
           <b-list-group >
             <b-list-group-item flush variant="primary">Username: {{user.userName}}</b-list-group-item>
@@ -10,10 +10,10 @@
             <b-list-group-item flush variant="primary">Postal code: {{user.postalCode}}</b-list-group-item>
             <b-list-group-item flush variant="primary">City: {{user.city}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Following: {{user.follows.length}} people</b-list-group-item>
-            <b-list-group-item flush variant="primary">Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary">Alcoholic intake: {{user.alcoholConsumed.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" >Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button size="sm" class="ml-auto" @click="openAddEntryPopup">Add alcoholic entry</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
             <b-list-group-item flush variant="primary" v-if="this.favoriteSystembolag">Favorite systembolag: {{ this.favoriteSystembolag }}</b-list-group-item>
           </b-list-group>
         </b-card>
@@ -22,7 +22,7 @@
         <b-card v-for="review in reviewsByUser" :key="review._id" style="max-width: 600px">
           <b-row>
           <b-col>
-            <b-img :src="review.image" fluid alt="bottle image"  style="max-width: 300px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+            <b-img :src= imageUrl(review.image) fluid alt="bottle image"  style="max-width: 300px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
           </b-col>
           <b-col>
             <b-list-group style="max-width: 300px">
@@ -34,16 +34,38 @@
           </b-row>
         </b-card>
       </b-list-group>
+      <!-- Add alcohol entry popup   -->
       <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+        <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
+          <b-form @submit.prevent="submitAlcoholEntry">
+            <b-form-group label="Volume (ml)">
+              <b-form-input v-model.number="alcVolume" type="number" min="0" required />
+            </b-form-group>
+            <b-form-group label="Alcohol % (0–100)">
+              <b-form-input v-model.number="alcPercent" type="number" min="0" max="100" required />
+            </b-form-group>
+            <b-button type="submit" variant="primary" class="mr-2">Save</b-button>
+            <b-button variant="secondary" @click="addEntryPopup = false">Cancel</b-button>
+          </b-form>
+        </b-modal>
+        <!-- Toilet prompt popup-->
+        <b-modal v-model="showTwoLiterPopup" title="Bathroom time" hide-footer>
+          <p>You have logged over 2 liters since last time.</p>
+          <b-button class="mr-2" variant="primary" @click="showTwoLiterPopup = false; $refs.toiletPanel.openPanel()">Find toilet</b-button>
+          <b-button variant="secondary" @click="showTwoLiterPopup = false">Cancel</b-button>
+        </b-modal>
+        <ToiletPanel ref="toiletPanel" />
     </div>
   </div>
 </template>
 
 <script>
 import { drinkApi } from '@/Api'
+import ToiletPanel from '@/components/ToiletMap.vue'
 
 export default {
   name: 'users',
+  components: { ToiletPanel },
   data() {
     return {
       user: null,
@@ -51,7 +73,12 @@ export default {
       reviewsByUser: [],
       currentUserId: null,
       favoriteSystembolag: null,
-      show: false
+      show: false,
+      addEntryPopup: false,
+      alcVolume: null,
+      alcPercent: null,
+      showTwoLiterPopup: false,
+      twoLiterBaselineTotalMl: 0
     }
   },
   props: {
@@ -65,6 +92,17 @@ export default {
           if (!this.user.profilePicture) {
             this.user.profilePicture = '/profilePictures/default_user.jpg'
           }
+
+          const currentTotalMl = this.user.alcoholConsumed.reduce((sum, entry) => sum + (Number(entry.volume) || 0), 0)
+          const totalConsumedKey = `twoLiterBaselineTotalMl:${this.user._id}`
+          const savedBaseline = localStorage.getItem(totalConsumedKey)
+
+          if (savedBaseline !== null) {
+            this.twoLiterBaselineTotalMl = Number(savedBaseline)
+          } else {
+            this.twoLiterBaselineTotalMl = currentTotalMl
+          }
+
           this.getUserFollowingList()
           this.getAllUserReviews()
           this.getFavoriteSystembolag()
@@ -85,8 +123,12 @@ export default {
     getFavoriteSystembolag() {
       drinkApi.get(this.user._links.favoritesSystembolag)
         .then(response => {
-          const systembolag = response.data
-          this.favoriteSystembolag = systembolag.favoriteSystembolag.name
+          if (response.data.favoriteSystembolag) {
+            const systembolag = response.data
+            this.favoriteSystembolag = systembolag.favoriteSystembolag.name
+          } else {
+            this.favoriteSystembolag = 'No favorite'
+          }
         })
         .catch(error => {
           this.message = error
@@ -128,10 +170,42 @@ export default {
         })
     },
     profilePictureError(event) {
-      event.target.src = '/profilePictures/default_user.jpg'
+      event.target.src = this.imageUrl('/profilePictures/default_user.jpg')
     },
     drinkPictureError(event) {
-      event.target.src = '/drinkPictures/default_drink.jpg'
+      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
+    },
+    imageUrl(image) {
+      const imagePath = `../assets${image}`
+      return new URL(imagePath, import.meta.url).href
+    },
+    openAddEntryPopup() {
+      this.addEntryPopup = true
+    },
+    submitAlcoholEntry() {
+      if (this.alcVolume <= 0 || this.alcPercent < 0 || this.alcPercent > 100) return
+      drinkApi.post(`/users/${this.user._id}/alcoholConsumed`, {
+        volume: this.alcVolume,
+        percent: this.alcPercent
+      })
+        .then(res => {
+          this.user.alcoholConsumed.push(res.data)
+
+          const currentTotalMl = this.user.alcoholConsumed.reduce((sum, entry) => sum + (Number(entry.volume) || 0), 0)
+          const mlSinceLastPrompt = currentTotalMl - this.twoLiterBaselineTotalMl
+
+          if (mlSinceLastPrompt >= 2000) {
+            this.showTwoLiterPopup = true
+            this.twoLiterBaselineTotalMl = currentTotalMl
+
+            localStorage.setItem(`twoLiterBaselineTotalMl:${this.user._id}`, String(currentTotalMl))
+          }
+
+          this.addEntryPopup = false
+        })
+        .catch(err => {
+          console.error('Failed to add alcohol entry', err)
+        })
     }
   },
   mounted() {

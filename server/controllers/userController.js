@@ -71,9 +71,6 @@ router.get("/users/:userId/follows", async (req, res, next) => {
                     "userName": followedUser.userName,
                 };
             });
-        if (userFollows.length === 0) {
-            return res.status(404).json({"message": "User does not follow any other users"});
-        }
         return res.json({ "follows": userFollows });
     } catch(err) { next(err) };
 });
@@ -103,9 +100,11 @@ router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
         const user = await User
             .findById(req.params.userId)
             .populate("favoriteSystembolag"); // populate the "favoriteSystembolag" field
-
+        if (!user) {
+            return res.status(404).json({"message": "User was not found"})
+        }
         if (!user.favoriteSystembolag) {
-            return res.status(404).json({ "favoriteSystembolag": undefined });
+            return res.json({ "favoriteSystembolag": undefined });
         }
         return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
     } catch(err) { next(err) };
