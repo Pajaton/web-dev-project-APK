@@ -91,11 +91,11 @@
               Only numbers are allowed
             </b-form-invalid-feedback>
           </BFormFloatingLabel>
-          <b-img class="images" :src="profilePicture" style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
+          <b-img class="images" :src=imageUrl(profilePicture) style="float:left" thumbnail alt="Profile Picture" @error="profilePictureError"></b-img>
           <b-button @click="modalShowPicture = !modalShowPicture">Choose profile picture</b-button>
           <b-modal v-model="modalShowPicture" title="Choose profile picture">
             <b-img class="images" v-for="(picture, index) in profilePictureList"
-            :key="index" :src="picture" thumbnail fluid @click="setProfilePicture(picture)">
+            :key="index" :src=imageUrl(picture) thumbnail fluid @click="setProfilePicture(picture)">
             </b-img>
           </b-modal>
         </BForm>
@@ -271,6 +271,10 @@ export default {
     numberState(number) {
       if (number === null) return true
       return /^\d*$/.test(number)
+    },
+    imageUrl(image) {
+      const imagePath = `../assets${image}`
+      return new URL(imagePath, import.meta.url).href
     }
   }
 }
