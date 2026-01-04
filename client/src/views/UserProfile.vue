@@ -178,7 +178,6 @@ export default {
     imageUrl(image) {
       const imagePath = `../assets${image}`
       return new URL(imagePath, import.meta.url).href
-      event.target.src = '/drinkPictures/default_drink.jpg'
     },
     openAddEntryPopup() {
       this.addEntryPopup = true
