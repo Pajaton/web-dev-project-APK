@@ -22,7 +22,7 @@
         <b-card v-for="review in reviewsByUser" :key="review._id" style="max-width: 600px">
           <b-row>
           <b-col>
-            <b-img :src="review.image" fluid alt="bottle image"  style="max-width: 300px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+            <b-img :src= imageUrl(review.image) fluid alt="bottle image"  style="max-width: 300px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
           </b-col>
           <b-col>
             <b-list-group style="max-width: 300px">
@@ -135,7 +135,7 @@ export default {
       event.target.src = this.imageUrl('/profilePictures/default_user.jpg')
     },
     drinkPictureError(event) {
-      event.target.src = '/drinkPictures/default_drink.jpg'
+      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
     },
     imageUrl(image) {
       const imagePath = `../assets${image}`
