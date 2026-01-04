@@ -48,15 +48,24 @@
             <b-button variant="secondary" @click="addEntryPopup = false">Cancel</b-button>
           </b-form>
         </b-modal>
+        <!-- Toilet prompt popup-->
+        <b-modal v-model="showTwoLiterPopup" title="Bathroom time" hide-footer>
+          <p>You have logged over 2 liters since last time.</p>
+          <b-button class="mr-2" variant="primary" @click="showTwoLiterPopup = false; $refs.toiletPanel.openPanel()">Find toilet</b-button>
+          <b-button variant="secondary" @click="showTwoLiterPopup = false">Cancel</b-button>
+        </b-modal>
+        <ToiletPanel ref="toiletPanel" />
     </div>
   </div>
 </template>
 
 <script>
 import { drinkApi } from '@/Api'
+import ToiletPanel from '@/components/ToiletMap.vue'
 
 export default {
   name: 'users',
+  components: { ToiletPanel },
   data() {
     return {
       user: null,
@@ -67,7 +76,9 @@ export default {
       show: false,
       addEntryPopup: false,
       alcVolume: null,
-      alcPercent: null
+      alcPercent: null,
+      showTwoLiterPopup: false,
+      twoLiterBaselineTotalMl: 0
     }
   },
   props: {
@@ -81,6 +92,17 @@ export default {
           if (!this.user.profilePicture) {
             this.user.profilePicture = '/profilePictures/default_user.jpg'
           }
+
+          const currentTotalMl = this.user.alcoholConsumed.reduce((sum, entry) => sum + (Number(entry.volume) || 0), 0)
+          const totalConsumedKey = `twoLiterBaselineTotalMl:${this.user._id}`
+          const savedBaseline = localStorage.getItem(totalConsumedKey)
+
+          if (savedBaseline !== null) {
+            this.twoLiterBaselineTotalMl = Number(savedBaseline)
+          } else {
+            this.twoLiterBaselineTotalMl = currentTotalMl
+          }
+
           this.getUserFollowingList()
           this.getAllUserReviews()
           this.getFavoriteSystembolag()
@@ -164,6 +186,17 @@ export default {
       })
         .then(res => {
           this.user.alcoholConsumed.push(res.data)
+
+          const currentTotalMl = this.user.alcoholConsumed.reduce((sum, entry) => sum + (Number(entry.volume) || 0), 0)
+          const mlSinceLastPrompt = currentTotalMl - this.twoLiterBaselineTotalMl
+
+          if (mlSinceLastPrompt >= 2000) {
+            this.showTwoLiterPopup = true
+            this.twoLiterBaselineTotalMl = currentTotalMl
+
+            localStorage.setItem(`twoLiterBaselineTotalMl:${this.user._id}`, String(currentTotalMl))
+          }
+
           this.addEntryPopup = false
         })
         .catch(err => {
