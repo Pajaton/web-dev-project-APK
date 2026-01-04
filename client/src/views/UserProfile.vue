@@ -101,8 +101,12 @@ export default {
     getFavoriteSystembolag() {
       drinkApi.get(this.user._links.favoritesSystembolag)
         .then(response => {
-          const systembolag = response.data
-          this.favoriteSystembolag = systembolag.favoriteSystembolag.name
+          if (response.data.favoriteSystembolag) {
+            const systembolag = response.data
+            this.favoriteSystembolag = systembolag.favoriteSystembolag.name
+          } else {
+            this.favoriteSystembolag = 'No favorite'
+          }
         })
         .catch(error => {
           this.message = error
