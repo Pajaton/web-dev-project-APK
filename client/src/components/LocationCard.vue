@@ -3,7 +3,6 @@
     <b-card
       :title="location.name"
       tag="location"
-      style="max-width: 20rem"
       class="mb-2">
       <b-card-body>
         <b-card-sub-title v-if=location.branch>Branch: {{ location.branch }}<br><br></b-card-sub-title>
@@ -18,6 +17,7 @@
         Get directions
       </b-button>
       <b-button
+          v-if=userId
           id="fav-button"
           @click="favoriteSystembolag()"
           variant="primary">
@@ -37,7 +37,7 @@
       },
       userId: {
         type: String,
-        default: ''
+        default: null
       }
     },
     data() {

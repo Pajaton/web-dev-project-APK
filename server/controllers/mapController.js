@@ -2,8 +2,8 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 
-// const baseMapURL = "https://overpass-api.de/api/interpreter";
-const baseMapURL = "https://overpass.private.coffee/api/interpreter";
+const baseMapURL = "https://overpass-api.de/api/interpreter";
+// const baseMapURL = "https://overpass.private.coffee/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 
@@ -161,7 +161,13 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     const rawMapData = await retryMapDataFetch(
       () => axios.post(baseMapURL, params, { timeout: 65000 })
     );
-    const graphData = buildGraph(rawMapData.data.elements);
+    
+    const elements = rawMapData.data?.elements;
+    if (!elements || !Array.isArray(elements)) {
+      throw new Error("Invalid response from Overpass API: missing elements");
+    }
+    
+    const graphData = buildGraph(elements);
     
     return {
       'targetLocations': targetLocationData,
@@ -170,7 +176,7 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     };
   } catch (error) {
     console.error("Error fetching map data:", error);
-    console.error(error.response.data);
+    console.error(error.response);
     throw error;
   }
 }
@@ -227,7 +233,7 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
 
 // Gets the coordinates and general info of nearby Systembolaget locations using Overpass API
 async function findSystembolag(userLat, userLon) {
-  const query = `[out:json][timeout:60];
+  const query = `[out:json][timeout:25];
     nwr
     ["name"="Systembolaget"]
     (around:5000,${userLat},${userLon});
@@ -235,15 +241,15 @@ async function findSystembolag(userLat, userLon) {
   const searchParams = new URLSearchParams({ data: query} );
 
   const response = await retryMapDataFetch(
-    () => axios.post(baseMapURL, searchParams, { timeout: 65000 })
+    () => axios.post(baseMapURL, searchParams, { timeout: 25000 })
   );
-  const elements = response.data.elements;
+  const elements = response.data?.elements;
 
-  if (elements.length === 0) {
+  if (!elements || !Array.isArray(elements) || elements.length === 0) {
     throw new Error("No Systembolaget locations found nearby");
   }
 
-  return response.data.elements;
+  return elements;
 }
 
 // based on a user's lat and lon values, gets the nearest few toilets

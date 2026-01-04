@@ -1,21 +1,27 @@
 <template>
   <div>
     <div
-      class="map-wrapper border mt-3"
-      style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      class="map-wrapper border position-relative"
       :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
       @mousedown="handleMouseDown"
       @mouseup="handleMouseUp"
       @mouseleave="handleMouseUp"
-      @mousemove="handleMouseMove"
+      @mousemove="handleMapPan"
       @click="handleMouseClick"
       @wheel.prevent="handleScroll"
+      @touchstart.prevent="handleTouchStart"
+      @touchend="handleTouchEnd"
+      @touchmove.prevent="handleTouchMove"
     >
-      <canvas ref="mapCanvas"></canvas>
+      <div id="map-canvas"
+        style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      >
+        <canvas ref="mapCanvas"></canvas>
+      </div>
 
       <div
         v-if="isLoading"
-        class="position-absolute top-50 start-50 translate-middle"
+        class="spinner-overlay position-absolute top-50 start-50 translate-middle"
       >
         <b-spinner label="Loading..."></b-spinner>
       </div>
@@ -137,9 +143,14 @@ export default {
         scale: 1.0
       },
 
+      // mouse events
       isDraggingMap: false,
       dragStart: { x: 0,y: 0 },
       mouseWheelTimer: null,
+
+      // touch events
+      touchStartPos: { x: 0,y: 0 },
+      lastTouchDistance: null,
 
       // map configs
       bounds: { minLat: 0,maxLat: 0,minLon: 0,maxLon: 0 },
@@ -281,7 +292,6 @@ export default {
           minDistance = distance
           nearestNodeId = nodeId
         }
-
       }
 
       return nearestNodeId ? String(nearestNodeId) : null
@@ -530,7 +540,7 @@ export default {
       this.isDraggingMap = false
     },
 
-    handleMouseMove(event) {
+    handleMapPan(event) {
       if (!this.isDraggingMap) return
 
       const dx = event.clientX - this.dragStart.x
@@ -545,20 +555,61 @@ export default {
       requestAnimationFrame(this.renderMap)
     },
 
-    handleMouseClick(event) {
-      // prevent accidental clicks if moving mouse while clicking
-      const distMoved = Math.hypot(
-        event.clientX - this.dragStart.x,
-        event.clientY - this.dragStart.y
-      )
-      if (distMoved > 5) return // user panning, not clicking
+    handleMapZoom(event, zoomFactor) {
+      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
 
       const rect = this.$refs.mapCanvas.getBoundingClientRect()
-      const mouseX = event.clientX - rect.left
-      const mouseY = event.clientY - rect.top
+      const eventX = event.clientX - rect.left
+      const eventY = event.clientY - rect.top
 
-      // we have to check if the mouse's location aligns with
-      // the location of a location marker
+      this.view.x = eventX - (eventX - this.view.x) * (newScale / this.view.scale)
+      this.view.y = eventY - (eventY - this.view.y) * (newScale / this.view.scale)
+
+      this.view.scale = newScale
+
+      requestAnimationFrame(this.renderMap)
+    },
+
+    // relates to zooming the map
+    handleScroll(event) {
+      const zoomSensitivity = 0.001
+      const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
+
+      this.handleMapZoom(event, zoomFactor)
+    },
+
+    handleTouchMove(event) {
+      if (event.touches.length === 1 && this.isDraggingMap) {
+        // Single touch - dragging
+        const touch = event.touches[0]
+        this.handleMapPan(touch)
+
+        requestAnimationFrame(this.renderMap)
+      } else if (event.touches.length === 2) {
+        // Two fingers - zooming
+        const currentDistance = this.getTouchDistance(event.touches)
+
+        if (this.lastTouchDistance) {
+          const zoomFactor = currentDistance / this.lastTouchDistance
+          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+
+          this.handleMapZoom({
+            clientX: (event.touches[0].clientX + event.touches[1].clientX) / 2,
+            clientY: (event.touches[0].clientY + event.touches[1].clientY) / 2
+          }, zoomFactor)
+        }
+
+        this.lastTouchDistance = currentDistance
+      }
+    },
+
+    handleMapSelection(event) {
+      const rect = this.$refs.mapCanvas.getBoundingClientRect()
+      const eventX = event.clientX - rect.left
+      const eventY = event.clientY - rect.top
+
+      // we have to check if the "clicked" or "pressed" area on the map
+      // is over a locaiton marker
       this.targetNodes.forEach(targetNode => {
         const node = this.mapData.nodes[targetNode.nodeId]
 
@@ -568,17 +619,29 @@ export default {
           const screenX = (proj.x * this.view.scale) + this.view.x
           const screenY = (proj.y * this.view.scale) + this.view.y
 
-          const dx = mouseX - screenX
-          const dy = mouseY - screenY
+          const dx = eventX - screenX
+          const dy = eventY - screenY
+
           const distance = Math.sqrt(dx ** 2 + dy ** 2)
 
           if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
             this.targetLocation.nodeId = targetNode.nodeId
             this.findShortestPath(this.userNodeId)
-            this.$nextTick(() => this.renderMap())
+            requestAnimationFrame(this.renderMap)
           }
         }
       })
+    },
+
+    handleMouseClick(event) {
+      // prevent accidental clicks if moving mouse while clicking
+      const distMoved = Math.hypot(
+        event.clientX - this.dragStart.x,
+        event.clientY - this.dragStart.y
+      )
+      if (distMoved > 5) return // user panning, not clicking
+
+      this.handleMapSelection(event)
     },
 
     // another way of selecting target location
@@ -595,27 +658,45 @@ export default {
       }
 
       this.findShortestPath(this.userNodeId)
-
-      this.$nextTick(() => {
-        this.renderMap()
-      })
+      requestAnimationFrame(this.renderMap)
     },
 
-    // relates to zooming the map
-    handleScroll(event) {
-      const zoomSensitivity = 0.001
-      const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
-      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+    getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX
+      const dy = touches[0].clientY - touches[1].clientY
+      return Math.hypot(dx, dy)
+    },
 
-      const rect = this.$refs.mapCanvas.getBoundingClientRect()
-      const mouseX = event.clientX - rect.left
-      const mouseY = event.clientY - rect.top
+    handleTouchStart(event) {
+      if (event.touches.length === 1) {
+        // One finger touch
+        this.isDraggingMap = true
+        this.touchStartPos.x = event.touches[0].clientX
+        this.touchStartPos.y = event.touches[0].clientY
+        this.dragStart.x = event.touches[0].clientX
+        this.dragStart.y = event.touches[0].clientY
+      } else if (event.touches.length === 2) {
+        // Two finger touch
+        this.isDraggingMap = false
+        this.lastTouchDistance = this.getTouchDistance(event.touches)
+      }
+    },
 
-      this.view.x = mouseX - (mouseX - this.view.x) * (newScale / this.view.scale)
-      this.view.y = mouseY - (mouseY - this.view.y) * (newScale / this.view.scale)
-      this.view.scale = newScale
+    handleTouchEnd(event) {
+      if (event.changedTouches.length === 1) {
+        const touch = event.changedTouches[0]
+        const distMoved = Math.hypot(
+          touch.clientX - this.touchStartPos.x,
+          touch.clientY - this.touchStartPos.y
+        )
 
-      requestAnimationFrame(this.renderMap)
+        if (distMoved < 10) {
+          this.handleMapSelection(touch)
+        }
+      }
+
+      this.isDraggingMap = false
+      this.lastTouchDistance = null
     },
 
     resizeCanvas() {
