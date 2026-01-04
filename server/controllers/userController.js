@@ -1,5 +1,6 @@
 var express = require("express");
 var session = require("express-session");
+var bcrypt = require('bcrypt');
 var router = express.Router();
 
 var User = require("../models/UserSchema");
@@ -158,10 +159,13 @@ router.get('/sessions/currentlyLoggedin', async (req, res, next) => {
 // Sign up a new user
 router.post("/users", async (req, res, next) => {
     try {
-        var newUser = new User({
+        const hashedPassword = await bcrypt.hash(req.body.password, 5); // 5 is the salt rounds parameter
+
+        const newUser = new User({
             "email": req.body.email,
             "profilePicture": req.body.profilePicture,
             "userName": req.body.userName,
+            "password": hashedPassword,
             "street": req.body.street,
             "streetNumber": req.body.streetNumber,
             "postalCode": req.body.postalCode,
@@ -184,6 +188,16 @@ router.post("/sessions", async (req, res, next) => {
             return res.status(401).json({
                 "message": "Authentication failed"
             });
+        }
+        
+        console.log(user.password)
+
+        const passOk = await bcrypt.compare(req.body.password, user.password);
+        console.log(passOk);
+        if (!passOk) {
+          return res.status(401).json({
+            "message": "Invalid password"
+          });
         }
 
         req.session.userId = user._id.toString();

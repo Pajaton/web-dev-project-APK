@@ -1,62 +1,112 @@
 <template>
   <div>
-    <b-container fluid>
-      <h1 class="display-5 fw-bold">Get directions to a {{ location }}</h1>
-      <p class="fs-4">Click the button below to find the {{ location }} closest to you</p>
+    <div
+      class="map-wrapper border mt-3"
+      style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
+      @mousedown="handleMouseDown"
+      @mouseup="handleMouseUp"
+      @mouseleave="handleMouseUp"
+      @mousemove="handleMouseMove"
+      @click="handleMouseClick"
+      @wheel.prevent="handleScroll"
+    >
+      <canvas ref="mapCanvas"></canvas>
 
-      <!-- Map canvas wrapper -->
-      <b-row>
-        <b-col>
-          <div
-            class="map-wrapper border mt-3"
-            style="max-width: 800px; max-height: 600px; overflow: hidden;"
-            :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
-            @mousedown="handleMouseDown"
-            @mouseup="handleMouseUp"
-            @mouseleave="handleMouseUp"
-            @mousemove="handleMouseMove"
-            @click="handleMouseClick"
-            @wheel.prevent="handleScroll"
-          >
-            <canvas ref="mapCanvas"></canvas>
-
-            <div
-              v-if="isLoading"
-              class="position-absolute top-50 start-50 translate-middle"
-            >
-              <b-spinner label="Loading..."></b-spinner>
-            </div>
-          </div>
-
-          <!-- Temp button for testing -->
-          <b-button
-            class="btn_message"
-            variant="primary"
-            v-on:click="getLocation()"
-            :disabled="isLoading"
-          >
-            {{ isLoading ? 'Locating...' : 'Get directions to a ' + location }}
-          </b-button>
-        </b-col>
-        <b-col
-          style="height: 600px; overflow-y: auto;"
-          class="mt-3 border-start"
-        >
-          <LocationCard
-            v-for="(target, index) in mapData.targetLocations"
-            :key="index"
-            :location="target"
-            :userId="userId"
-            @select-location="handleCardSelection"
-          />
-        </b-col>
-      </b-row>
-    </b-container>
+      <div
+        v-if="isLoading"
+        class="position-absolute top-50 start-50 translate-middle"
+      >
+        <b-spinner label="Loading..."></b-spinner>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { Api } from '@/Api'
+
+class MinHeap {
+  constructor(estimatedCost) {
+    this.heap = []
+    this.length = 0
+    this.estimatedCost = estimatedCost // reference
+  }
+
+  // return and remove min value
+  pop() {
+    if (this.heap.length === 0) return null
+    if (this.heap.length === 1) return this.heap.pop()
+
+    const min = this.heap[0]
+    this.heap[0] = this.heap.pop()
+    this.length -= 1
+
+    this.bubbleDown()
+
+    return min
+  }
+
+  // insert a new node
+  insert(nodeId) {
+    this.heap.push(nodeId)
+    this.bubbleUp()
+    this.length += 1
+  }
+
+  // checks if a node is already in the heap
+  includes(nodeId) {
+    return this.heap.includes(nodeId)
+  }
+
+  // swaps a parent node with its child node
+  swap(parentIndex, index) {
+    [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]]
+  }
+
+  // moves node down in heap
+  bubbleDown() {
+    let index = 0
+    let leftIndex = 1
+    let rightIndex = 2
+
+    while (leftIndex <= this.heap.length - 1) {
+      leftIndex = index * 2 + 1
+      rightIndex = index * 2 + 2
+      let minIndex = index
+
+      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[leftIndex]]) {
+        minIndex = leftIndex
+      }
+      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[rightIndex]]) {
+        minIndex = rightIndex
+      }
+
+      if (minIndex !== index) {
+        this.swap(index, minIndex)
+        index = minIndex
+      } else {
+        break
+      }
+    }
+  }
+
+  // moves node up in heap
+  bubbleUp() {
+    let index = this.heap.length - 1
+
+    while (index > 0) {
+      let parentIndex = Math.floor((index - 1) / 2)
+
+      if (this.estimatedCost[this.heap[parentIndex]] > this.estimatedCost[this.heap[index]]) {
+        this.swap(parentIndex, index)
+        index = parentIndex
+      } else {
+        break
+      }
+    }
+  }
+}
 
 export default {
   props: {
@@ -65,6 +115,7 @@ export default {
       default: 'location'
     }
   },
+  emits: ['loading-change', 'targets-loaded'],
   data() {
     return {
       userId: null,
@@ -102,6 +153,7 @@ export default {
   methods: {
     async getLocation() {
       this.isLoading = true
+      this.$emit('loading-change', true)
       if (this.coordinates === null) {
         await this.getUserCoordinates()
       }
@@ -113,7 +165,7 @@ export default {
           const response = await Api.get('/maps/coordinates', {
             params: {
               userLat: this.coordinates.lat,
-              userLng: this.coordinates.lng,
+              userLon: this.coordinates.lng,
               type: this.location
             }
           })
@@ -176,6 +228,8 @@ export default {
       }
 
       this.isLoading = false
+      this.$emit('loading-change', false)
+      this.$emit('targets-loaded', this.mapData.targetLocations || [])
     },
 
     // find user latitude and longitude via either GPS (if a gps receiver
@@ -235,13 +289,14 @@ export default {
 
     // implemented shortest path algorithm with A*
     findShortestPath(startId) {
+      const estimatedTotalCost = {}
+      const nodesToVisit = new MinHeap(estimatedTotalCost)
       const targetId = this.targetLocation.nodeId
       const { nodes,adjacencyList } = this.mapData
 
-      const nodesToVisit = [startId]
+      nodesToVisit.insert(startId)
       const cameFrom = {}
       const costToHere = {}
-      const estimatedTotalCost = {}
 
       Object.keys(nodes).forEach(nodeId => {
         costToHere[nodeId] = Infinity
@@ -252,11 +307,8 @@ export default {
       estimatedTotalCost[startId] = this.getDistance(nodes[startId], nodes[targetId])
 
       while (nodesToVisit.length > 0) {
-        // If enough time left before deadline, implement min heap
-        // Sort by cost
-        nodesToVisit.sort((a,b) => estimatedTotalCost[a] - estimatedTotalCost[b])
         // dequeue
-        const currentNode = nodesToVisit.shift()
+        const currentNode = nodesToVisit.pop()
 
         if (this.targetLocation.nodeId === currentNode) {
           this.shortestPath = this.reconstructPath(cameFrom,currentNode)
@@ -279,7 +331,7 @@ export default {
             estimatedTotalCost[neighbor] = costToNext + estimatedNextCost
 
             if (!nodesToVisit.includes(neighbor)) {
-              nodesToVisit.push(neighbor)
+              nodesToVisit.insert(neighbor)
             }
           }
         }

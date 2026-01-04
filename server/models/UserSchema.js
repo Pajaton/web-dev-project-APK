@@ -10,6 +10,7 @@ var userSchema = new Schema({
     "email": {type: String, unique: true, required: true},
     "profilePicture": {type: String},
     "userName": {type: String},
+    "password": {type: String},
     "settings": {
         "darkMode": {type: Boolean, default: false},
         "notifications": {type: Boolean, default: true},

@@ -19,8 +19,8 @@ var systembolagSchema = new Schema({
     "city": {type: String},
 
     // Derived attributes
-    "longitude": {type: Number},
-    "latitude": {type: Number},
+    "lon": {type: Number},
+    "lat": {type: Number},
 
     // Relationships
     "hasInStock": [{
