@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="user">
-      <b-img :src="user.profilePicture" fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
+      <b-img :src= imageUrl(user.profilePicture) fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
         <b-card style="max-width: 400px" horizontal header="User Info">
           <b-list-group >
             <b-list-group-item flush variant="primary">Username: {{user.userName}}</b-list-group-item>
@@ -132,10 +132,14 @@ export default {
         })
     },
     profilePictureError(event) {
-      event.target.src = '/profilePictures/default_user.jpg'
+      event.target.src = this.imageUrl('/profilePictures/default_user.jpg')
     },
     drinkPictureError(event) {
       event.target.src = '/drinkPictures/default_drink.jpg'
+    },
+    imageUrl(image) {
+      const imagePath = `../assets${image}`
+      return new URL(imagePath, import.meta.url).href
     }
   },
   mounted() {
