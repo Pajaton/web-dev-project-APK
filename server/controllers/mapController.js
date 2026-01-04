@@ -2,8 +2,8 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 
-// const baseMapURL = "https://overpass-api.de/api/interpreter";
-const baseMapURL = "https://overpass.private.coffee/api/interpreter";
+const baseMapURL = "https://overpass-api.de/api/interpreter";
+// const baseMapURL = "https://overpass.private.coffee/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 

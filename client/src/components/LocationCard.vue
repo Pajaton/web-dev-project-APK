@@ -3,7 +3,6 @@
     <b-card
       :title="location.name"
       tag="location"
-      style="max-width: 20rem"
       class="mb-2">
       <b-card-body>
         <b-card-sub-title v-if=location.branch>Branch: {{ location.branch }}<br><br></b-card-sub-title>

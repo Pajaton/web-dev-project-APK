@@ -1,8 +1,7 @@
 <template>
   <div>
     <div
-      class="map-wrapper border mt-3"
-      style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      class="map-wrapper border position-relative"
       :style="{ cursor: isDraggingMap ? 'grabbing' : 'grab' }"
       @mousedown="handleMouseDown"
       @mouseup="handleMouseUp"
@@ -14,11 +13,15 @@
       @touchend="handleTouchEnd"
       @touchmove.prevent="handleTouchMove"
     >
-      <canvas ref="mapCanvas"></canvas>
+      <div id="map-canvas"
+        style="max-width: 800px; max-height: 600px; overflow: hidden;"
+      >
+        <canvas ref="mapCanvas"></canvas>
+      </div>
 
       <div
         v-if="isLoading"
-        class="position-absolute top-50 start-50 translate-middle"
+        class="spinner-overlay position-absolute top-50 start-50 translate-middle"
       >
         <b-spinner label="Loading..."></b-spinner>
       </div>

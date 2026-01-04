@@ -2,10 +2,9 @@
   <div>
     <b-container fluid>
       <h1 class="display-5 fw-bold">Get directions to a Systembolag</h1>
-      <p class="fs-4">Click the button below to find the Systembolag closest to you</p>
 
       <b-row>
-        <b-col>
+        <b-col cols="12" lg="8">
           <MapDirections
             ref="mapDirections"
             location="Systembolag"
@@ -23,17 +22,21 @@
             {{ isLoading ? 'Locating...' : 'Get directions to a Systembolag' }}
           </b-button>
         </b-col>
-        <b-col
+        <b-col cols="6" lg="4" sm="12"
           style="height: 600px; overflow-y: auto;"
           class="mt-3 border-start"
         >
-          <LocationCard
-            v-for="(target, index) in targetLocations"
-            :key="index"
-            :location="target"
-            :userId="userId"
-            @select-location="handleCardSelection"
-          />
+          <b-row>
+            <b-col cols="12" sm="6" lg="12"
+              v-for="(target, index) in targetLocations"
+              :key="index">
+              <LocationCard
+                :location="target"
+                :userId="userId"
+                @select-location="handleCardSelection"
+              />
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
     </b-container>
