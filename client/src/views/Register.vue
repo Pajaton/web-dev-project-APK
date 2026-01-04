@@ -12,11 +12,11 @@
         placeholder="Email address"
         :state="emailState"
         aria-describedby="email-feedback"
-      />
-      <b-form-invalid-feedback id="email-feedback">
-        Enter a valid email
-      </b-form-invalid-feedback>
-    </BFormFloatingLabel>
+        />
+        <b-form-invalid-feedback id="email-feedback">
+          Enter a valid email
+        </b-form-invalid-feedback>
+      </BFormFloatingLabel>
       <BFormFloatingLabel label="User Name" label-for="floatingUserName">
       <BFormInput
         id="floatingUserName"
@@ -167,7 +167,7 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        this.showAlert('Registration failed', 'danger')
+        this.showAlert('Registration failed, server is unavailable', 'danger')
       }
     },
     resetFields() {
