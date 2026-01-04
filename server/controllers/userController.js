@@ -104,7 +104,7 @@ router.get("/users/:userId/favorites/systembolag", async (req, res, next) => {
             .populate("favoriteSystembolag"); // populate the "favoriteSystembolag" field
 
         if (!user.favoriteSystembolag) {
-            return res.status(404).json({ "favoriteSystembolag": undefined });
+            return res.json({ "favoriteSystembolag": undefined });
         }
         return res.json({ "favoriteSystembolag": user.favoriteSystembolag });
     } catch(err) { next(err) };
