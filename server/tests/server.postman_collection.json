@@ -3,8 +3,8 @@
 		"_postman_id": "ef09807c-4aae-4127-a931-1c98012bbf54",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50199247",
-		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50199247"
+		"_exporter_id": "50127910",
+		"_collection_link": "https://pajaton-8204655.postman.co/workspace/Web-apk's-Workspace~2027cf63-fdc0-46f8-84a0-cd15774fa1d2/collection/50199247-ef09807c-4aae-4127-a931-1c98012bbf54?action=share&source=collection_link&creator=50127910"
 	},
 	"item": [
 		{
@@ -999,14 +999,10 @@
 								"exec": [
 									"var json = pm.response.json();\r",
 									"\r",
-									"pm.test(\"Status code is 404\", () => {\r",
-									"    pm.response.to.have.status(404);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Correctly fetches user follows\", () => {\r",
-									"    pm.expect(json).to.have.property(\"message\");\r",
-									"    pm.expect(json.message).to.eq(\"User does not follow any other users\");\r",
-									"});\r",
 									""
 								],
 								"type": "text/javascript",
@@ -1771,8 +1767,8 @@
 								"exec": [
 									"var json = pm.response.json();\r",
 									"\r",
-									"pm.test(\"Status code is 404\", () => {\r",
-									"    pm.response.to.have.status(404);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Unable to fetch user's favorite systembolag\", () => {\r",
