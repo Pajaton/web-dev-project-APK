@@ -3,32 +3,45 @@ var router = express.Router();
 var axios = require("axios");
 
 const baseMapURL = "https://overpass-api.de/api/interpreter";
-// const baseMapURL = "https://overpass.private.coffee/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 
-// Retry helper for Overpass API
+/**
+ * Retries a request function with exponential backoff for transient errors.
+ * @param {Function} requestFunction - The async function to retry.
+ * @param {number} [maxRetries=3] - Maximum number of retry attempts.
+ * @param {number} [delayMs=1000] - Initial delay between retries in milliseconds.
+ * @returns {Promise<any>} The result of the successful request.
+ * @throws {Error} Throws the last error if all retries fail.
+ */
 async function retryMapDataFetch(requestFunction, maxRetries = 3, delayMs = 1000) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await requestFunction();
     } catch (error) {
       const status = error.response?.status;
-      const isRetryable = status === 504 || status === 502 || status === 503 || error.code === 'ECONNRESET';
+      const isRetryable = [502, 503, 504].includes(status) || error.code === 'ECONNRESET';
       
       if (!isRetryable || attempt === maxRetries) {
         throw error;
       }
       
-      console.warn(`Overpass API attempt ${attempt}/${maxRetries} failed (${status || error.code}), retrying in ${delayMs}ms...`);
       await new Promise(resolve => setTimeout(resolve, delayMs));
       delayMs *= 2; // exponential backoff
     }
   }
 }
 
-// Haversine formula to calculate distance between two lat/lon points
-// possibly a bit overkill
+/**
+ * Calculates the distance between two geographic coordinates using the Haversine formula.
+ * @param {Object} nodeA - First node with lat/lon properties.
+ * @param {number} nodeA.lat - Latitude of the first node.
+ * @param {number} nodeA.lon - Longitude of the first node.
+ * @param {Object} nodeB - Second node with lat/lon properties.
+ * @param {number} nodeB.lat - Latitude of the second node.
+ * @param {number} nodeB.lon - Longitude of the second node.
+ * @returns {number} Distance between the two points in meters.
+ */
 function getDistance(nodeA, nodeB) {
   const R = 6371e3; // radius of earth in meters
   const latA = toRadians(nodeA.lat);
@@ -43,10 +56,23 @@ function getDistance(nodeA, nodeB) {
   return R * c; // distance in meters
 }
 
+/**
+ * Converts degrees to radians.
+ * @param {number} degrees - Angle in degrees.
+ * @returns {number} Angle in radians.
+ */
 function toRadians(degrees) {
   return degrees * (Math.PI / 180);
 }
 
+/**
+ * Builds a graph representation from OpenStreetMap elements.
+ * Creates an adjacency list of walkable paths with distances as weights.
+ * @param {Array<Object>} elements - Array of OSM elements (nodes and ways).
+ * @returns {Object} Graph object containing nodes lookup and adjacency list.
+ * @returns {Object} return.nodes - Lookup object mapping node IDs to their coordinates.
+ * @returns {Object} return.adjacencyList - Adjacency list mapping node IDs to connected nodes with weights.
+ */
 function buildGraph(elements) {
   const nodeLookup = {};
   const adjacencyList = {};
@@ -95,6 +121,12 @@ function buildGraph(elements) {
   };
 }
 
+/**
+ * Formats a display name for a location based on its tags and type.
+ * @param {Object} location - Location object from OSM or external API.
+ * @param {string} locationType - Type of location (e.g., "Systembolag", "toilets").
+ * @returns {string} Formatted location name.
+ */
 function formatLocationName(location, locationType) {
   let locationName = locationType
   const tags = location.tags || {}
@@ -107,11 +139,17 @@ function formatLocationName(location, locationType) {
   return locationName
 }
 
-async function formatLocationData(locations, locationType) {
-  const targetLocationData = await Promise.all(locations.map(async location => {
-    const tags = location.tags || {};
+/**
+ * Transforms raw location data into a standardized format.
+ * @param {Array<Object>} locations - Array of raw location objects.
+ * @param {string} locationType - Type of location for naming purposes.
+ * @returns {Array<Object>} Array of formatted location objects with standardized properties.
+ */
+function formatLocationData(locations, locationType) {
+  return locations.map(location => {
+    const tags = location.tags || {}
     
-    const locationData = {
+    return {
       id: location.id,
       name: formatLocationName(location, locationType),
       street: tags['addr:street'] || location.street,
@@ -126,23 +164,40 @@ async function formatLocationData(locations, locationType) {
       unisex: location.unisex,
       upvotes: location.upvote,
       downvotes: location.downvote
-    };
-
-    await Systembolag.updateOne(
-      { systembolagID: location.id },
-      { $setOnInsert: locationData },
-      { upsert: true }
-    );
-
-    return locationData;
-  }));
-
-  return targetLocationData;
+    }
+  })
 }
 
-// fetch the map data (ways/edges) based on the user position and the locations
+/**
+ * Saves or updates location data in the database using bulk upsert.
+ * Only inserts new locations; existing ones are not modified.
+ * @param {Array<Object>} locations - Array of formatted location objects to save.
+ * @returns {Promise<void>}
+ */
+async function saveLocationsToDb(locations) {
+  const operations = locations.map(location => ({
+    updateOne: {
+      filter: { systembolagID: location.id },
+      update: { $setOnInsert: location },
+      upsert: true
+    }
+  }))
+  await Systembolag.bulkWrite(operations)
+}
+
+/**
+ * Fetches map data (walkable paths) for routing between user and target locations.
+ * Queries the Overpass API for highway data within the bounding box.
+ * @param {number} userLat - User's latitude.
+ * @param {number} userLon - User's longitude.
+ * @param {Array<Object>} locations - Array of target location objects.
+ * @param {string} locationType - Type of locations being queried.
+ * @returns {Promise<Object>} Object containing target locations and graph data.
+ * @throws {Error} Throws if Overpass API returns invalid data.
+ */
 async function getLocationMapData(userLat, userLon, locations, locationType) {
-  const targetLocationData = await formatLocationData(locations, locationType);
+  const targetLocationData = formatLocationData(locations, locationType);
+  await saveLocationsToDb(locations);
   const {south, north, west, east} = getBoundingBox(userLat, userLon, targetLocationData);
 
   if (isNaN(south) || isNaN(north) || isNaN(west) || isNaN(east)) {
@@ -175,14 +230,18 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
       'adjacencyList': graphData.adjacencyList,
     };
   } catch (error) {
-    console.error("Error fetching map data:", error);
-    console.error(error.response);
     throw error;
   }
 }
 
-// based on a user's position and initially fetched locations, we
-// get the bounding box to fetch only the map data we need
+/**
+ * Calculates a bounding box that encompasses the user and all target locations.
+ * Limits the maximum span to prevent excessively large queries.
+ * @param {number} userLat - User's latitude.
+ * @param {number} userLon - User's longitude.
+ * @param {Array<Object>} locationCoordinates - Array of location objects with lat/lon.
+ * @returns {Object} Bounding box with south, north, west, east coordinates.
+ */
 function getBoundingBox(userLat, userLon, locationCoordinates) {
   let south = userLat;
   let north = userLat;
@@ -210,8 +269,6 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   
   if (latSpan > maxSpan || lonSpan > maxSpan) {
     
-    console.warn(`Bounding box too large (${latSpan.toFixed(4)} x ${lonSpan.toFixed(4)}), clamping to ${maxSpan}`);
-    
     // recenter
     const centerLat = (north + south) / 2;
     const centerLon = (east + west) / 2;
@@ -231,7 +288,14 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   };
 }
 
-// Gets the coordinates and general info of nearby Systembolaget locations using Overpass API
+/**
+ * Finds nearby Systembolaget stores using the Overpass API.
+ * Searches within a 5km radius of the user's position.
+ * @param {number} userLat - User's latitude.
+ * @param {number} userLon - User's longitude.
+ * @returns {Promise<Array<Object>>} Array of Systembolaget location elements.
+ * @throws {Error} Throws if no locations are found nearby.
+ */
 async function findSystembolag(userLat, userLon) {
   const query = `[out:json][timeout:25];
     nwr
@@ -252,7 +316,13 @@ async function findSystembolag(userLat, userLon) {
   return elements;
 }
 
-// based on a user's lat and lon values, gets the nearest few toilets
+/**
+ * Finds nearby accessible restrooms using the Refuge Restrooms API.
+ * Returns up to 20 restrooms sorted by proximity.
+ * @param {number} userLat - User's latitude.
+ * @param {number} userLon - User's longitude.
+ * @returns {Promise<Array<Object>>} Array of restroom location objects.
+ */
 async function findToilets(userLat, userLon) {
   const query = `?page=1&per_page=20&offset=0&lat=${userLat}&lng=${userLon}`
 
@@ -266,15 +336,22 @@ async function findToilets(userLat, userLon) {
   return toiletLocations
 }
 
-// GET ROUTES DEFINITION
-
+/**
+ * @route GET /maps/coordinates
+ * @description Fetches map data and nearby locations based on user position and type.
+ * @query {string} userLat - User's latitude (required).
+ * @query {string} userLon - User's longitude (required).
+ * @query {string} type - Location type: "systembolag" or "toilets" (required).
+ * @returns {Object} 200 - Map data with target locations, nodes, and adjacency list.
+ * @returns {Object} 400 - Missing or invalid query parameters.
+ */
 router.get("/maps/coordinates", async (req, res, next) => {
   try {
     let locations;
     const { userLat, userLon, type} = req.query;
 
     if (!userLat || !userLon || !type) {
-      return status(400).json({ "message": "Missing required query parameters." });
+      return res.status(400).json({ "message": "Missing required query parameters." });
     }
 
     switch (type.toLowerCase()) {
@@ -288,7 +365,6 @@ router.get("/maps/coordinates", async (req, res, next) => {
 
       default:
         return res.status(400).json({ "message": "Invalid type parameter."});
-        break;
     }
 
     const mapData = await getLocationMapData(
