@@ -14,11 +14,25 @@ router.get("/drinks", async (req, res, next) => {
         const allowedFilters = ["type", "percentage", "price", "apk"];
         const filters = {};
 
-        allowedFilters.forEach(filter => {
-            if (filterQuery[filter]) {
-                filters[filter] = filterQuery[filter];
+        if (req.query.type) {
+            if (Array.isArray(req.query.type)) {
+                filters.type = { $in: req.query.type };
+            } else {
+                filters.type = req.query.type;
             }
-        });
+        }
+
+        ["percentage", "price", "apk"].forEach(filter => {
+            const min = req.query[`${filter}Min`];
+            const max = req.query[`${filter}Max`];
+
+            if (min || max) {
+                filters[filter] = {};
+                if (min) filters[filter].$gte = Number(min);
+                if (max) filters[filter].$lte = Number(max);
+            }
+    });
+
 
         if (!sortQuery) {
             sortQuery = "apk";
