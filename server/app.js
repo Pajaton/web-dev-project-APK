@@ -69,20 +69,6 @@ app.get('/api', function(req, res) {
     res.json({ 'message': 'Welcome to the APK Calc API' });
 });
 
-// Session check route for unregistered users, used to check if an
-// age prompt is needed
-app.get(`/api/${apiVersion}/guest-sessions`, function(req, res) {
-    let isNewSession = false;
-
-    if (req.session.cookie.maxAge == null ) {
-        isNewSession = true;
-    }
-
-    req.session.cookie.maxAge = cookieTtl;
-
-    return res.json({ 'newSession': isNewSession });
-});
-
 app.use(`/api/${apiVersion}`, drinkController);
 app.use(`/api/${apiVersion}`, usersController);
 app.use(`/api/${apiVersion}`, reviewController);
