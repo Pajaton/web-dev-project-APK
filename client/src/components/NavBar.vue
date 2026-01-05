@@ -39,7 +39,6 @@ export default {
   watch: {
     $route() {
       this.fetchCurrentUser()
-      console.log('Current user ID: ' + this.currentUserId)
     }
   },
   methods: {
