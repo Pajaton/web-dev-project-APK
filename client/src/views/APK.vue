@@ -54,7 +54,7 @@
                 <b-form-checkbox v-model="selectedFilter" value="apk">
                   <h4>Minimum APK</h4>
                 </b-form-checkbox>
-                <b-form-input v-if="selectedFilter.includes('apk')" type="number" v-model="apkText"/>
+                <b-form-input v-if="selectedFilter.includes('apk')" type="number" v-model="apkMinText"/>
               </b-form-group>
               <b-button type="submit">
                 Apply filters
