@@ -310,7 +310,7 @@ async function findSystembolag(userLat, userLon) {
   const elements = response.data?.elements;
 
   if (!elements || !Array.isArray(elements) || elements.length === 0) {
-    throw new Error("No Systembolaget locations found nearby");
+    return [];
   }
 
   return elements;
@@ -344,6 +344,7 @@ async function findToilets(userLat, userLon) {
  * @query {string} type - Location type: "systembolag" or "toilets" (required).
  * @returns {Object} 200 - Map data with target locations, nodes, and adjacency list.
  * @returns {Object} 400 - Missing or invalid query parameters.
+ * @returns {Object} 404 - No locations found nearby.
  */
 router.get("/maps/coordinates", async (req, res, next) => {
   try {
@@ -357,6 +358,11 @@ router.get("/maps/coordinates", async (req, res, next) => {
     switch (type.toLowerCase()) {
       case "systembolag":
         locations = await findSystembolag(userLat, userLon);
+
+        if (locations.length === 0) {
+          return res.status(404).json({ "message": "No Systembolaget locations found nearby."});
+        }
+
         break;
 
       case "toilets":

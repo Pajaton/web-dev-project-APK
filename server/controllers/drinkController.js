@@ -3,10 +3,20 @@ var router = express.Router();
 
 var Drink = require("../models/DrinkSchema");
 
-// GET ROUTES DEFINITION
-// Sort by adding ?sort=price to sort by price for example http://localhost:3000/api/v1/drinks?sort=colour
-// Filter by adding ?type=Beer to filter by type for example http://localhost:3000/api/v1/drinks?type=Beer
-// Combine sorting and filtering, e.g., ?sort=price&type=Beer
+/**
+ * @route GET /drinks
+ * @description Retrieves a list of drinks with optional sorting and filtering.
+ * @query {string} [sort=apk] - Field to sort by (productNumber, name, type, container, volume, percentage, colour, price, apk).
+ * @query {string|string[]} [type] - Filter by drink type(s).
+ * @query {number} [percentageMin] - Minimum alcohol percentage.
+ * @query {number} [percentageMax] - Maximum alcohol percentage.
+ * @query {number} [priceMin] - Minimum price.
+ * @query {number} [priceMax] - Maximum price.
+ * @query {number} [apkMin] - Minimum APK value.
+ * @query {number} [apkMax] - Maximum APK value.
+ * @returns {Object} 200 - Object containing array of drinks.
+ * @returns {Object} 400 - Invalid sort parameter.
+ */
 router.get("/drinks", async (req, res, next) => {
     try {
         let {sort: sortQuery, ...filterQuery} = req.query;
@@ -48,6 +58,13 @@ router.get("/drinks", async (req, res, next) => {
     } catch(err) {next(err)};
 });
 
+/**
+ * @route GET /drinks/:drinkId
+ * @description Retrieves a specific drink by its ID.
+ * @param {string} drinkId - The ID of the drink to retrieve.
+ * @returns {Object} 200 - The requested drink object.
+ * @returns {Object} 404 - Drink not found.
+ */
 router.get("/drinks/:drinkId", async (req, res, next) => {
     try {
         const requestedDrink = await Drink
@@ -59,7 +76,13 @@ router.get("/drinks/:drinkId", async (req, res, next) => {
     } catch(err) {next(err)};
 });
 
-// Get all systembolag where a specific drink is available
+/**
+ * @route GET /drinks/:drinkId/systembolag
+ * @description Retrieves all Systembolag stores where a specific drink is available.
+ * @param {string} drinkId - The ID of the drink.
+ * @returns {Object} 200 - Object containing array of Systembolag locations.
+ * @returns {Object} 404 - Drink not found or no Systembolag with drink in stock.
+ */
 router.get("/drinks/:drinkId/systembolag", async (req, res, next) => {
     try {
         const drinkInStockAt = await Drink
@@ -74,6 +97,14 @@ router.get("/drinks/:drinkId/systembolag", async (req, res, next) => {
     } catch(err) {next(err)};
 });
 
+/**
+ * @route GET /drinks/:drinkId/systembolag/:systembolagId
+ * @description Checks if a specific drink is available at a specific Systembolag.
+ * @param {string} drinkId - The ID of the drink.
+ * @param {string} systembolagId - The ID of the Systembolag.
+ * @returns {Object} 200 - The Systembolag where the drink is available.
+ * @returns {Object} 404 - Drink not found or drink not in stock at this Systembolag.
+ */
 router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
     try {
         const drinkInStockAt = await Drink
@@ -95,8 +126,21 @@ router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next)
     } catch(err) { next(err) };
 });
 
-// POST ROUTES DEFINITION
-
+/**
+ * @route POST /drinks
+ * @description Creates a new drink.
+ * @body {number} productNumber - Product number.
+ * @body {string} name - Name of the drink.
+ * @body {string} type - Type of drink (e.g., Beer, Wine).
+ * @body {string} container - Container type (e.g., Bottle, Can).
+ * @body {number} volume - Volume in ml.
+ * @body {number} percentage - Alcohol percentage.
+ * @body {string} colour - Colour of the drink.
+ * @body {number} price - Price in SEK.
+ * @body {string} [image] - Image URL.
+ * @body {number} apk - Alcohol per krona value.
+ * @returns {Object} 201 - The created drink object.
+ */
 router.post("/drinks", async (req, res, next) => {
     try{
         const newDrink = new Drink({
@@ -116,12 +160,23 @@ router.post("/drinks", async (req, res, next) => {
     } catch(err) {next(err) };
 });
 
-
-
-// PATCH ROUTES DEFINITION
-
-
-// Update an existing drink
+/**
+ * @route PATCH /drinks/:drinkId
+ * @description Partially updates an existing drink.
+ * @param {string} drinkId - The ID of the drink to update.
+ * @body {number} [productNumber] - Product number.
+ * @body {string} [name] - Name of the drink.
+ * @body {string} [type] - Type of drink.
+ * @body {string} [container] - Container type.
+ * @body {number} [volume] - Volume in ml.
+ * @body {number} [percentage] - Alcohol percentage.
+ * @body {string} [colour] - Colour of the drink.
+ * @body {number} [price] - Price in SEK.
+ * @body {string} [image] - Image URL.
+ * @body {number} [apk] - Alcohol per krona value.
+ * @returns {Object} 200 - The updated drink object.
+ * @returns {Object} 404 - Drink not found.
+ */
 router.patch("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
     try {
@@ -150,6 +205,14 @@ router.patch("/drinks/:drinkId", async (req, res, next) => {
     } catch (err) { next(err) };
 });
 
+/**
+ * @route PATCH /drinks/:drinkId/systembolag/:systembolagId
+ * @description Adds a Systembolag to the list of stores where a drink is available.
+ * @param {string} drinkId - The ID of the drink.
+ * @param {string} systembolagId - The ID of the Systembolag to add.
+ * @returns {Object} 200 - The updated drink object.
+ * @returns {Object} 404 - Drink not found.
+ */
 router.patch("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next) => {
     try {
         const updatedDrink = await Drink
@@ -170,12 +233,23 @@ router.patch("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, nex
     } catch(err) { next(err) };
 });
 
-
-// PUT ROUTES DEFINITION
-
-
-
-// Replace an existing drink
+/**
+ * @route PUT /drinks/:drinkId
+ * @description Replaces an existing drink entirely.
+ * @param {string} drinkId - The ID of the drink to replace.
+ * @body {number} productNumber - Product number.
+ * @body {string} name - Name of the drink.
+ * @body {string} type - Type of drink.
+ * @body {string} container - Container type.
+ * @body {number} volume - Volume in ml.
+ * @body {number} percentage - Alcohol percentage.
+ * @body {string} colour - Colour of the drink.
+ * @body {number} price - Price in SEK.
+ * @body {string} [image] - Image URL.
+ * @body {number} apk - Alcohol per krona value.
+ * @returns {Object} 200 - The replaced drink object.
+ * @returns {Object} 404 - Drink not found.
+ */
 router.put("/drinks/:drinkId", async (req, res, next) => {
     // Find the drink to update
     try {
@@ -200,12 +274,13 @@ router.put("/drinks/:drinkId", async (req, res, next) => {
         } catch(err) { next(err) };
 });
 
-
-
-// DELETE ROUTES DEFINITION
-
-
-
+/**
+ * @route DELETE /drinks/:drinkId
+ * @description Deletes a drink by its ID.
+ * @param {string} drinkId - The ID of the drink to delete.
+ * @returns {Object} 200 - The deleted drink object.
+ * @returns {Object} 404 - Drink not found.
+ */
 router.delete("/drinks/:drinkId", async (req, res, next) => {
     try {
         const deletedDrink = await Drink
