@@ -4,7 +4,7 @@
       <b-img :src= imageUrl(user.profilePicture) fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
         <b-card style="max-width: 400px" horizontal header="User Info">
           <b-list-group >
-            <b-list-group-item flush variant="primary">Username: {{user.userName}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Username: {{user.userName}}</span><b-button v-if="currentUserId && id !== currentUserId" size="sm" class="ml-auto" @click="toggleFollowUser">{{ currentUserFollows ? 'Unfollow' : 'Follow' }}</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">Email: {{user.email}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Adress: {{user.street}} {{ user.streetNumber}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Postal code: {{user.postalCode}}</b-list-group-item>
@@ -72,6 +72,7 @@ export default {
       userFollowingList: [],
       reviewsByUser: [],
       currentUserId: null,
+      currentUserFollows: false,
       favoriteSystembolag: null,
       show: false,
       addEntryPopup: false,
@@ -141,7 +142,7 @@ export default {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
+          this.currentUserFollows = response.data.user.follows.includes(this.user._id)
         })
         .catch(error => {
           this.message = error
@@ -206,6 +207,19 @@ export default {
         .catch(err => {
           console.error('Failed to add alcohol entry', err)
         })
+    },
+
+    async toggleFollowUser() {
+      try {
+        if (!this.currentUserFollows) {
+          await drinkApi.patch(`/users/${this.currentUserId}/follows/${this.user._id}`)
+        } else {
+          await drinkApi.delete(`/users/${this.currentUserId}/follows/${this.user._id}`)
+        }
+        this.currentUserFollows = !this.currentUserFollows
+      } catch (error) {
+        console.error('Error toggling follow status:', error)
+      }
     }
   },
   mounted() {
