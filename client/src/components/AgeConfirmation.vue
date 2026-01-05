@@ -5,6 +5,7 @@
       title="Age Confirmation"
       @ok="confirmAge"
       ok-title="Yes, I am over 18"
+      @cancel="denyAccess"
       cancel-title="No"
       no-close-on-backdrop
       no-close-on-esc
@@ -26,13 +27,23 @@
     methods: {
       async checkIfSessionExists() {
         try {
-          const response = await Api.get('/guest-sessions')
+          // first check for logged in user
+          const sessionResponse = await Api.get('/sessions/currentlyLoggedin/')
 
-          if (!response.data.ageConfirmed) {
+          if (!sessionResponse.data.user) {
             this.$refs['age-modal'].show()
           }
-        } catch (error) {
-          console.error('Error checking session:', error)
+        } catch {
+          try {
+            // if no logged in user, check for guest session
+            const guestResponse = await Api.get('/guest-sessions')
+
+            if (!guestResponse.data.ageConfirmed) {
+              this.$refs['age-modal'].show()
+            }
+          } catch (error) {
+            console.error('Error checking session:', error)
+          }
         }
       },
 
@@ -44,6 +55,10 @@
         } catch (error) {
           console.error('Error confirming age:', error)
         }
+      },
+
+      denyAccess() {
+        window.location.href = 'https://www.google.com/'
       }
     },
     mounted() {
