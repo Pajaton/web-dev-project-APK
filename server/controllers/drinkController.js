@@ -41,8 +41,7 @@ router.get("/drinks", async (req, res, next) => {
                 if (min) filters[filter].$gte = Number(min);
                 if (max) filters[filter].$lte = Number(max);
             }
-    });
-
+        });
 
         if (!sortQuery) {
             sortQuery = "apk";
@@ -69,9 +68,11 @@ router.get("/drinks/:drinkId", async (req, res, next) => {
     try {
         const requestedDrink = await Drink
             .findById(req.params.drinkId);
+
         if (!requestedDrink) {
             return res.status(404).json({"message": "Drink not found"});
         }
+
         return res.json(requestedDrink)
     } catch(err) {next(err)};
 });
@@ -88,11 +89,13 @@ router.get("/drinks/:drinkId/systembolag", async (req, res, next) => {
         const drinkInStockAt = await Drink
             .findById(req.params.drinkId)
             .populate("availableAt");
+
         if (!drinkInStockAt) {
             return res.status(404).json({"message": "Drink not found"});
         } else if (drinkInStockAt.availableAt.length === 0) {
             return res.status(404).json({"message": "No Systembolag with drink in stock"});
         }
+
         return res.json({"availableAt": drinkInStockAt.availableAt})
     } catch(err) {next(err)};
 });
@@ -122,6 +125,7 @@ router.get("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, next)
         if (!isAvailableAt) {
             return res.status(404).json({"message": "The drink is not in stock at this Systembolag"});
         }
+
         return res.json({ "availableAt": isAvailableAt });
     } catch(err) { next(err) };
 });
@@ -156,6 +160,7 @@ router.post("/drinks", async (req, res, next) => {
             "apk": req.body.apk
         });
         await newDrink.save();
+
         return res.status(201).json(newDrink);
     } catch(err) {next(err) };
 });
@@ -182,6 +187,7 @@ router.patch("/drinks/:drinkId", async (req, res, next) => {
     try {
         const drinkToUpdate = await Drink
             .findById(req.params.drinkId);
+
         if (!drinkToUpdate) {
             return res.status(404).json({"message": "Drink was not found"});
         }
@@ -217,6 +223,7 @@ router.patch("/drinks/:drinkId/systembolag/:systembolagId", async (req, res, nex
     try {
         const updatedDrink = await Drink
             .findById(req.params.drinkId);
+
         if (!updatedDrink) {
             return res.status(404).json({"message": "Drink was not found"});
         }    
@@ -268,10 +275,13 @@ router.put("/drinks/:drinkId", async (req, res, next) => {
                   "apk": req.body.apk },
                 { new: true }  // return the updated document
             );
-            if (!drinkToUpdate) {
-                return res.status(404).json({"message": "Drink was not found"});
-            } return res.json(drinkToUpdate);
-        } catch(err) { next(err) };
+
+        if (!drinkToUpdate) {
+            return res.status(404).json({"message": "Drink was not found"});
+        }
+
+        return res.json(drinkToUpdate);
+    } catch(err) { next(err) };
 });
 
 /**
@@ -285,9 +295,12 @@ router.delete("/drinks/:drinkId", async (req, res, next) => {
     try {
         const deletedDrink = await Drink
             .findByIdAndDelete(req.params.drinkId);
+
         if (!deletedDrink) {
             return res.status(404).json({"message": "Drink was not found"})
-        } return res.json(deletedDrink);
+        }
+        
+        return res.json(deletedDrink);
     } catch(err) { next(err) };
 });
 

@@ -164,7 +164,7 @@ router.get("/users/:userId/drinks", async (req, res, next) => {
  * @returns {Object} 200 - Object containing userId, alcoholConsumed array, and timestamp.
  * @returns {Object} 404 - User not found.
  */
-router.get("/users/:userId/alcoholConsumed", async (req, res) => {
+router.get("/users/:userId/alcoholConsumed", async (req, res, next) => {
     try {
         const userId = req.params.userId;
         const user = await User.findById(userId);
@@ -176,7 +176,7 @@ router.get("/users/:userId/alcoholConsumed", async (req, res) => {
         res.json({
             userId: user._id,
             alcoholConsumed: user.alcoholConsumed,
-            timestamp: user.timstamp
+            timestamp: user.timestamp
         });
     } catch(err) { next(err) };
 });
@@ -256,7 +256,6 @@ router.post("/users", async (req, res, next) => {
  * @returns {Object} 401 - Authentication failed or invalid password.
  */
 router.post("/sessions", async (req, res, next) => {
-    // TEMPORARY AUTHENTICATION LOGIC FOR DEMO PURPOSES ONLY
     try {
         const user = await User.findOne({ email: req.body.email });
 
@@ -266,10 +265,8 @@ router.post("/sessions", async (req, res, next) => {
             });
         }
         
-        console.log(user.password)
-
         const passOk = await bcrypt.compare(req.body.password, user.password);
-        console.log(passOk);
+
         if (!passOk) {
           return res.status(401).json({
             "message": "Invalid password"
@@ -458,7 +455,6 @@ router.put("/users/:userId/favorites/systembolag/:systembolagId", async (req, re
                 { $set: { favoriteSystembolag: systembolagToFavorite._id } }, // set the favoriteSystembolag field
                 { new: true });
         if (!user) {
-          console.log(":)")
             return res.status(404).json({"message": "User was not found"});
         }
 
