@@ -327,6 +327,10 @@ async function findToilets(userLat, userLon) {
   const query = `?page=1&per_page=20&offset=0&lat=${userLat}&lng=${userLon}`
 
   const response = await axios.get(baseToiletURL + query)
+
+  if (!response.data || response.data.length === 0) {
+    return [];
+  }
   
   // ensure we only include toilets which have lat and lon values
   const toiletLocations = response.data.filter(location => {
@@ -367,6 +371,11 @@ router.get("/maps/coordinates", async (req, res, next) => {
 
       case "toilets":
         locations = await findToilets(userLat, userLon);
+
+        if (locations.length === 0) {
+          return res.status(404).json({ "message": "No public toilets found nearby."});
+        }
+
         break;
 
       default:
