@@ -352,16 +352,19 @@ export default {
     },
     sendReviewRating() {
       drinkApi.post('/reviews', {
-        // Change the mock data for the user who is currently logged in.
         userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText
       })
-      console.log('Review added: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
-      this.reviewText = ''
-      this.rating = null
-      this.showReviewPopup = false
+        .then(response => {
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     },
     updateReviewRating() {
       drinkApi.put('/reviews/' + this.oldReview._id, {
@@ -370,10 +373,14 @@ export default {
         rating: this.rating,
         comment: this.reviewText
       })
-      console.log('Review updated: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
-      this.reviewText = ''
-      this.rating = null
-      this.showReviewPopup = false
+        .then(response => {
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     },
     deleteReview() {
       if (!this.oldReview) {
