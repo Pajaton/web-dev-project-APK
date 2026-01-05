@@ -169,8 +169,14 @@ export default {
                     rating: review.rating
                   })
                 })
+                .catch(error => {
+                  this.message = error
+                })
             }
           })
+        })
+        .catch(error => {
+          this.message = error
         })
     },
     profilePictureError(event) {
@@ -207,8 +213,8 @@ export default {
 
           this.addEntryPopup = false
         })
-        .catch(err => {
-          console.error('Failed to add alcohol entry', err)
+        .catch(error => {
+          this.message = error
         })
     },
 
