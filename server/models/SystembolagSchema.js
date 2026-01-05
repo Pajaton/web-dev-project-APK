@@ -1,10 +1,19 @@
 var mongoose = require('mongoose');
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
 
-//shortcut for Mongoose schema constructor
 var Schema = mongoose.Schema;
 
-//Define the structure of the schema
+/**
+ * @module Systembolag
+ * @description Represents a Systembolaget store location.
+ * 
+ * @property {number} systembolagID - Unique store identifier from OSM/Overpass.
+ * @property {number} lon - Longitude coordinate.
+ * @property {number} lat - Latitude coordinate.
+ * 
+ * @relationship Drink (N) - Drinks available at this store.
+ * @relationship User (N) - Users who have favorited this store.
+ */
 var systembolagSchema = new Schema({
     // Primary key
     "systembolagID": {type: Number, unique: true},
