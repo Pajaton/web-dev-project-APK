@@ -28,55 +28,54 @@
 </template>
 
 <script>
-  import { Api } from '@/Api'
-  export default {
-    props: {
-      location: {
-        type: Object,
-        default: () => ({})
-      },
-      userId: {
-        type: String,
-        default: null
+import { Api } from '@/Api'
+export default {
+  props: {
+    location: {
+      type: Object,
+      default: () => ({})
+    },
+    userId: {
+      type: String,
+      default: null
+    }
+  },
+  data() {
+    return {
+      formattedOpenHours: '',
+      locationAddress: ''
+    }
+  },
+  mounted() {
+    this.formatOpenHours()
+    this.formatAddress()
+  },
+  methods: {
+    favoriteSystembolag() {
+      Api.put(`/users/${this.userId}/favorites/systembolag/${this.location.id}`)
+        .catch(error => {
+          this.message = error
+        })
+    },
+    setTargetLocation() {
+      this.$emit('select-location', this.location)
+    },
+    formatOpenHours() {
+      if (this.location.openHours) {
+        // since both commas and semi-colons appear as separators, split by regex pattern
+        const weekdays = this.location.openHours.split(/[,;]+/)
+        weekdays.forEach(entry => {
+          this.formattedOpenHours += entry.trim() + '\n'
+        })
       }
     },
-    data() {
-      return {
-        formattedOpenHours: "",
-        locationAddress: ""
-      }
-    },
-    mounted() {
-      this.formatOpenHours(),
-      this.formatAddress()
-    },
-    methods: {
-      favoriteSystembolag() {
-        Api.put(`/users/${this.userId}/favorites/systembolag/${this.location.id}`)
-      },
-
-      setTargetLocation() {
-        this.$emit('select-location', this.location)
-      },
-
-      formatOpenHours() {
-        if (this.location.openHours) {
-          // since both commas and semi-colons appear as separators, split by regex pattern
-          const weekdays = this.location.openHours.split(/[,;]+/)
-
-          weekdays.forEach(entry => {
-            this.formattedOpenHours += entry.trim() + '\n'
-          })
-        }
-      },
-
-      formatAddress() {
-        if (this.location.street) {
-          this.locationAddress += `Address:\n${this.location.street} ${this.location.streetNumber}\n${this.location.city}, ${this.location.postalCode}`
-        }
+    formatAddress() {
+      if (this.location.street) {
+        this.locationAddress += `Address:\n${this.location.street} ${this.location.streetNumber}\n${this.location.city}, ${this.location.postalCode}`
       }
     }
   }
+}
 </script>
 
 <style>
