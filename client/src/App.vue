@@ -1,5 +1,10 @@
+<script setup lang="ts">
+
+</script>
+
 <template>
   <div id="app">
+    <AgeConfirmation/>
     <NavBar/>
     <ToiletMap/>
     <!-- Render the content of the current page view -->
