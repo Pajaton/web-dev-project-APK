@@ -152,6 +152,14 @@ router.get('/sessions/currentlyLoggedin', async (req, res, next) => {
     }
 });
 
+// Session check route for users not logged in.
+// Used to check if an age prompt is needed
+router.get(`/guest-sessions`, function(req, res) {
+    const ageConfirmed = req.session.ageConfirmed;
+
+    return res.json({ 'ageConfirmed': ageConfirmed });
+});
+
 
 // POST ROUTE DEFINITIONS
 
@@ -208,6 +216,12 @@ router.post("/sessions", async (req, res, next) => {
             "user": req.session.userId,
         });
     } catch(err) { next(err) };
+});
+
+// Session creation for unregistered users to confirm age
+router.post(`/guest-sessions`, function(req, res) {
+    req.session.ageConfirmed = true;
+    return res.json({ 'message': 'Age confirmed for session' });
 });
 
 router.post("/users/:userId/alcoholConsumed", async (req, res, next) => {
