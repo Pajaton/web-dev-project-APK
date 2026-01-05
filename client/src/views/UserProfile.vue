@@ -35,7 +35,7 @@
         </b-card>
       </b-list-group>
       <!-- Add alcohol entry popup   -->
-      <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+      <b-button block type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
         <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
           <b-form @submit.prevent="submitAlcoholEntry">
             <b-form-group label="Volume (ml)">
