@@ -4,9 +4,11 @@ var router = express.Router();
 var Systembolag = require("../models/SystembolagSchema");
 const { json } = require("body-parser");
 
-// GET ROUTE DEFINITIONS
-
-// Get a list of Systembolaget stores
+/**
+ * @route GET /systembolag
+ * @description Retrieves a list of all Systembolaget stores.
+ * @returns {Object} 200 - Object containing array of all Systembolag stores.
+ */
 router.get("/systembolag", async (req, res, next) => {
     const systembolag = await Systembolag
         .find()
@@ -15,7 +17,12 @@ router.get("/systembolag", async (req, res, next) => {
     return res.json({ "systembolag": systembolag });
 });
 
-// Get a list of products available at Systembolaget
+/**
+ * @route GET /systembolag/products
+ * @description Retrieves a list of all products available across all Systembolaget stores.
+ * @returns {Object} 200 - Object containing array of products.
+ * @returns {Object} 404 - No products found.
+ */
 router.get("/systembolag/products", async (req, res, next) => {
     try{
         const products = await Systembolag
@@ -28,9 +35,14 @@ router.get("/systembolag/products", async (req, res, next) => {
     } catch(err){ next(err) };
 });
 
-// Get list of products available at a specific systembolag
+/**
+ * @route GET /systembolag/:systembolagId/products
+ * @description Retrieves a list of products available at a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store.
+ * @returns {Object} 200 - Object containing array of products in stock.
+ * @returns {Object} 404 - No products found at this store.
+ */
 router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
-    // Logic to get list of products available at a specific store
     try {
         const drinksAtASystembolag = await Systembolag
             .findById(req.params.systembolagId)
@@ -42,7 +54,14 @@ router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
     }catch(err) { next(err) };
 });
 
-// Get product availability at a specific systembolag
+/**
+ * @route GET /systembolag/:systembolagId/products/:productId
+ * @description Checks if a specific product is available at a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store.
+ * @param {string} productId - The ID of the product.
+ * @returns {Object} 200 - The product if available at the store.
+ * @returns {Object} 404 - Product not available at this Systembolag.
+ */
 router.get("/systembolag/:systembolagId/products/:productId", async (req, res, next) => {
     try {
         const drinksInStockAtASystembolag = await Systembolag
@@ -61,9 +80,14 @@ router.get("/systembolag/:systembolagId/products/:productId", async (req, res, n
     } catch(err) { next(err) };
 });
 
-// Get the location of a specific Systembolaget store
+/**
+ * @route GET /systembolag/:systembolagId/address
+ * @description Retrieves the address and location of a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store.
+ * @returns {Object} 200 - Object containing address details (street, streetNumber, postalCode, city, lon, lat).
+ * @returns {Object} 404 - No address found for this Systembolag.
+ */
 router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
-    // Logic to get a Systembolaget store's address
     try {
         const systembolagAddress = await Systembolag
             .findById(req.params.systembolagId)
@@ -76,7 +100,13 @@ router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
 
 });
 
-// Get details of a specific Systembolaget store
+/**
+ * @route GET /systembolag/:systembolagId
+ * @description Retrieves details of a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store.
+ * @returns {Object} 200 - The Systembolag store object.
+ * @returns {Object} 404 - Systembolag not found.
+ */
 router.get("/systembolag/:systembolagId", async (req, res, next) => {
     try{
         const mySystembolag = await Systembolag
@@ -88,10 +118,19 @@ router.get("/systembolag/:systembolagId", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
-
-// POST ROUTE DEFINITIONS
-
-// Add a new Systembolaget store
+/**
+ * @route POST /systembolag
+ * @description Creates a new Systembolaget store.
+ * @body {string} id - The Systembolag ID.
+ * @body {string} name - Name of the store.
+ * @body {string} street - Street name.
+ * @body {string} streetNumber - Street number.
+ * @body {string} postalCode - Postal code.
+ * @body {string} city - City name.
+ * @body {number} lon - Longitude coordinate.
+ * @body {number} lat - Latitude coordinate.
+ * @returns {Object} 201 - The created Systembolag store object.
+ */
 router.post("/systembolag", async (req, res, next) => {
     try {
         var newSystembolag = new Systembolag({
@@ -109,7 +148,14 @@ router.post("/systembolag", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
-// Add a new product to a specific Systembolaget store
+/**
+ * @route POST /systembolag/:systembolagId/products
+ * @description Adds a product to a specific Systembolaget store's inventory.
+ * @param {string} systembolagId - The ID of the Systembolag store.
+ * @body {string} productId - The ID of the product to add.
+ * @returns {Object} 201 - The updated Systembolag store object.
+ * @returns {Object} 404 - Systembolag not found.
+ */
 router.post("/systembolag/:systembolagId/products", async (req, res, next) => {
     try {
         const systembolag = await Systembolag.findByIdAndUpdate(
@@ -128,11 +174,21 @@ router.post("/systembolag/:systembolagId/products", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
-
-// PATCH ROUTE DEFINITIONS
-
-
-// Update details of a specific Systembolaget store
+/**
+ * @route PATCH /systembolag/:systembolagId
+ * @description Partially updates details of a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store to update.
+ * @body {string} [id] - The Systembolag ID.
+ * @body {string} [name] - Name of the store.
+ * @body {string} [street] - Street name.
+ * @body {string} [streetNumber] - Street number.
+ * @body {string} [postalCode] - Postal code.
+ * @body {string} [city] - City name.
+ * @body {number} [lon] - Longitude coordinate.
+ * @body {number} [lat] - Latitude coordinate.
+ * @returns {Object} 200 - The updated Systembolag store object.
+ * @returns {Object} 404 - Systembolag not found.
+ */
 router.patch("/systembolag/:systembolagId", async (req, res, next) => {
     try {
         const updatedSystembolag = await Systembolag
@@ -158,9 +214,13 @@ router.patch("/systembolag/:systembolagId", async (req, res, next) => {
     } catch(err) { next(err) };
 });
 
-// DELETE ROUTE DEFINITIONS
-
-// Delete a specific Systembolaget store
+/**
+ * @route DELETE /systembolag/:systembolagId
+ * @description Deletes a specific Systembolaget store.
+ * @param {string} systembolagId - The ID of the Systembolag store to delete.
+ * @returns {Object} 200 - The deleted Systembolag store object.
+ * @returns {Object} 404 - Systembolag not found.
+ */
 router.delete("/systembolag/:systembolagId", async (req, res, next) => {
     try {
         const deletedSystembolag = await Systembolag
