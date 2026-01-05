@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 
-//Fix to bypass current certificate configuration. For developers only, do NOT use in commercial projects.
+//Fix to bypass current certificate configuration. For developers only. Do not use in commercial projects.
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const drinksURL = `https://localhost:3000/api/v1/drinks`;
