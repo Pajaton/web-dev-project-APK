@@ -1,10 +1,19 @@
 var mongoose = require('mongoose');
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
 
-// Shortcut for Mongoose schema constructor
 var Schema = mongoose.Schema;
 
-// Define the structure of the schema
+/**
+ * @module Drink
+ * @description Represents an alcoholic beverage available at Systembolaget.
+ * 
+ * @property {string} productNumber - Unique product identifier.
+ * @property {number} apk - Alcohol per krona (value for money metric).
+ * 
+ * @relationship Review (N) - Reviews written for this drink.
+ * @relationship Systembolag (N) - Stores where this drink is available.
+ * @relationship User (N) - Users who have tried this drink.
+ */
 var drinkSchema = new Schema({
     // Primary key
     "productNumber": {type: String, unique: true},
@@ -38,4 +47,4 @@ var drinkSchema = new Schema({
 })
 
 // Create a Mongoose model called "Drink" to interact with the "Drink" collection in the database
-module.exports=mongoose.model("Drink", drinkSchema);
+module.exports = mongoose.model("Drink", drinkSchema);
