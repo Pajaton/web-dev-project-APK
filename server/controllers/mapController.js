@@ -393,7 +393,21 @@ router.get("/maps/coordinates", async (req, res, next) => {
         
     return res.json(mapData);
 
-  } catch(err) {next(err)};
+  } catch(err) {
+    switch (err.response?.status) {
+      case 400:
+        return res.status(400).json({ "message": "Bad request to map service. Please check your parameters." });
+      case 429:
+        return res.status(429).json({ "message": "Map service rate limit exceeded. Please try again later." });
+      case 502:
+      case 503:
+        return res.status(503).json({ "message": "Map service is currently unavailable. Please try again later." });
+      case 504:
+        return res.status(504).json({ "message": "Map service timed out. Please try again." });
+    }
+
+    return next(err);
+  };
 });
 
 module.exports = router;

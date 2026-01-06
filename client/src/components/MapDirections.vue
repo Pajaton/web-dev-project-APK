@@ -30,7 +30,7 @@
           variant="primary"
           @click="getLocation"
           @touchstart.stop
-          @touchend.stop="getLocation">{{ statusMessage !== '' ? 'Retry' : 'Load ' + location }}</b-button>
+          @touchend.stop="getLocation">{{ statusMessage !== '' ? 'Retry' : 'Find ' + location }}</b-button>
       </div>
     </div>
   </div>
@@ -188,16 +188,15 @@ export default {
             type: this.location
           }
         })
+
         // Object.freeze to prevent Vue from making it reactive
         this.mapData = Object.freeze(response.data)
         dataFetched = true
       } catch (error) {
         if (!error.response) {
           this.statusMessage = "Network error. Please check your connection."
-        } else if (error.response.status === 429) {
-          this.statusMessage = "Server is busy, please try again."
-        } else if (error.response.status === 504) {
-          this.statusMessage = "Server timed out, please try again."
+        } else if (error.response.data?.message) {
+          this.statusMessage = error.response.data.message
         } else {
           this.message = `Error fetching map data: ${error.response.statusText}`
         }
