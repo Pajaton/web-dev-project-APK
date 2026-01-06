@@ -128,7 +128,7 @@ export default {
       default: 'location'
     }
   },
-  emits: ['loading-change', 'targets-loaded', 'mounted'],
+  emits: ['loading-change', 'target-location', 'targets-loaded', 'mounted'],
   data() {
     return {
       userId: null,
@@ -224,14 +224,13 @@ export default {
           const distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
 
           if (!this.targetLocation || distance < this.targetLocation.distance) {
-            this.targetLocation = {
-              nodeId: target.nodeId,
-              distance: distance
-            }
+            this.targetLocation = target
           }
         }
         return target
       })
+
+      this.$emit('target-location', this.targetLocation)
 
       const shortestPathFound = this.findShortestPath(this.userNodeId)
 
@@ -642,7 +641,9 @@ export default {
           const distance = Math.sqrt(dx ** 2 + dy ** 2)
 
           if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
-            this.targetLocation.nodeId = targetNode.nodeId
+            this.targetLocation = targetNode
+
+            this.$emit('target-location', this.targetLocation)
             this.findShortestPath(this.userNodeId)
             requestAnimationFrame(this.renderMap)
           }

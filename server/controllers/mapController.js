@@ -162,6 +162,8 @@ function formatLocationData(locations, locationType) {
       accessible: tags.wheelchair || location.accessible,
       changingTable: location.changing_table,
       unisex: location.unisex,
+      directions: location.directions,
+      comment: location.comment,
       upvotes: location.upvote,
       downvotes: location.downvote
     }
