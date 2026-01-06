@@ -15,15 +15,40 @@
             body-scrolling
             title="Find toilets"
         >
+            <div id="toilet-info" flush v-if="targetToilet !== null">
+              <b-list-group>
+                <b-list-group-item>
+                  <p>Toilet at {{ targetToilet.street }}</p>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.directions">
+                  <p>Directions: {{ targetToilet.directions }}</p>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.comment">
+                  <p>Comment: {{ targetToilet.comment }}</p>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.unisex">
+                  <p>{{ targetToilet.unisex ? 'The toilet is unisex' : 'The toilet is not unisex' }}</p>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.accessible">
+                  <p>{{ targetToilet.accessible ? 'The toilet is accessible' : 'The toilet is not accessible' }}</p>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.changingTable">
+                  <p>{{ targetToilet.changingTable ? 'The toilet has a changing table' : 'The toilet does not have a changing table' }}</p>
+                </b-list-group-item>
+                <b-list-group-item>
+                  <p>Upvotes: {{ targetToilet.upvotes }}<br>Downvotes: {{ targetToilet.downvotes }}</p>
+                </b-list-group-item>
+              </b-list-group>
+            </div>
             <MapDirections
               v-if="hasOpened"
               ref="mapDirections"
               location="toilets"
               @loading-change="isLoading = $event"
+              @target-location="targetToilet = $event"
             />
         </BOffcanvas>
     </div>
-
 </template>
 
 <script>
@@ -33,6 +58,7 @@ export default {
   components: { MapDirections },
   data() {
     return {
+      targetToilet: null,
       showPanel: false,
       hasOpened: false,
       isLoading: false,
