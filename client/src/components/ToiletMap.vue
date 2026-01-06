@@ -15,28 +15,28 @@
             body-scrolling
             title="Find toilets"
         >
-            <div id="toilet-info" flush v-if="targetToilet !== null">
-              <b-list-group>
+            <div id="toilet-info" v-if="targetToilet !== null">
+              <b-list-group flush>
                 <b-list-group-item>
-                  <p>Toilet at {{ targetToilet.street }}</p>
+                  <div class="fw-bold">Toilet at: {{ targetToilet.street }}</div>
                 </b-list-group-item>
                 <b-list-group-item v-if="targetToilet.directions">
-                  <p>Directions: {{ targetToilet.directions }}</p>
+                  <div class="fw-bold">At the location: {{ targetToilet.directions }}</div>
                 </b-list-group-item>
                 <b-list-group-item v-if="targetToilet.comment">
-                  <p>Comment: {{ targetToilet.comment }}</p>
+                  <div class="fw-bold">Comment: {{ targetToilet.comment }}</div>
                 </b-list-group-item>
                 <b-list-group-item v-if="targetToilet.unisex">
-                  <p>{{ targetToilet.unisex ? 'The toilet is unisex' : 'The toilet is not unisex' }}</p>
+                  <div class="fw-bold">{{ targetToilet.unisex ? 'The toilet is unisex' : 'The toilet is gendered' }}</div>
                 </b-list-group-item>
                 <b-list-group-item v-if="targetToilet.accessible">
-                  <p>{{ targetToilet.accessible ? 'The toilet is accessible' : 'The toilet is not accessible' }}</p>
+                  <div class="fw-bold">{{ targetToilet.accessible ? 'The toilet is accessible' : 'The toilet is not accessible' }}</div>
                 </b-list-group-item>
                 <b-list-group-item v-if="targetToilet.changingTable">
-                  <p>{{ targetToilet.changingTable ? 'The toilet has a changing table' : 'The toilet does not have a changing table' }}</p>
+                  <div class="fw-bold">{{ targetToilet.changingTable ? 'The toilet has a changing table' : 'The toilet does not have a changing table' }}</div>
                 </b-list-group-item>
-                <b-list-group-item>
-                  <p>Upvotes: {{ targetToilet.upvotes }}<br>Downvotes: {{ targetToilet.downvotes }}</p>
+                <b-list-group-item v-if="targetToilet.upvotes !== undefined && targetToilet.downvotes !== undefined">
+                  <div class="fw-bold">Upvotes: {{ targetToilet.upvotes }}<br>Downvotes: {{ targetToilet.downvotes }}</div>
                 </b-list-group-item>
               </b-list-group>
             </div>
