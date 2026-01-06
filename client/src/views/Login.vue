@@ -46,7 +46,6 @@
   </div>
 </template>
 
-
 <script>
 // Login view behavior
 
@@ -70,7 +69,6 @@ export default {
           email: this.email,
           password: this.password
         })
-        console.log('LOGIN SUCCESS:', res.data)
         this.$router.push({ path: '/home' })
       } catch (err) {
         this.show = true
