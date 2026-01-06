@@ -121,7 +121,7 @@
             <p><strong>Average Rating:</strong> {{ avgRating }}</p>
           </b-col>
           <b-col cols="12" md="6">
-            <b-img :src= imageUrl(chosenDrink.image) fluid alt="bottle image"  style="max-width: 230px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+            <b-img :src= chosenDrink.image fluid alt="bottle image"  style="max-width: 230px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
           </b-col>
         </b-row>
         <b-button v-if="currentUserId" @click="getReviewRating">
