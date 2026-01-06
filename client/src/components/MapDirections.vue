@@ -33,6 +33,17 @@
           @touchend.stop="getLocation">{{ statusMessage !== '' ? 'Retry' : 'Find ' + location }}</b-button>
       </div>
     </div>
+
+    <!-- notify user of path not found -->
+    <BAlert
+      :model-value="isPathNotFound"
+      variant="warning"
+      dismissible
+      class="position-fixed top-0 start-50 translate-middle-x mt-5"
+      style="z-index: 1000; min-width: 300px;"
+    >
+      Unable to find a path to this location. Try selecting a different one.
+    </BAlert>
   </div>
 </template>
 
@@ -50,12 +61,15 @@ const CANVAS_CONFIG = {
 const ZOOM_LIMITS = { min: 0.1, max: 10 }
 const CLICK_TOLERANCE_PX = 5 // max distance mouse can move and still register as a click
 
+const MAX_ITERATIONS = 100000 // prevent infinite loops in pathfinding
+
 class MinHeap {
   constructor(estimatedCost) {
     this.heap = []
-    this.length = 0
     this.estimatedCost = estimatedCost // reference
   }
+
+  get length() { return this.heap.length }
 
   // return and remove min value
   pop() {
@@ -64,8 +78,6 @@ class MinHeap {
 
     const min = this.heap[0]
     this.heap[0] = this.heap.pop()
-    this.length -= 1
-
     this.bubbleDown()
 
     return min
@@ -75,7 +87,6 @@ class MinHeap {
   insert(nodeId) {
     this.heap.push(nodeId)
     this.bubbleUp()
-    this.length += 1
   }
 
   // checks if a node is already in the heap
@@ -99,10 +110,10 @@ class MinHeap {
       rightIndex = index * 2 + 2
       let minIndex = index
 
-      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[leftIndex]]) {
+      if (leftIndex < this.heap.length && this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[leftIndex]]) {
         minIndex = leftIndex
       }
-      if (this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[rightIndex]]) {
+      if (rightIndex < this.heap.length && this.estimatedCost[this.heap[minIndex]] > this.estimatedCost[this.heap[rightIndex]]) {
         minIndex = rightIndex
       }
 
@@ -142,7 +153,6 @@ export default {
   emits: ['loading-change', 'target-location', 'targets-loaded', 'mounted'],
   data() {
     return {
-      userId: null,
       message: '',
       statusMessage: '',
       coordinates: null,
@@ -150,6 +160,7 @@ export default {
       targetLocation: null,
       shortestPath: [],
       isLoading: false,
+      pathSearchFailed: false,
 
       // canvas
       ctx: null, // The visible screen
@@ -178,6 +189,16 @@ export default {
 
       canvasFullWidth: CANVAS_CONFIG.fullWidth, // rendered width
       canvasFullHeight: CANVAS_CONFIG.fullHeight // rendered height
+    }
+  },
+  computed: {
+    isPathNotFound: {
+      get() {
+        return this.pathSearchFailed && this.mapData.nodes && this.shortestPath.length === 0
+      },
+      set(newValue) {
+        if (!newValue) this.pathSearchFailed = false
+      }
     }
   },
   methods: {
@@ -231,14 +252,24 @@ export default {
         target.nodeId = this.getNearestNodeId(target.lat, target.lon)
 
         if (this.userNodeId && target.nodeId && this.mapData.nodes[this.userNodeId] && this.mapData.nodes[target.nodeId]) {
-          const distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
-
-          if (!this.targetLocation || distance < this.targetLocation.distance) {
-            this.targetLocation = target
-          }
+          target.distance = this.getDistance(this.mapData.nodes[this.userNodeId], this.mapData.nodes[target.nodeId])
+        } else {
+          target.distance = Infinity
         }
+
         return target
       })
+
+      // Sort by distance and pick the closest one
+      this.targetNodes.sort((a, b) => a.distance - b.distance)
+      this.targetLocation = this.targetNodes[0] || null
+
+      if (!this.targetLocation) {
+        this.statusMessage = "No locations found nearby."
+        this.isLoading = false
+        this.$emit('loading-change', false)
+        return
+      }
 
       this.$emit('target-location', this.targetLocation)
 
@@ -261,6 +292,7 @@ export default {
 
       } else {
         this.message = "No path found."
+        this.pathSearchFailed = true
       }
 
       this.isLoading = false
@@ -321,26 +353,40 @@ export default {
 
     // implemented shortest path algorithm with A*
     findShortestPath(startId) {
-      const estimatedTotalCost = {}
-      const nodesToVisit = new MinHeap(estimatedTotalCost)
+      this.shortestPath = []
+      this.pathSearchFailed = false
       const targetId = this.targetLocation.nodeId
       const { nodes,adjacencyList } = this.mapData
 
-      nodesToVisit.insert(startId)
+      if (!nodes[startId] || !nodes[targetId]) {
+        return false
+      }
+
+      const estimatedTotalCost = {}
+      const nodesToVisit = new MinHeap(estimatedTotalCost)
       const cameFrom = {}
       const costToHere = {}
-
+      const visited = new Set()
+      
       Object.keys(nodes).forEach(nodeId => {
         costToHere[nodeId] = Infinity
         estimatedTotalCost[nodeId] = Infinity
       })
-
+      
       costToHere[startId] = 0
       estimatedTotalCost[startId] = this.getDistance(nodes[startId], nodes[targetId])
+      nodesToVisit.insert(startId)
+
+      let iterations = 0
 
       while (nodesToVisit.length > 0) {
+        if (++iterations > MAX_ITERATIONS) return false
+
         // dequeue
         const currentNode = nodesToVisit.pop()
+
+        if (visited.has(currentNode)) continue
+        visited.add(currentNode)
 
         if (this.targetLocation.nodeId === currentNode) {
           this.shortestPath = this.reconstructPath(cameFrom,currentNode)
@@ -353,9 +399,13 @@ export default {
 
         for (const edge of neighbors) {
           const neighbor = String(edge.node)
+
+          if (visited.has(neighbor)) continue
+          if (!nodes[neighbor]) continue  // skip if neighbor node doesn't exist
+
           const costToNext = costToHere[currentNode] + edge.weight
 
-          if (costToNext < costToHere[neighbor]) {
+          if (costToNext < (costToHere[neighbor]) || Infinity) {
             cameFrom[neighbor] = currentNode
             costToHere[neighbor] = costToNext
 
@@ -481,24 +531,33 @@ export default {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       this.ctx.save()
 
-      // apply pan and zoom to the canvas and map
       this.ctx.translate(this.view.x, this.view.y)
       this.ctx.scale(this.view.scale, this.view.scale)
 
-      this.ctx.drawImage(this.offscreenCanvas,0,0)
+      this.ctx.drawImage(this.offscreenCanvas, 0, 0)
 
-      if (this.shortestPath.length>0) {
+      // 1. Draw the path ONLY if it exists
+      if (this.shortestPath.length > 0) {
         this.drawPath(this.mapData.nodes, this.shortestPath)
-
-        const startNodeId = this.shortestPath[0]
-        const targetNodeId = this.shortestPath[this.shortestPath.length - 1]
-        this.drawMarker(this.mapData.nodes[startNodeId], '#005885') // Start
-
-        this.targetNodes.forEach(targetNode => {
-          this.drawMarker(this.mapData.nodes[targetNode.nodeId], '#76B07E')
-        })
       }
 
+      // 2. Draw the markers ALWAYS (if mapData exists)
+      if (this.mapData.nodes) {
+        // Draw the User/Start marker if we have a userNodeId
+        if (this.userNodeId && this.mapData.nodes[this.userNodeId]) {
+          this.drawMarker(this.mapData.nodes[this.userNodeId], '#005885')
+        }
+      
+        // Draw all target markers
+        this.targetNodes.forEach(targetNode => {
+          // Highlight the currently selected target even if pathing failed
+          const color = (this.targetLocation && targetNode.nodeId === this.targetLocation.nodeId) 
+                        ? '#cc0000' // Darker red/green for the "selected" one
+                        : '#76B07E'
+          this.drawMarker(this.mapData.nodes[targetNode.nodeId], color)
+        })
+      }
+    
       this.ctx.restore()
     },
 
@@ -648,10 +707,15 @@ export default {
           const distance = Math.sqrt(dx ** 2 + dy ** 2)
 
           if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
+            
             this.targetLocation = targetNode
-
-            this.$emit('target-location', this.targetLocation)
-            this.findShortestPath(this.userNodeId)
+            const pathFound = this.findShortestPath(this.userNodeId)
+            
+            if (pathFound) {
+              this.$emit('target-location', this.targetLocation)
+            } else {
+              this.pathSearchFailed = true
+            }
             requestAnimationFrame(this.renderMap)
           }
         }
@@ -677,7 +741,13 @@ export default {
       if (!targetNodeId) return
 
       this.targetLocation = { nodeId: targetNodeId, distance: 0 }
-      this.findShortestPath(this.userNodeId)
+      const pathFound =this.findShortestPath(this.userNodeId)
+
+      if (pathFound) {
+        this.$emit('target-location', this.targetLocation)
+      } else {
+        this.pathSearchFailed = true
+      }
       requestAnimationFrame(this.renderMap)
     },
 
@@ -729,19 +799,9 @@ export default {
       if (this.offscreenCanvas) {
         this.renderMap()
       }
-    },
-    fetchCurrentUser() {
-      Api.get('/sessions/currentlyLoggedin/')
-        .then(response => {
-          this.userId = response.data.user._id
-        })
-        .catch(error => {
-          this.message = error
-        })
     }
   },
   mounted() {
-    this.fetchCurrentUser()
     this.resizeCanvas()
     this.getUserCoordinates()
     this.$emit('mounted')
