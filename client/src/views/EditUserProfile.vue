@@ -159,7 +159,7 @@
 <script>
 // Register view behavior
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'Register',
@@ -231,7 +231,7 @@ export default {
     },
     async editUser() {
       try {
-        const response = await drinkApi.patch('/users/' + this.currentUserId, {
+        const response = await Api.patch('/users/' + this.currentUserId, {
           email: this.email,
           profilePicture: this.profilePicture,
           userName: this.userName,
@@ -257,7 +257,7 @@ export default {
     },
     async resetFields() {
       try {
-        const response = await drinkApi.get('/users/' + this.currentUserId)
+        const response = await Api.get('/users/' + this.currentUserId)
         this.userInfo = response.data
         this.email = this.userInfo.email
         this.profilePicture = this.userInfo.profilePicture ?? '/profilePictures/default_user.jpg'
@@ -278,8 +278,8 @@ export default {
     },
     async deleteUser() {
       try {
-        await drinkApi.delete('/sessions/' + this.currentUserId)
-        await drinkApi.delete('/users/' + this.currentUserId)
+        await Api.delete('/sessions/' + this.currentUserId)
+        await Api.delete('/users/' + this.currentUserId)
         this.currentUserId = null
         this.modalShowConfirmation = true
         console.log('User deleted: ' + this.userName + ' Email: ' + this.email)
@@ -292,7 +292,7 @@ export default {
       this.$router.push({ path: '/home' })
     },
     fetchCurrentUser() {
-      drinkApi.get('/sessions/currentlyLoggedin/')
+      Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
           return this.resetFields()

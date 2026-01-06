@@ -183,7 +183,7 @@
 
 <script>
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'APK',
@@ -219,7 +219,7 @@ export default {
   },
   methods: {
     getDrinklist(filterUrl) {
-      drinkApi.get('/drinks/' + filterUrl)
+      Api.get('/drinks/' + filterUrl)
         .then(response => {
           this.drinks = response.data.drinks
         })
@@ -228,7 +228,7 @@ export default {
         })
     },
     getDrinkById(id) {
-      drinkApi.get('/drinks/' + id)
+      Api.get('/drinks/' + id)
         .then(response => {
           this.chosenDrink = response.data
         })
@@ -337,7 +337,7 @@ export default {
       this.showAllReviewsPopup = false
     },
     getReviewRating() {
-      drinkApi.get('/users/' + this.currentUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
+      Api.get('/users/' + this.currentUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
           const reviews = response.data.reviews || []
           if (reviews.length === 0) {
@@ -353,7 +353,7 @@ export default {
         })
     },
     sendReviewRating() {
-      drinkApi.post('/reviews', {
+      Api.post('/reviews', {
         userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
@@ -369,7 +369,7 @@ export default {
         })
     },
     updateReviewRating() {
-      drinkApi.put('/reviews/' + this.oldReview._id, {
+      Api.put('/reviews/' + this.oldReview._id, {
         userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
@@ -388,7 +388,7 @@ export default {
       if (!this.oldReview) {
         return
       }
-      drinkApi.delete('/reviews/' + this.oldReview._id)
+      Api.delete('/reviews/' + this.oldReview._id)
         .then(response => {
           this.oldReview = null
           this.reviewText = ''
@@ -400,7 +400,7 @@ export default {
         })
     },
     deleteAllReviews() {
-      drinkApi.delete('/reviews')
+      Api.delete('/reviews')
         .then(response => {
           this.showReviewPopup = false
         })
@@ -411,14 +411,14 @@ export default {
     getAllReviewRating() {
       this.showAllReviewsPopup = true
       this.reviewsForChosenDrink = []
-      drinkApi.get('/reviews')
+      Api.get('/reviews')
         .then(response => {
           this.allReviews = response.data.review
 
           this.allReviews.forEach(review => {
             if (review.productID === this.chosenDrink._id) {
               /* Store names and review/rating of the people who have done reviews on the chosen drink */
-              drinkApi.get('/users/' + review.userID)
+              Api.get('/users/' + review.userID)
                 .then(response => {
                   this.user = response.data
                   this.reviewsForChosenDrink.push({
@@ -445,7 +445,7 @@ export default {
     async getAverageScore(drink) {
       let avgScore = 0
       try {
-        const response = await drinkApi.get('/drinks/' + drink + '/reviews')
+        const response = await Api.get('/drinks/' + drink + '/reviews')
         const drinkReviews = response.data.reviewForDrink
         let reviewCounter = 0
         let totalScore = 0
@@ -466,7 +466,7 @@ export default {
       return avgScore
     },
     fetchCurrentUser() {
-      drinkApi.get('/sessions/currentlyLoggedin/')
+      Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
           console.log(this.currentUserId)

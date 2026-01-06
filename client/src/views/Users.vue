@@ -31,7 +31,7 @@
 
 <script>
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'userProfile',
@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     getUsers() {
-      drinkApi.get('/users/')
+      Api.get('/users/')
         .then(response => {
           this.users = response.data.users
         })

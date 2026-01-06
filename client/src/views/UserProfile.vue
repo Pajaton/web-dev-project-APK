@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 import ToiletPanel from '@/components/ToiletMap.vue'
 
 export default {
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     getUserInfo() {
-      drinkApi.get('/users/' + this.id)
+      Api.get('/users/' + this.id)
         .then(response => {
           this.user = response.data
           if (!this.user.profilePicture) {
@@ -117,7 +117,7 @@ export default {
         })
     },
     getUserFollowingList() {
-      drinkApi.get(this.user._links.follows)
+      Api.get(this.user._links.follows)
         .then(response => {
           this.userFollowingList = response.data.follows
         })
@@ -126,7 +126,7 @@ export default {
         })
     },
     getFavoriteSystembolag() {
-      drinkApi.get(this.user._links.favoritesSystembolag)
+      Api.get(this.user._links.favoritesSystembolag)
         .then(response => {
           if (response.data.favoriteSystembolag) {
             const systembolag = response.data
@@ -143,7 +143,7 @@ export default {
       this.$router.push({ path: '/users/' + this.currentUserId + '/edit' })
     },
     fetchCurrentUser() {
-      drinkApi.get('/sessions/currentlyLoggedin/')
+      Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
           this.currentUserFollows = response.data.user.follows.includes(this.user._id)
@@ -155,11 +155,11 @@ export default {
     async getAllUserReviews() {
       this.reviewsByUser = []
       try {
-        const response = await drinkApi.get('/users/' + this.user._id + '/reviews')
+        const response = await Api.get('/users/' + this.user._id + '/reviews')
         const allReviews = response.data.reviewedBy
         for (const review of allReviews) {
           if (review.userID === this.user._id) {
-            const drinkResponse = await drinkApi.get('/drinks/' + review.productID)
+            const drinkResponse = await Api.get('/drinks/' + review.productID)
             this.drink = drinkResponse.data
             const avgRating = await this.getAverageScore(this.drink._id)
             this.reviewsByUser.push({
@@ -178,7 +178,7 @@ export default {
     async getAverageScore(drink) {
       let avgScore = 0
       try {
-        const response = await drinkApi.get('/drinks/' + drink + '/reviews')
+        const response = await Api.get('/drinks/' + drink + '/reviews')
         const drinkReviews = response.data.reviewForDrink
         let reviewCounter = 0
         let totalScore = 0
@@ -213,7 +213,7 @@ export default {
     },
     submitAlcoholEntry() {
       if (this.alcVolume <= 0 || this.alcPercent < 0 || this.alcPercent > 100) return
-      drinkApi.post(`/users/${this.user._id}/alcoholConsumed`, {
+      Api.post(`/users/${this.user._id}/alcoholConsumed`, {
         volume: this.alcVolume,
         percent: this.alcPercent
       })
@@ -240,9 +240,9 @@ export default {
     async toggleFollowUser() {
       try {
         if (!this.currentUserFollows) {
-          await drinkApi.patch(`/users/${this.currentUserId}/follows/${this.user._id}`)
+          await Api.patch(`/users/${this.currentUserId}/follows/${this.user._id}`)
         } else {
-          await drinkApi.delete(`/users/${this.currentUserId}/follows/${this.user._id}`)
+          await Api.delete(`/users/${this.currentUserId}/follows/${this.user._id}`)
         }
         this.currentUserFollows = !this.currentUserFollows
       } catch (error) {
