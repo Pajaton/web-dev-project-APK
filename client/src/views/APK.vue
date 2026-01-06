@@ -483,11 +483,10 @@ export default {
         })
     },
     drinkPictureError(event) {
-      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
+      event.target.src = this.imageUrl('default_drink.jpg')
     },
     imageUrl(image) {
-      const imagePath = `../assets${image}`
-      return new URL(imagePath, import.meta.url).href
+      return new URL(`../assets/drinkPictures/${image}`, import.meta.url).href
     }
   }
 }

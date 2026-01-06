@@ -95,7 +95,7 @@ export default {
         .then(response => {
           this.user = response.data
           if (!this.user.profilePicture) {
-            this.user.profilePicture = '/profilePictures/default_user.jpg'
+            this.user.profilePicture = 'default_user.jpg'
           }
 
           const currentTotalMl = this.user.alcoholConsumed.reduce((sum, entry) => sum + (Number(entry.volume) || 0), 0)
@@ -199,14 +199,16 @@ export default {
       return avgScore
     },
     profilePictureError(event) {
-      event.target.src = this.imageUrl('/profilePictures/default_user.jpg')
+      event.target.src = this.imageUrl('default_user.jpg')
     },
     drinkPictureError(event) {
-      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
+      event.target.src = this.imageUrlDrink('default_drink.jpg')
     },
     imageUrl(image) {
-      const imagePath = `../assets${image}`
-      return new URL(imagePath, import.meta.url).href
+      return new URL(`../assets/profilePictures/${image}`, import.meta.url).href
+    },
+    imageUrlDrink(image) {
+      return new URL(`../assets/drinkPictures/${image}`, import.meta.url).href
     },
     openAddEntryPopup() {
       this.addEntryPopup = true
