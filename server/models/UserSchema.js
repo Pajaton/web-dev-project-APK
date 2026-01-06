@@ -1,10 +1,21 @@
 var mongoose = require('mongoose');
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
 
-//shortcut for Mongoose schema constructor
 var Schema = mongoose.Schema;
 
-//Define the structure of the schema
+/**
+ * @module User
+ * @description Represents a registered user of the application.
+ * 
+ * @property {string} email - Unique email address (required).
+ * @property {Object} settings - User preferences (darkMode, notifications, language).
+ * @property {Array} alcoholConsumed - History of alcohol consumption entries.
+ * 
+ * @relationship User (N) - Users this user follows.
+ * @relationship Systembolag (1) - User's favorite store.
+ * @relationship Drink (N) - Drinks the user has tried (with favorite flag).
+ * @relationship Review (N) - Reviews written by this user.
+ */
 var userSchema = new Schema({
     // Local attributes
     "email": {type: String, unique: true, required: true},

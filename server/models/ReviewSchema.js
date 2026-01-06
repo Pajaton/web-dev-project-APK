@@ -1,10 +1,20 @@
 var mongoose = require('mongoose');
 var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/animalDevelopmentDB';
 
-//shortcut for Mongoose schema constructor
 var Schema = mongoose.Schema;
 
-//Define the structure of the schema
+/**
+ * @module Review
+ * @description Represents a user's review of a drink.
+ * 
+ * @property {ObjectId} userID - Reference to the User who wrote the review.
+ * @property {ObjectId} productID - Reference to the Drink being reviewed.
+ * @property {number} rating - Rating from 1-5.
+ * @property {string} comment - Optional review text.
+ * 
+ * @relationship User (1) - The author of this review.
+ * @relationship Drink (1) - The drink being reviewed.
+ */
 var reviewSchema = new Schema({
     // Composite primary key
     "userID": {type: Schema.Types.ObjectId, ref: "User"},

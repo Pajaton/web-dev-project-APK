@@ -11,7 +11,7 @@
               <!-- Type -->
               <b-form-group>
                 <b-form-checkbox v-model="selectedFilter" value="type">
-                  Type of beverage
+                  <h4>Type of beverage</h4>
                 </b-form-checkbox>
                 <b-card-body v-if="selectedFilter.includes('type')">
                   <b-form-checkbox-group v-if="selectedFilter.includes('type')" v-model="selectedType" stacked>
@@ -26,25 +26,35 @@
               <!-- Percentage -->
               <b-form-group>
                 <b-form-checkbox v-model="selectedFilter" value="percentage">
-                  Alcohol percentage
+                  <h4>Alcohol percentage</h4>
                 </b-form-checkbox>
-                <b-form-input v-if="selectedFilter.includes('percentage')" type="number" v-model="percentageText"/>
+                <div v-if="selectedFilter.includes('percentage')">
+                  Min %
+                  <b-form-input type="number" v-model="percentageMinText"/>
+                  Max %
+                  <b-form-input type="number" v-model="percentageMaxText"/>
+                </div>
               </b-form-group>
 
               <!-- Price -->
               <b-form-group>
                 <b-form-checkbox v-model="selectedFilter" value="price">
-                  Price
+                  <h4>Price</h4>
                 </b-form-checkbox>
-                <b-form-input v-if="selectedFilter.includes('price')" type="number" v-model="priceText"/>
+                <div v-if="selectedFilter.includes('price')">
+                  Minimum price
+                  <b-form-input type="number" v-model="priceMinText"/>
+                  Maximum price
+                  <b-form-input type="number" v-model="priceMaxText"/>
+                </div>
               </b-form-group>
 
               <!-- APK -->
               <b-form-group>
                 <b-form-checkbox v-model="selectedFilter" value="apk">
-                  Alcohol per krona (krona per 1 ml of 100% alcohol)
+                  <h4>Minimum APK</h4>
                 </b-form-checkbox>
-                <b-form-input v-if="selectedFilter.includes('apk')" type="number" v-model="apkText"/>
+                <b-form-input v-if="selectedFilter.includes('apk')" type="number" v-model="apkMinText"/>
               </b-form-group>
               <b-button type="submit">
                 Apply filters
@@ -185,9 +195,11 @@ export default {
       selectedSort: '',
       selectedType: [],
       typeText: '',
-      percentageText: '',
-      priceText: '',
-      apkText: '',
+      percentageMinText: '',
+      priceMinText: '',
+      apkMinText: '',
+      percentageMaxText: '',
+      priceMaxText: '',
       showDrinkPopup: false,
       chosenDrink: null,
       showReviewPopup: false,
@@ -237,29 +249,45 @@ export default {
           query += `${prefix}type=${this.capitalizeFirst(type)}`
         })
       }
-      if (this.selectedFilter.includes('percentage') && this.percentageText) {
+      if (this.selectedFilter.includes('percentage') && this.percentageMinText) {
         if (query === '') {
           query += '?'
         } else {
           query += '&'
         }
-        query += 'percentage=' + this.percentageText
+        query += 'percentageMin=' + this.percentageMinText
       }
-      if (this.selectedFilter.includes('price') && this.priceText) {
+      if (this.selectedFilter.includes('percentage') && this.percentageMaxText) {
         if (query === '') {
           query += '?'
         } else {
           query += '&'
         }
-        query += 'price=' + this.priceText
+        query += 'percentageMax=' + this.percentageMaxText
       }
-      if (this.selectedFilter.includes('apk') && this.apkText) {
+      if (this.selectedFilter.includes('price') && this.priceMinText) {
         if (query === '') {
           query += '?'
         } else {
           query += '&'
         }
-        query += 'apk=' + this.apkText
+        query += 'priceMin=' + this.priceMinText
+      }
+      if (this.selectedFilter.includes('price') && this.priceMaxText) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'priceMax=' + this.priceMaxText
+      }
+      if (this.selectedFilter.includes('apk') && this.apkMinText) {
+        if (query === '') {
+          query += '?'
+        } else {
+          query += '&'
+        }
+        query += 'apkMin=' + this.apkMinText
       }
       if (this.selectedSort) {
         if (query === '') {
@@ -326,16 +354,19 @@ export default {
     },
     sendReviewRating() {
       drinkApi.post('/reviews', {
-        // Change the mock data for the user who is currently logged in.
         userID: this.currentUserId,
         productID: this.chosenDrink._id,
         rating: this.rating,
         comment: this.reviewText
       })
-      console.log('Review added: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
-      this.reviewText = ''
-      this.rating = null
-      this.showReviewPopup = false
+        .then(response => {
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     },
     updateReviewRating() {
       drinkApi.put('/reviews/' + this.oldReview._id, {
@@ -344,10 +375,14 @@ export default {
         rating: this.rating,
         comment: this.reviewText
       })
-      console.log('Review updated: ' + this.reviewText + ' ' + ' Rating: ' + this.rating)
-      this.reviewText = ''
-      this.rating = null
-      this.showReviewPopup = false
+        .then(response => {
+          this.reviewText = ''
+          this.rating = null
+          this.showReviewPopup = false
+        })
+        .catch(error => {
+          this.message = error
+        })
     },
     deleteReview() {
       if (!this.oldReview) {

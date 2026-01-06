@@ -4,14 +4,14 @@
       <b-img :src= imageUrl(user.profilePicture) fluid alt="Profile Picture" class="profile-picture" @error="profilePictureError"></b-img>
         <b-card style="max-width: 400px" horizontal header="User Info">
           <b-list-group >
-            <b-list-group-item flush variant="primary">Username: {{user.userName}}</b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Username: {{user.userName}}</span><b-button v-if="currentUserId && id !== currentUserId" size="sm" class="ml-auto" @click="toggleFollowUser">{{ currentUserFollows ? 'Unfollow' : 'Follow' }}</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">Email: {{user.email}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Adress: {{user.street}} {{ user.streetNumber}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Postal code: {{user.postalCode}}</b-list-group-item>
             <b-list-group-item flush variant="primary">City: {{user.city}}</b-list-group-item>
             <b-list-group-item flush variant="primary">Following: {{user.follows.length}} people</b-list-group-item>
             <b-list-group-item flush variant="primary" >Number of review written: {{user.reviewsWritten.length}}</b-list-group-item>
-            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button size="sm" class="ml-auto" @click="openAddEntryPopup">Add alcoholic entry</b-button></b-list-group-item>
+            <b-list-group-item flush variant="primary" class="d-flex"><span class="me-5">Alcoholic intake: {{ user.alcoholConsumed.length }}</span><b-button v-if="currentUserId && id === currentUserId" size="sm" class="ml-auto" @click="openAddEntryPopup">Add alcoholic entry</b-button></b-list-group-item>
             <b-list-group-item flush variant="primary">How many drinks tried: {{user.triedDrinks.length}}</b-list-group-item>
             <b-list-group-item flush variant="primary" class="d-flex" v-for="followedUser in userFollowingList" :key="followedUser.email">{{ user.userName }} follows: {{ followedUser.userName }}</b-list-group-item>
             <b-list-group-item flush variant="primary" v-if="this.favoriteSystembolag">Favorite systembolag: {{ this.favoriteSystembolag }}</b-list-group-item>
@@ -35,8 +35,8 @@
           </b-row>
         </b-card>
       </b-list-group>
-      <!-- Add alcohol entry popup   -->
-      <b-button block v-if="id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
+
+      <b-button block v-if="currentUserId && id === currentUserId" type="button" variant="login" @click="goToEdit()">Edit Profile</b-button>
         <b-modal v-model="addEntryPopup" title="Add alcoholic entry" hide-footer>
           <b-form @submit.prevent="submitAlcoholEntry">
             <b-form-group label="Volume (ml)">
@@ -73,6 +73,7 @@ export default {
       userFollowingList: [],
       reviewsByUser: [],
       currentUserId: null,
+      currentUserFollows: false,
       favoriteSystembolag: null,
       show: false,
       addEntryPopup: false,
@@ -83,7 +84,10 @@ export default {
     }
   },
   props: {
-    id: String
+    id: {
+      type: String,
+      default: null
+    }
   },
   methods: {
     getUserInfo() {
@@ -142,7 +146,7 @@ export default {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
+          this.currentUserFollows = response.data.user.follows.includes(this.user._id)
         })
         .catch(error => {
           this.message = error
@@ -228,9 +232,22 @@ export default {
 
           this.addEntryPopup = false
         })
-        .catch(err => {
-          console.error('Failed to add alcohol entry', err)
+        .catch(error => {
+          this.message = error
         })
+    },
+
+    async toggleFollowUser() {
+      try {
+        if (!this.currentUserFollows) {
+          await drinkApi.patch(`/users/${this.currentUserId}/follows/${this.user._id}`)
+        } else {
+          await drinkApi.delete(`/users/${this.currentUserId}/follows/${this.user._id}`)
+        }
+        this.currentUserFollows = !this.currentUserFollows
+      } catch (error) {
+        console.error('Error toggling follow status:', error)
+      }
     }
   },
   mounted() {
