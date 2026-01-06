@@ -27,7 +27,8 @@
           <b-col>
             <b-list-group style="max-width: 300px">
               <b-list-group-item flush variant="primary">Name: {{ review.drink }}</b-list-group-item>
-              <b-list-group-item flush variant="primary">Rating: {{ review.rating }}</b-list-group-item>
+              <b-list-group-item flush variant="primary">User Rating: {{ review.rating }}</b-list-group-item>
+              <b-list-group-item flush variant="primary">Average Rating: {{ review.avgrating }}</b-list-group-item>
               <b-list-group-item flush variant="primary">Review: {{ review.comment }}</b-list-group-item>
             </b-list-group>
           </b-col>
@@ -147,27 +148,51 @@ export default {
           this.message = error
         })
     },
-    getAllUserReviews() {
+    async getAllUserReviews() {
       this.reviewsByUser = []
-      drinkApi.get('/users/' + this.user._id + '/reviews')
-        .then(response => {
-          this.allReviews = response.data.reviewedBy
-
-          this.allReviews.forEach(review => {
-            if (review.userID === this.user._id) {
-              drinkApi.get('/drinks/' + review.productID)
-                .then(response => {
-                  this.drink = response.data
-                  this.reviewsByUser.push({
-                    drink: this.drink.name,
-                    image: this.drink.image,
-                    comment: review.comment,
-                    rating: review.rating
-                  })
-                })
-            }
-          })
-        })
+      try {
+        const response = await drinkApi.get('/users/' + this.user._id + '/reviews')
+        const allReviews = response.data.reviewedBy
+        for (const review of allReviews) {
+          if (review.userID === this.user._id) {
+            const drinkResponse = await drinkApi.get('/drinks/' + review.productID)
+            this.drink = drinkResponse.data
+            const avgRating = await this.getAverageScore(this.drink._id)
+            this.reviewsByUser.push({
+              drink: this.drink.name,
+              image: this.drink.image,
+              comment: review.comment,
+              rating: review.rating,
+              avgrating: avgRating
+            })
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async getAverageScore(drink) {
+      let avgScore = 0
+      try {
+        const response = await drinkApi.get('/drinks/' + drink + '/reviews')
+        const drinkReviews = response.data.reviewForDrink
+        let reviewCounter = 0
+        let totalScore = 0
+        for (const review of drinkReviews) {
+          if (review.rating != null) {
+            reviewCounter += 1
+            totalScore += review.rating
+          }
+          if (reviewCounter > 0) {
+            avgScore = totalScore / reviewCounter
+          } else {
+            avgScore = 'No score'
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+      return avgScore
     },
     profilePictureError(event) {
       event.target.src = this.imageUrl('/profilePictures/default_user.jpg')
