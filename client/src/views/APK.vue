@@ -427,8 +427,8 @@ export default {
                     rating: review.rating
                   })
                 })
-                .catch(err => {
-                  console.error('User fetch failed', err)
+                .catch(error => {
+                  this.message = error
                   this.reviewsForChosenDrink.push({
                     userName: 'Account deleted',
                     comment: review.comment,
@@ -438,8 +438,8 @@ export default {
             }
           })
         })
-        .catch(err => {
-          console.error('Reviews fetch failed', err)
+        .catch(error => {
+          this.message = error
         })
     },
     async getAverageScore(drink) {
@@ -461,7 +461,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error(error)
+        this.message = error
       }
       return avgScore
     },
@@ -469,7 +469,6 @@ export default {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
         })
         .catch(error => {
           this.message = error
