@@ -608,6 +608,7 @@ export default {
       const eventX = event.clientX - rect.left
       const eventY = event.clientY - rect.top
 
+      if (!this.mapData.nodes) return
       // we have to check if the "clicked" or "pressed" area on the map
       // is over a locaiton marker
       this.targetNodes.forEach(targetNode => {
