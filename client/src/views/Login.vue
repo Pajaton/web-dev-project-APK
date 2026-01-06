@@ -5,7 +5,7 @@
       <h1 class="display-5 fw-bold">Welcome to APK</h1>
     </b-container>
 
-    <BForm class="px-0 px-md-3">
+    <BForm class="login-form mx-auto px-3">
       <BFormFloatingLabel
         label="Email address"
         label-for="floatingEmail"
@@ -98,4 +98,8 @@ export default {
     border-style: solid;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
   }
+  .login-form {
+  max-width: 420px;
+  }
+
 </style>
