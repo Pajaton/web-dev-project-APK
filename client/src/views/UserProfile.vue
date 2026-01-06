@@ -172,7 +172,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error(error)
+        this.message = error
       }
     },
     async getAverageScore(drink) {
