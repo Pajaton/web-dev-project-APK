@@ -20,6 +20,7 @@
               ref="mapDirections"
               location="toilets"
               @loading-change="isLoading = $event"
+              @mounted="onMapMounted"
             />
         </BOffcanvas>
     </div>
@@ -43,7 +44,8 @@ export default {
     openPanel() {
       this.showPanel = true
       this.hasOpened = true
-
+    },
+    onMapMounted() {
       if (!this.mapLoaded) {
         this.$nextTick(() => {
           this.$refs.mapDirections.getLocation()

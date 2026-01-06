@@ -18,12 +18,19 @@
       >
         <canvas ref="mapCanvas"></canvas>
       </div>
-
       <div
         v-if="isLoading"
         class="spinner-overlay position-absolute top-50 start-50 translate-middle"
       >
         <b-spinner label="Loading..."></b-spinner>
+      </div>
+      <div class="position-absolute top-50 start-50 translate-middle">
+        <p class="fw-bold" v-if="statusMessage !== ''">{{ statusMessage }}</p>
+        <b-button v-if="!isLoading && !mapData.nodes"
+          variant="primary"
+          @click="getLocation"
+          @touchstart.stop
+          @touchend.stop="getLocation">{{ statusMessage !== '' ? 'Retry' : 'Load ' + location }}</b-button>
       </div>
     </div>
   </div>
@@ -121,11 +128,12 @@ export default {
       default: 'location'
     }
   },
-  emits: ['loading-change', 'targets-loaded'],
+  emits: ['loading-change', 'targets-loaded', 'mounted'],
   data() {
     return {
       userId: null,
       message: '',
+      statusMessage: '',
       coordinates: null,
       mapData: {},
       targetLocation: null,
@@ -164,6 +172,7 @@ export default {
   methods: {
     async getLocation() {
       this.isLoading = true
+      this.statusMessage = ''
       this.$emit('loading-change', true)
       if (this.coordinates === null) {
         await this.getUserCoordinates()
@@ -171,24 +180,31 @@ export default {
 
       let dataFetched = false
 
-      while (!dataFetched) {
-        try {
-          const response = await Api.get('/maps/coordinates', {
-            params: {
-              userLat: this.coordinates.lat,
-              userLon: this.coordinates.lng,
-              type: this.location
-            }
-          })
-          // Object.freeze to prevent Vue from making it reactive
-          this.mapData = Object.freeze(response.data)
-
-          dataFetched = true
-        } catch (error) {
-          console.log(`Error: ${error}`)
-
-          if (error.status === 429) timeout(5000)
+      try {
+        const response = await Api.get('/maps/coordinates', {
+          params: {
+            userLat: this.coordinates.lat,
+            userLon: this.coordinates.lng,
+            type: this.location
+          }
+        })
+        // Object.freeze to prevent Vue from making it reactive
+        this.mapData = Object.freeze(response.data)
+        dataFetched = true
+      } catch (error) {
+        if (!error.response) {
+          this.statusMessage = "Network error. Please check your connection."
+        } else if (error.response.status === 429) {
+          this.statusMessage = "Server is busy, please try again."
+        } else if (error.response.status === 504) {
+          this.statusMessage = "Server timed out, please try again."
+        } else {
+          this.message = `Error fetching map data: ${error.response.statusText}`
         }
+
+        this.isLoading = false
+        this.$emit('loading-change', false)
+        return
       }
 
       // a user may not have the exact coords of a node, therefore
@@ -726,6 +742,7 @@ export default {
     this.fetchCurrentUser()
     this.resizeCanvas()
     this.getUserCoordinates()
+    this.$emit('mounted')
   }
 }
 </script>

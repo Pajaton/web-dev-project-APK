@@ -12,15 +12,7 @@
             @targets-loaded="targetLocations = $event"
           />
 
-          <!-- Temp button for testing -->
-          <b-button
-            class="btn_message"
-            variant="primary"
-            @click="getDirections"
-            :disabled="isLoading"
-          >
-            {{ isLoading ? 'Locating...' : 'Get directions to a Systembolag' }}
-          </b-button>
+          
         </b-col>
         <b-col cols="6" lg="4" sm="12"
           style="height: 600px; overflow-y: auto;"
