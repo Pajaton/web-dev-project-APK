@@ -39,6 +39,17 @@
 <script>
 import { Api } from '@/Api'
 
+// constants
+const EARTH_RADIUS_METERS = 6371e3
+const CANVAS_CONFIG = {
+  width: 800,
+  height: 600,
+  fullWidth: 3000,
+  fullHeight: 2400
+}
+const ZOOM_LIMITS = { min: 0.1, max: 10 }
+const CLICK_TOLERANCE_PX = 5 // max distance mouse can move and still register as a click
+
 class MinHeap {
   constructor(estimatedCost) {
     this.heap = []
@@ -162,11 +173,11 @@ export default {
 
       // map configs
       bounds: { minLat: 0,maxLat: 0,minLon: 0,maxLon: 0 },
-      canvasWidth: 800, // visible width
-      canvasHeight: 600, // visible height
+      canvasWidth: CANVAS_CONFIG.width, // visible width
+      canvasHeight: CANVAS_CONFIG.height, // visible height
 
-      canvasFullWidth: 3000, // rendered width
-      canvasFullHeight: 2400 // rendered height
+      canvasFullWidth: CANVAS_CONFIG.fullWidth, // rendered width
+      canvasFullHeight: CANVAS_CONFIG.fullHeight // rendered height
     }
   },
   methods: {
@@ -296,11 +307,8 @@ export default {
       let nearestNodeId = null
       let minDistance = Infinity
 
-      for (const nodeId in this.mapData.nodes) {
-        const node = this.mapData.nodes[nodeId]
-        const dLat = node.lat - lat
-        const dLon = node.lon - lng
-        const distance = (dLat * dLat) + (dLon * dLon)
+      for (const [nodeId, node] of Object.entries(this.mapData.nodes)) {
+        const distance = (node.lat - lat) ** 2 + (node.lon - lng) ** 2
 
         if (distance < minDistance) {
           minDistance = distance
@@ -308,7 +316,7 @@ export default {
         }
       }
 
-      return nearestNodeId ? String(nearestNodeId) : null
+      return nearestNodeId
     },
 
     // implemented shortest path algorithm with A*
@@ -366,7 +374,6 @@ export default {
 
     // get the distance between node A and node B
     getDistance(nodeA, nodeB) {
-      const R = 6371e3
       const toRadians = (degrees) => degrees * (Math.PI / 180)
       const latA = toRadians(nodeA.lat)
       const latB = toRadians(nodeB.lat)
@@ -376,7 +383,7 @@ export default {
         Math.cos(latA) * Math.cos(latB) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2)
 
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      return EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     },
 
     // build the shortest path
@@ -571,7 +578,7 @@ export default {
     },
 
     handleMapZoom(event, zoomFactor) {
-      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+      const newScale = Math.min(Math.max(this.view.scale * zoomFactor, ZOOM_LIMITS.min), ZOOM_LIMITS.max)
 
       const rect = this.$refs.mapCanvas.getBoundingClientRect()
       const eventX = event.clientX - rect.left
@@ -606,7 +613,7 @@ export default {
 
         if (this.lastTouchDistance) {
           const zoomFactor = currentDistance / this.lastTouchDistance
-          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, 0.1), 10)
+          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, ZOOM_LIMITS.min), ZOOM_LIMITS.max)
 
           this.handleMapZoom({
             clientX: (event.touches[0].clientX + event.touches[1].clientX) / 2,
@@ -657,7 +664,7 @@ export default {
         event.clientX - this.dragStart.x,
         event.clientY - this.dragStart.y
       )
-      if (distMoved > 5) return // user panning, not clicking
+      if (distMoved > CLICK_TOLERANCE_PX) return // user panning, not clicking
 
       this.handleMapSelection(event)
     },
@@ -667,14 +674,9 @@ export default {
       if (!this.userNodeId || !this.mapData.nodes) return
 
       const targetNodeId = this.getNearestNodeId(locationData.lat, locationData.lon)
-
       if (!targetNodeId) return
 
-      this.targetLocation = {
-        nodeId: targetNodeId,
-        distance: 0
-      }
-
+      this.targetLocation = { nodeId: targetNodeId, distance: 0 }
       this.findShortestPath(this.userNodeId)
       requestAnimationFrame(this.renderMap)
     },
@@ -708,7 +710,7 @@ export default {
           touch.clientY - this.touchStartPos.y
         )
 
-        if (distMoved < 10) {
+        if (distMoved < CLICK_TOLERANCE_PX) {
           this.handleMapSelection(touch)
         }
       }
