@@ -1,9 +1,9 @@
 <template>
   <!-- Register HTML template -->
   <div>
-    <BFormGroup class="my-2">
+    <BFormGroup class="register-wrapper my-2 px-2 px-md-0">
     <h2>Register</h2>
-    <BForm style="padding-left: 2rem;">
+    <BForm class="px-0 px-md-4">
       <BFormFloatingLabel label="Email Address" label-for="floatingEmail">
         <BFormInput
         id="floatingEmail"
@@ -88,8 +88,12 @@
       <b-form-checkbox v-model="ageCheck" inline>I confirm that I am over 20 years old</b-form-checkbox>
       <BAlert :model-value="!!message" :variant="alertVariant" dismissible @dismissed="message=''"> {{ message }} </BAlert>
     </BForm>
-    <b-button  variant="danger" block @click="resetFields()" class="my-2">Reset</b-button>
-    <b-button variant="primary" block @click="registerUser()" :disabled="!validForm" class="my-2">Register</b-button>
+      <div class="px-2 px-md-0">
+        <div class="d-inline-flex flex-column flex-md-row gap-2 align-items-start justify-content-md-center w-100">
+          <b-button variant="danger" @click="resetFields()">Reset</b-button>
+          <b-button variant="primary" @click="registerUser()" :disabled="!validForm">Register</b-button>
+        </div>
+      </div>
     </BFormGroup>
   </div>
 </template>
@@ -204,7 +208,7 @@ export default {
 </script>
 
 <style>
-.my-2 {
-      max-width: 500px;
-    }
+.register-wrapper {
+  max-width: 500px; width: 100%;
+  }
 </style>
