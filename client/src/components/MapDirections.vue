@@ -391,6 +391,7 @@ export default {
 
     // gets the node bounds
     calculateBounds(nodes) {
+      const padding = 0.001 // ~100m padding
       let minLat = Infinity
       let maxLat = -Infinity
       let minLon = Infinity
@@ -400,10 +401,10 @@ export default {
         const node = nodes[nodeId]
 
         // the +- 0.001 is bounds padding
-        if (node.lat < minLat) minLat = node.lat - 0.001
-        if (node.lat > maxLat) maxLat = node.lat + 0.001
-        if (node.lon < minLon) minLon = node.lon - 0.001
-        if (node.lon > maxLon) maxLon = node.lon + 0.001
+        if (node.lat < minLat) minLat = node.lat - padding
+        if (node.lat > maxLat) maxLat = node.lat + padding
+        if (node.lon < minLon) minLon = node.lon - padding
+        if (node.lon > maxLon) maxLon = node.lon + padding
       }
       this.bounds = { minLat, maxLat, minLon, maxLon }
     },
