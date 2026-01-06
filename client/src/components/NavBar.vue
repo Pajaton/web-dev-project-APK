@@ -11,9 +11,8 @@
                 <b-col><b-button block variant="navbar" to="/drinks">Drinks</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
                 <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/reviews">Reviews</b-button></b-col>
+                <b-col><b-button block variant="navbar" @click=goToMyProfile()>Profile</b-button></b-col>
                 <b-col><b-button block variant="navbar" @click="loginLogout">{{ currentUserId ? 'Logout' : 'Login' }}</b-button></b-col>
-
               </b-collapse>
             </b-row>
           </b-container>
@@ -66,6 +65,13 @@ export default {
       this.currentUserId = null
       await this.fetchCurrentUser()
       this.$router.push('/login')
+    },
+    goToMyProfile() {
+      if (!this.currentUserId) {
+        this.$router.push('/login')
+        return
+      }
+      this.$router.push(`/users/${this.currentUserId}`)
     }
   }
 }
