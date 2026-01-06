@@ -84,7 +84,7 @@
                 Apply sort
               </b-button>
 
-              <b-button variant="danger" @click="deleteAllReviews">
+              <b-button v-if="currentUserEmail === 'admin@apk.com'" variant="danger" @click="deleteAllReviews">
                 DELETE ALL REVIEWS
               </b-button>
             </b-form>
@@ -108,16 +108,22 @@
     <b-modal v-model="showDrinkPopup" title="Drink details" hide-footer>
       <div v-if="chosenDrink">
         <h2>{{ chosenDrink.name }}</h2>
-        <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
-        <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
-        <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
-        <p><strong>Volume:</strong> {{ chosenDrink.volume }} ml</p>
-        <p><strong>Alcohol percentage:</strong> {{ chosenDrink.percentage }} %</p>
-        <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
-        <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
-        <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
-        <p><strong>Average Rating:</strong> {{ avgRating }}</p>
-
+        <b-row>
+          <b-col cols="12" md="6">
+            <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
+            <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
+            <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
+            <p><strong>Volume:</strong> {{ chosenDrink.volume }} ml</p>
+            <p><strong>Alcohol percentage:</strong> {{ chosenDrink.percentage }} %</p>
+            <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
+            <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
+            <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
+            <p><strong>Average Rating:</strong> {{ avgRating }}</p>
+          </b-col>
+          <b-col cols="12" md="6">
+            <b-img :src= chosenDrink.image fluid alt="bottle image"  style="max-width: 230px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+          </b-col>
+        </b-row>
         <b-button v-if="currentUserId" @click="getReviewRating">
           Review drink
         </b-button>
@@ -206,6 +212,7 @@ export default {
       reviewText: '',
       rating: null,
       currentUserId: null,
+      currentUserEmail: null,
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
@@ -427,8 +434,8 @@ export default {
                     rating: review.rating
                   })
                 })
-                .catch(err => {
-                  console.error('User fetch failed', err)
+                .catch(error => {
+                  this.message = error
                   this.reviewsForChosenDrink.push({
                     userName: 'Account deleted',
                     comment: review.comment,
@@ -438,8 +445,8 @@ export default {
             }
           })
         })
-        .catch(err => {
-          console.error('Reviews fetch failed', err)
+        .catch(error => {
+          this.message = error
         })
     },
     async getAverageScore(drink) {
@@ -461,7 +468,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error(error)
+        this.message = error
       }
       return avgScore
     },
@@ -469,11 +476,18 @@ export default {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
+          this.currentUserEmail = response.data.user.email
         })
         .catch(error => {
           this.message = error
         })
+    },
+    drinkPictureError(event) {
+      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
+    },
+    imageUrl(image) {
+      const imagePath = `../assets${image}`
+      return new URL(imagePath, import.meta.url).href
     }
   }
 }
