@@ -203,21 +203,21 @@ export default {
       modalShowConfirmation: false,
       alertVariant: 'info',
       profilePictureList: [
-        '/profilePictures/greger.jpg',
-        '/profilePictures/bacchus.jpg',
-        '/profilePictures/dionysos.jpg',
-        '/profilePictures/freya.jpg',
-        '/profilePictures/ellie.jpg',
-        '/profilePictures/jules.jpg',
-        '/profilePictures/tyrion.jpg',
-        '/profilePictures/penny.jpg',
-        '/profilePictures/zoro.jpg',
-        '/profilePictures/kapten_haddock.jpeg',
-        '/profilePictures/malory_archer.jpg',
-        '/profilePictures/sterling_archer.jpg',
-        '/profilePictures/pam.jpg',
-        '/profilePictures/patsy.jpg',
-        '/profilePictures/tom.png'
+        'greger.jpg',
+        'bacchus.jpg',
+        'dionysos.jpg',
+        'freya.jpg',
+        'ellie.jpg',
+        'jules.jpg',
+        'tyrion.jpg',
+        'penny.jpg',
+        'zoro.jpg',
+        'kapten_haddock.jpeg',
+        'malory_archer.jpg',
+        'sterling_archer.jpg',
+        'pam.jpg',
+        'patsy.jpg',
+        'tom.png'
       ]
     }
   },
@@ -260,7 +260,7 @@ export default {
         const response = await drinkApi.get('/users/' + this.currentUserId)
         this.userInfo = response.data
         this.email = this.userInfo.email
-        this.profilePicture = this.userInfo.profilePicture ?? '/profilePictures/default_user.jpg'
+        this.profilePicture = this.userInfo.profilePicture ?? 'default_user.jpg'
         this.userName = this.userInfo.userName
         this.street = this.userInfo.street
         this.streetNumber = this.userInfo.streetNumber
@@ -302,15 +302,14 @@ export default {
         })
     },
     profilePictureError(event) {
-      event.target.src = '/profilePictures/default_user.jpg'
+      event.target.src = 'default_user.jpg'
     },
     numberState(number) {
       if (number === null) return true
       return /^\d*$/.test(number)
     },
     imageUrl(image) {
-      const imagePath = `../assets${image}`
-      return new URL(imagePath, import.meta.url).href
+      return new URL(`../assets/profilePictures/${image}`, import.meta.url).href
     }
   }
 }

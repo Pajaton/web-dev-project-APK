@@ -53,8 +53,7 @@ export default {
         })
     },
     imageUrl(image) {
-      const imagePath = `../assets/homePagePictures/${image}`
-      return new URL(imagePath, import.meta.url).href
+      return new URL(`../assets/homePagePictures/${image}`, import.meta.url).href
     }
   }
 }
