@@ -108,7 +108,6 @@
     <b-modal v-model="showDrinkPopup" title="Drink details" hide-footer>
       <div v-if="chosenDrink">
         <h2>{{ chosenDrink.name }}</h2>
-
         <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
         <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
         <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
@@ -117,6 +116,7 @@
         <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
         <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
         <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
+        <p><strong>Average Rating:</strong> {{ avgRating }}</p>
 
         <b-button v-if="currentUserId" @click="getReviewRating">
           Review drink
@@ -209,7 +209,8 @@ export default {
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
-      showAllReviewsPopup: false
+      showAllReviewsPopup: false,
+      avgRating: null
     }
   },
   mounted() {
@@ -309,9 +310,10 @@ export default {
     capitalizeFirst(str) {
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
     },
-    openDrinkPopup(drink) {
+    async openDrinkPopup(drink) {
       this.showDrinkPopup = true
       this.getDrinkById(drink._id)
+      this.avgRating = await this.getAverageScore(drink._id)
     },
     closeDrinkPopup() {
       this.showDrinkPopup = false
@@ -439,6 +441,29 @@ export default {
         .catch(err => {
           console.error('Reviews fetch failed', err)
         })
+    },
+    async getAverageScore(drink) {
+      let avgScore = 0
+      try {
+        const response = await drinkApi.get('/drinks/' + drink + '/reviews')
+        const drinkReviews = response.data.reviewForDrink
+        let reviewCounter = 0
+        let totalScore = 0
+        for (const review of drinkReviews) {
+          if (review.rating != null) {
+            reviewCounter += 1
+            totalScore += review.rating
+          }
+          if (reviewCounter > 0) {
+            avgScore = totalScore / reviewCounter
+          } else {
+            avgScore = 'No score'
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+      return avgScore
     },
     fetchCurrentUser() {
       drinkApi.get('/sessions/currentlyLoggedin/')
