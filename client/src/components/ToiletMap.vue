@@ -15,15 +15,40 @@
             body-scrolling
             title="Find toilets"
         >
+            <div id="toilet-info" v-if="targetToilet !== null">
+              <b-list-group flush>
+                <b-list-group-item>
+                  <div class="fw-bold">Toilet at: {{ targetToilet.street }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.directions">
+                  <div class="fw-bold">At the location: {{ targetToilet.directions }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.comment">
+                  <div class="fw-bold">Comment: {{ targetToilet.comment }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.unisex">
+                  <div class="fw-bold">{{ targetToilet.unisex ? 'The toilet is unisex' : 'The toilet is gendered' }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.accessible">
+                  <div class="fw-bold">{{ targetToilet.accessible ? 'The toilet is accessible' : 'The toilet is not accessible' }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.changingTable">
+                  <div class="fw-bold">{{ targetToilet.changingTable ? 'The toilet has a changing table' : 'The toilet does not have a changing table' }}</div>
+                </b-list-group-item>
+                <b-list-group-item v-if="targetToilet.upvotes !== undefined && targetToilet.downvotes !== undefined">
+                  <div class="fw-bold">Upvotes: {{ targetToilet.upvotes }}<br>Downvotes: {{ targetToilet.downvotes }}</div>
+                </b-list-group-item>
+              </b-list-group>
+            </div>
             <MapDirections
               v-if="hasOpened"
               ref="mapDirections"
               location="toilets"
               @loading-change="isLoading = $event"
+              @target-location="targetToilet = $event"
             />
         </BOffcanvas>
     </div>
-
 </template>
 
 <script>
@@ -33,6 +58,7 @@ export default {
   components: { MapDirections },
   data() {
     return {
+      targetToilet: null,
       showPanel: false,
       hasOpened: false,
       isLoading: false,
