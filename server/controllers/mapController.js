@@ -6,6 +6,64 @@ const baseMapURL = "https://overpass-api.de/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
 const Systembolag = require("../models/SystembolagSchema.js")
 
+// Simple in-memory cache
+const cache = new Map();
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Gets cached map data or fetches and caches it.
+ * @param {string} key - Cache key.
+ * @param {Function} fetchFunction - Async function to fetch data if not cached.
+ * @returns {Promise<any>} Cached or freshly fetched data.
+ */
+async function getMapData(key, fetchFunction) {
+  const cachedData = cache.get(key);
+  
+  // return cached data if exists and not expired
+  if (cachedData && Date.now() < cachedData.expiry) {
+    return cachedData.data;
+  }
+  
+  const data = await fetchFunction();
+  
+  // save to in-memory cache
+  cache.set(key, {
+    data,
+    expiry: Date.now() + CACHE_TTL
+  });
+  
+  return data;
+}
+
+/**
+ * Generates a cache key based on coordinates (rounded to reduce unique keys).
+ * @param {string} prefix - Cache key prefix.
+ * @param {number} lat - Latitude.
+ * @param {number} lon - Longitude.
+ * @returns {string} Cache key.
+ */
+function getCacheKey(prefix, lat, lon) {
+  // Round to ~1km precision to increase cache hits
+  const roundedLat = Math.round(parseFloat(lat) * 100) / 100;
+  const roundedLon = Math.round(parseFloat(lon) * 100) / 100;
+  return `${prefix}:${roundedLat}:${roundedLon}`;
+}
+
+/**
+ * Periodically cleans up expired cache entries.
+ */
+function cleanupCache() {
+  const now = Date.now();
+  for (const [key, value] of cache.entries()) {
+    if (now >= value.expiry) {
+      cache.delete(key);
+    }
+  }
+}
+
+// Run cleanup every 10 minutes
+setInterval(cleanupCache, 10 * 60 * 1000);
+
 /**
  * Retries a request function with exponential backoff for transient errors.
  * @param {Function} requestFunction - The async function to retry.
@@ -206,12 +264,13 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
     throw new Error("Invalid bounding box coordinates");
   }
 
-  const query = `[out:json][timeout:60];
-    (way["highway"](${south},${west},${north},${east}););
-    (._;>;);
-    out body;`;
+  const cacheKey = `map:${south.toFixed(3)}:${north.toFixed(3)}:${west.toFixed(3)}:${east.toFixed(3)}`;  
+  const graphData = await getMapData(cacheKey, async () => {
+    const query = `[out:json][timeout:60];
+      (way["highway"](${south},${west},${north},${east}););
+      (._;>;);
+      out body;`;
 
-  try {
     const params = new URLSearchParams();
     params.append('data', query);
 
@@ -224,16 +283,14 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
       throw new Error("Invalid response from Overpass API: missing elements");
     }
     
-    const graphData = buildGraph(elements);
-    
-    return {
-      'targetLocations': targetLocationData,
-      'nodes': graphData.nodes,
-      'adjacencyList': graphData.adjacencyList,
-    };
-  } catch (error) {
-    throw error;
-  }
+    return buildGraph(elements);
+  });
+  
+  return {
+    'targetLocations': targetLocationData,
+    'nodes': graphData.nodes,
+    'adjacencyList': graphData.adjacencyList,
+  };
 }
 
 /**
@@ -299,23 +356,27 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
  * @throws {Error} Throws if no locations are found nearby.
  */
 async function findSystembolag(userLat, userLon) {
-  const query = `[out:json][timeout:25];
-    nwr
-    ["name"="Systembolaget"]
-    (around:5000,${userLat},${userLon});
-    out center;`;
-  const searchParams = new URLSearchParams({ data: query} );
+  const cacheKey = getCacheKey('systembolag', userLat, userLon);
+  
+  return getMapData(cacheKey, async () => {
+    const query = `[out:json][timeout:25];
+      nwr
+      ["name"="Systembolaget"]
+      (around:5000,${userLat},${userLon});
+      out center;`;
+    const searchParams = new URLSearchParams({ data: query });
 
-  const response = await retryMapDataFetch(
-    () => axios.post(baseMapURL, searchParams, { timeout: 25000 })
-  );
-  const elements = response.data?.elements;
+    const response = await retryMapDataFetch(
+      () => axios.post(baseMapURL, searchParams, { timeout: 25000 })
+    );
+    const elements = response.data?.elements;
 
-  if (!elements || !Array.isArray(elements) || elements.length === 0) {
-    return [];
-  }
+    if (!elements || !Array.isArray(elements) || elements.length === 0) {
+      return [];
+    }
 
-  return elements;
+    return elements;
+  });
 }
 
 /**
@@ -326,20 +387,22 @@ async function findSystembolag(userLat, userLon) {
  * @returns {Promise<Array<Object>>} Array of restroom location objects.
  */
 async function findToilets(userLat, userLon) {
-  const query = `?page=1&per_page=20&offset=0&lat=${userLat}&lng=${userLon}`
-
-  const response = await axios.get(baseToiletURL + query)
-
-  if (!response.data || response.data.length === 0) {
-    return [];
-  }
+  const cacheKey = getCacheKey('toilets', userLat, userLon);
   
-  // ensure we only include toilets which have lat and lon values
-  const toiletLocations = response.data.filter(location => {
-    return location.latitude !== undefined && location.longitude !== undefined
-  })
+  return getMapData(cacheKey, async () => {
+    const query = `?page=1&per_page=20&offset=0&lat=${userLat}&lng=${userLon}`;
+    const response = await axios.get(baseToiletURL + query);
 
-  return toiletLocations
+    if (!response.data || response.data.length === 0) {
+      return [];
+    }
+    
+    const toiletLocations = response.data.filter(location => {
+      return location.latitude !== undefined && location.longitude !== undefined;
+    });
+
+    return toiletLocations;
+  });
 }
 
 /**
