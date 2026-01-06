@@ -84,7 +84,7 @@
                 Apply sort
               </b-button>
 
-              <b-button variant="danger" @click="deleteAllReviews">
+              <b-button v-if="currentUserEmail === 'admin@apk.com'" variant="danger" @click="deleteAllReviews">
                 DELETE ALL REVIEWS
               </b-button>
             </b-form>
@@ -206,6 +206,7 @@ export default {
       reviewText: '',
       rating: null,
       currentUserId: null,
+      currentUserEmail: null,
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
@@ -469,6 +470,7 @@ export default {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
+          this.currentUserEmail = response.data.user.email
         })
         .catch(error => {
           this.message = error
