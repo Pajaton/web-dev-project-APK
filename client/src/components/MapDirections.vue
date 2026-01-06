@@ -731,7 +731,6 @@ export default {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.userId = response.data.user._id
-          console.log(this.userId)
         })
         .catch(error => {
           this.message = error

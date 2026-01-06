@@ -84,7 +84,7 @@
                 Apply sort
               </b-button>
 
-              <b-button variant="danger" @click="deleteAllReviews">
+              <b-button v-if="currentUserEmail === 'admin@apk.com'" variant="danger" @click="deleteAllReviews">
                 DELETE ALL REVIEWS
               </b-button>
             </b-form>
@@ -212,6 +212,7 @@ export default {
       reviewText: '',
       rating: null,
       currentUserId: null,
+      currentUserEmail: null,
       oldReview: null,
       allReviews: null,
       reviewsForChosenDrink: [],
@@ -433,8 +434,8 @@ export default {
                     rating: review.rating
                   })
                 })
-                .catch(err => {
-                  console.error('User fetch failed', err)
+                .catch(error => {
+                  this.message = error
                   this.reviewsForChosenDrink.push({
                     userName: 'Account deleted',
                     comment: review.comment,
@@ -444,8 +445,8 @@ export default {
             }
           })
         })
-        .catch(err => {
-          console.error('Reviews fetch failed', err)
+        .catch(error => {
+          this.message = error
         })
     },
     async getAverageScore(drink) {
@@ -467,7 +468,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error(error)
+        this.message = error
       }
       return avgScore
     },
@@ -475,7 +476,7 @@ export default {
       drinkApi.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
-          console.log(this.currentUserId)
+          this.currentUserEmail = response.data.user.email
         })
         .catch(error => {
           this.message = error
