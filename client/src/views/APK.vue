@@ -108,16 +108,22 @@
     <b-modal v-model="showDrinkPopup" title="Drink details" hide-footer>
       <div v-if="chosenDrink">
         <h2>{{ chosenDrink.name }}</h2>
-        <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
-        <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
-        <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
-        <p><strong>Volume:</strong> {{ chosenDrink.volume }} ml</p>
-        <p><strong>Alcohol percentage:</strong> {{ chosenDrink.percentage }} %</p>
-        <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
-        <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
-        <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
-        <p><strong>Average Rating:</strong> {{ avgRating }}</p>
-
+        <b-row>
+          <b-col cols="12" md="6">
+            <p><strong>Product number:</strong> {{ chosenDrink.productNumber }}</p>
+            <p><strong>Type:</strong> {{ chosenDrink.type }}</p>
+            <p><strong>Container:</strong> {{ chosenDrink.container }}</p>
+            <p><strong>Volume:</strong> {{ chosenDrink.volume }} ml</p>
+            <p><strong>Alcohol percentage:</strong> {{ chosenDrink.percentage }} %</p>
+            <p><strong>Price:</strong> {{ chosenDrink.price }} kr</p>
+            <p><strong>APK:</strong> {{ chosenDrink.apk }}</p>
+            <p><strong>Colour:</strong> {{ chosenDrink.colour }}</p>
+            <p><strong>Average Rating:</strong> {{ avgRating }}</p>
+          </b-col>
+          <b-col cols="12" md="6">
+            <b-img :src= chosenDrink.image fluid alt="bottle image"  style="max-width: 230px; max-height: 300px; display:block;" @error="drinkPictureError"></b-img>
+          </b-col>
+        </b-row>
         <b-button v-if="currentUserId" @click="getReviewRating">
           Review drink
         </b-button>
@@ -475,6 +481,13 @@ export default {
         .catch(error => {
           this.message = error
         })
+    },
+    drinkPictureError(event) {
+      event.target.src = this.imageUrl('/drinkPictures/default_drink.jpg')
+    },
+    imageUrl(image) {
+      const imagePath = `../assets${image}`
+      return new URL(imagePath, import.meta.url).href
     }
   }
 }
