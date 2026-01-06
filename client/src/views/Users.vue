@@ -1,17 +1,32 @@
 <template>
-    <!-- User Profile HTML template -->
-    <div>
-      <h1>COMMUNITY HOMEPAGE</h1>
-      <h3 class="users-info-style">List of users: </h3>
-      <div class="users-info-style" style="padding-left: 1rem;">
-        <li style="list-style: none;" v-for="user in users" :key="user._id">
-          <router-link
-            :to="{ name: 'userProfile', params: { id: user._id } }">
-            {{ user.userName }}
-          </router-link>
-        </li>
-      </div>
-    </div>
+  <div>
+    <b-container>
+      <b-row>
+        <b-col cols="12">
+          <b-card>
+            <h1 class="text-start text-md-center">COMMUNITY HOMEPAGE</h1>
+            <h4 class="mb-3 text-start text-md-center">List of users:</h4>
+
+            <b-list-group>
+              <b-list-group-item
+                v-for="user in users"
+                :key="user._id"
+                class="border-0"
+              >
+                <b-button
+                  variant="outline-primary"
+                  class="w-auto"
+                  @click="$router.push({ name: 'userProfile', params: { id: user._id } })"
+                >
+                  {{ user.userName }}
+                </b-button>
+              </b-list-group-item>
+            </b-list-group>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-container>
+  </div>
 </template>
 
 <script>
