@@ -205,7 +205,6 @@ export default {
       selectedFilter: [],
       selectedSort: '',
       selectedType: [],
-      typeText: '',
       percentageMinText: '',
       priceMinText: '',
       apkMinText: '',
@@ -428,7 +427,7 @@ export default {
         rating: this.rating,
         comment: this.reviewText
       })
-        .then(response => {
+        .then(() => {
           this.reviewText = ''
           this.rating = null
           this.showReviewPopup = false
@@ -448,7 +447,7 @@ export default {
         rating: this.rating,
         comment: this.reviewText
       })
-        .then(response => {
+        .then(() => {
           this.reviewText = ''
           this.rating = null
           this.showReviewPopup = false
@@ -466,7 +465,7 @@ export default {
         return
       }
       Api.delete('/reviews/' + this.oldReview._id)
-        .then(response => {
+        .then(() => {
           this.oldReview = null
           this.reviewText = ''
           this.rating = null
@@ -482,7 +481,7 @@ export default {
      */
     deleteAllReviews() {
       Api.delete('/reviews')
-        .then(response => {
+        .then(() => {
           this.showReviewPopup = false
         })
         .catch(error => {
