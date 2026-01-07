@@ -1,23 +1,23 @@
 <template>
-    <div>
-      <b-navbar toggleable="sm" type="dark" variant="info">
-        <b-navbar-toggle target="nav-text-collapse">
-           <b-button variant="navbar" block>APK Menu</b-button>
-        </b-navbar-toggle>
-          <b-container fluid>
-            <b-row>
-              <b-collapse id="nav-text-collapse" is-nav>
-                <b-col><b-button block variant="navbar" to="/home">HOME</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/drinks">Drinks</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
-                <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
-                <b-col><b-button block variant="navbar" @click=goToMyProfile()>Profile</b-button></b-col>
-                <b-col><b-button block variant="navbar" @click="loginLogout">{{ currentUserId ? 'Logout' : 'Login' }}</b-button></b-col>
-              </b-collapse>
-            </b-row>
-          </b-container>
-        </b-navbar>
-    </div>
+  <div>
+    <b-navbar toggleable="sm" type="dark" variant="info">
+      <b-navbar-toggle target="nav-text-collapse">
+         <b-button variant="navbar" block>APK Menu</b-button>
+      </b-navbar-toggle>
+      <b-container fluid>
+        <b-row>
+          <b-collapse id="nav-text-collapse" is-nav>
+            <b-col><b-button block variant="navbar" to="/home">HOME</b-button></b-col>
+            <b-col><b-button block variant="navbar" to="/drinks">Drinks</b-button></b-col>
+            <b-col><b-button block variant="navbar" to="/systembolag">Systembolag</b-button></b-col>
+            <b-col><b-button block variant="navbar" to="/users">Users</b-button></b-col>
+            <b-col><b-button block variant="navbar" @click=goToMyProfile()>Profile</b-button></b-col>
+            <b-col><b-button block variant="navbar" @click="loginLogout">{{ currentUserId ? 'Logout' : 'Login' }}</b-button></b-col>
+          </b-collapse>
+        </b-row>
+      </b-container>
+    </b-navbar>
+  </div>
 </template>
 
 <script>

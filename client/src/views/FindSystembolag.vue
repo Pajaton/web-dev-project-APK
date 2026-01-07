@@ -12,7 +12,6 @@
             @targets-loaded="targetLocations = $event"
           />
 
-          
         </b-col>
         <b-col cols="6" lg="4" sm="12"
           style="height: 600px; overflow-y: auto;"
@@ -38,7 +37,7 @@
 </template>
 
 <script>
-import {Api} from '@/Api.js'
+import { Api } from '@/Api.js'
 import MapDirections from '@/components/MapDirections.vue'
 
 /**
@@ -55,7 +54,7 @@ export default {
       isLoading: false,
       targetLocations: [],
       userId: null,
-      favoriteSystembolagId: null 
+      favoriteSystembolagId: null
     }
   },
   async mounted() {

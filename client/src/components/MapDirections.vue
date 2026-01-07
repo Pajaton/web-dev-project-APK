@@ -167,7 +167,7 @@ class MinHeap {
     let index = this.heap.length - 1
 
     while (index > 0) {
-      let parentIndex = Math.floor((index - 1) / 2)
+      const parentIndex = Math.floor((index - 1) / 2)
 
       if (this.estimatedCost[this.heap[parentIndex]] > this.estimatedCost[this.heap[index]]) {
         this.swap(parentIndex, index)
@@ -212,15 +212,15 @@ export default {
 
       // mouse events
       isDraggingMap: false,
-      dragStart: { x: 0,y: 0 },
+      dragStart: { x: 0, y: 0 },
       mouseWheelTimer: null,
 
       // touch events
-      touchStartPos: { x: 0,y: 0 },
+      touchStartPos: { x: 0, y: 0 },
       lastTouchDistance: null,
 
       // map configs
-      bounds: { minLat: 0,maxLat: 0,minLon: 0,maxLon: 0 },
+      bounds: { minLat: 0, maxLat: 0, minLon: 0, maxLon: 0 },
       canvasWidth: CANVAS_CONFIG.width, // visible width
       canvasHeight: CANVAS_CONFIG.height, // visible height
 
@@ -251,8 +251,6 @@ export default {
         await this.getUserCoordinates()
       }
 
-      let dataFetched = false
-
       try {
         const response = await Api.get('/maps/coordinates', {
           params: {
@@ -264,10 +262,9 @@ export default {
 
         // Object.freeze to prevent Vue from making it reactive
         this.mapData = Object.freeze(response.data)
-        dataFetched = true
       } catch (error) {
         if (!error.response) {
-          this.statusMessage = "Network error. Please check your connection."
+          this.statusMessage = 'Network error. Please check your connection.'
         } else if (error.response.data?.message) {
           this.statusMessage = error.response.data.message
         } else {
@@ -306,7 +303,7 @@ export default {
       this.targetLocation = this.targetNodes[0] || null
 
       if (!this.targetLocation) {
-        this.statusMessage = "No locations found nearby."
+        this.statusMessage = 'No locations found nearby.'
         this.isLoading = false
         this.$emit('loading-change', false)
         return
@@ -330,9 +327,8 @@ export default {
         this.$nextTick(() => {
           this.renderMap()
         })
-
       } else {
-        this.message = "No path found."
+        this.message = 'No path found.'
         this.pathSearchFailed = true
       }
 
@@ -408,7 +404,7 @@ export default {
       this.shortestPath = []
       this.pathSearchFailed = false
       const targetId = this.targetLocation.nodeId
-      const { nodes,adjacencyList } = this.mapData
+      const { nodes, adjacencyList } = this.mapData
 
       if (!nodes[startId] || !nodes[targetId]) {
         return false
@@ -419,12 +415,12 @@ export default {
       const cameFrom = {}
       const costToHere = {}
       const visited = new Set()
-      
+
       Object.keys(nodes).forEach(nodeId => {
         costToHere[nodeId] = Infinity
         estimatedTotalCost[nodeId] = Infinity
       })
-      
+
       costToHere[startId] = 0
       estimatedTotalCost[startId] = this.getDistance(nodes[startId], nodes[targetId])
       nodesToVisit.insert(startId)
@@ -441,7 +437,7 @@ export default {
         visited.add(currentNode)
 
         if (this.targetLocation.nodeId === currentNode) {
-          this.shortestPath = this.reconstructPath(cameFrom,currentNode)
+          this.shortestPath = this.reconstructPath(cameFrom, currentNode)
 
           return true
         }
@@ -453,7 +449,7 @@ export default {
           const neighbor = String(edge.node)
 
           if (visited.has(neighbor)) continue
-          if (!nodes[neighbor]) continue  // skip if neighbor node doesn't exist
+          if (!nodes[neighbor]) continue // skip if neighbor node doesn't exist
 
           const costToNext = costToHere[currentNode] + edge.weight
 
@@ -579,7 +575,7 @@ export default {
         const neighbors = adjacencyList[fromId]
         neighbors.forEach(edge => {
           const toNode = nodes[edge.node]
-          const edgeKey = [fromId,edge.node].sort().join('-') // Ensure edges are drawn once (A->B === B->A)
+          const edgeKey = [fromId, edge.node].sort().join('-') // Ensure edges are drawn once (A->B === B->A)
 
           if (toNode && !processedEdges.has(edgeKey)) {
             const p1 = this.project(fromNode.lat, fromNode.lon)
@@ -623,17 +619,17 @@ export default {
         if (this.userNodeId && this.mapData.nodes[this.userNodeId]) {
           this.drawMarker(this.mapData.nodes[this.userNodeId], '#005885')
         }
-      
+
         // Draw all target markers
         this.targetNodes.forEach(targetNode => {
           // Highlight the currently selected target even if pathing failed
-          const color = (this.targetLocation && targetNode.nodeId === this.targetLocation.nodeId) 
-                        ? '#cc0000' // Darker red/green for the "selected" one
-                        : '#76B07E'
+          const color = (this.targetLocation && targetNode.nodeId === this.targetLocation.nodeId)
+            ? '#cc0000' // Darker red/green for the "selected" one
+            : '#76B07E'
           this.drawMarker(this.mapData.nodes[targetNode.nodeId], color)
         })
       }
-    
+
       this.ctx.restore()
     },
 
@@ -667,8 +663,8 @@ export default {
       if (pathIds.length < 2) return
 
       const start = nodes[pathIds[0]]
-      const startProj = this.project(start.lat,start.lon)
-      this.ctx.moveTo(startProj.x,startProj.y)
+      const startProj = this.project(start.lat, start.lon)
+      this.ctx.moveTo(startProj.x, startProj.y)
 
       pathIds.forEach(id => {
         const node = nodes[id]
@@ -690,7 +686,7 @@ export default {
       const radius = 8 / this.view.scale // keep consistent size
 
       this.ctx.beginPath()
-      this.ctx.arc(proj.x,proj.y, radius, 0, 2 * Math.PI)
+      this.ctx.arc(proj.x, proj.y, radius, 0, 2 * Math.PI)
       this.ctx.fillStyle = color
       this.ctx.fill()
       this.ctx.strokeStyle = 'white'
@@ -782,7 +778,6 @@ export default {
 
         if (this.lastTouchDistance) {
           const zoomFactor = currentDistance / this.lastTouchDistance
-          const newScale = Math.min(Math.max(this.view.scale * zoomFactor, ZOOM_LIMITS.min), ZOOM_LIMITS.max)
 
           this.handleMapZoom({
             clientX: (event.touches[0].clientX + event.touches[1].clientX) / 2,
@@ -821,10 +816,10 @@ export default {
           const distance = Math.sqrt(dx ** 2 + dy ** 2)
 
           if (distance < 10 && this.targetLocation.nodeId !== targetNode.nodeId) {
-            
             this.targetLocation = targetNode
+
             const pathFound = this.findShortestPath(this.userNodeId)
-            
+
             if (pathFound) {
               this.$emit('target-location', this.targetLocation)
             } else {
@@ -862,7 +857,7 @@ export default {
       if (!targetNodeId) return
 
       this.targetLocation = { nodeId: targetNodeId, distance: 0 }
-      const pathFound =this.findShortestPath(this.userNodeId)
+      const pathFound = this.findShortestPath(this.userNodeId)
 
       if (pathFound) {
         this.$emit('target-location', this.targetLocation)
