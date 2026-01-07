@@ -58,7 +58,7 @@
       },
 
       denyAccess() {
-        window.location.href = 'https://www.google.com/'
+        window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
       }
     },
     mounted() {

@@ -49,7 +49,7 @@
 <script>
 // Login view behavior
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'login',
@@ -65,7 +65,7 @@ export default {
   methods: {
     async userVerification() {
       try {
-        const res = await drinkApi.post('/sessions', {
+        const res = await Api.post('/sessions', {
           email: this.email,
           password: this.password
         })

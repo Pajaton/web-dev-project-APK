@@ -25,6 +25,8 @@
               <LocationCard
                 :location="target"
                 :userId="userId"
+                :currentFavoriteId="favoriteSystembolagId"
+                @favorite-updated="handleFavoriteChange"
                 @select-location="handleCardSelection"
               />
             </b-col>
@@ -47,27 +49,43 @@ export default {
     return {
       isLoading: false,
       targetLocations: [],
-      userId: null
+      userId: null,
+      favoriteSystembolagId: null 
     }
   },
-  mounted() {
-    this.fetchCurrentUser()
+  async mounted() {
+    await this.fetchCurrentUser()
+
+    if (this.userId) {
+      await this.fetchFavSystembolag()
+    }
   },
   methods: {
-    fetchCurrentUser() {
-      Api.get('/sessions/currentlyLoggedin/')
-        .then(response => {
-          this.userId = response.data.user._id
-        })
-        .catch(() => {
-          this.userId = null
-        })
+    async fetchCurrentUser() {
+      try {
+        const response = await Api.get('/sessions/currentlyLoggedin/')
+        this.userId = response.data.user._id
+      } catch {
+        this.userId = null
+      }
     },
     getDirections() {
       this.$refs.mapDirections.getLocation()
     },
     handleCardSelection(locationData) {
       this.$refs.mapDirections.handleCardSelection(locationData)
+    },
+    async fetchFavSystembolag() {
+      if (!this.userId) return
+      try {
+        const response = await Api.get(`/users/${this.userId}/favorites/systembolag`)
+        this.favoriteSystembolagId = response.data.favoriteSystembolag?.systembolagID ?? null
+      } catch (error) {
+        console.error('Error fetching favorite Systembolag:', error)
+      }
+    },
+    handleFavoriteChange(newFavId) {
+      this.favoriteSystembolagId = newFavId
     }
   }
 }

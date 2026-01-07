@@ -22,7 +22,7 @@
 
 <script>
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'navbar',
@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     fetchCurrentUser() {
-      drinkApi.get('/sessions/currentlyLoggedin/')
+      Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
           this.currentUserId = response.data.user._id
         })
@@ -57,7 +57,7 @@ export default {
       }
 
       try {
-        await drinkApi.delete('/sessions/' + this.currentUserId)
+        await Api.delete('/sessions/' + this.currentUserId)
       } catch (error) {
         this.message = error
       }

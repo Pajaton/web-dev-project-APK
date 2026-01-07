@@ -2,13 +2,37 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 
+// external APIs
 const baseMapURL = "https://overpass-api.de/api/interpreter";
 const baseToiletURL = "https://www.refugerestrooms.org/api/v1/restrooms/by_location";
-const Systembolag = require("../models/SystembolagSchema.js")
 
-// Simple in-memory cache
-const cache = new Map();
+// cache configuration
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+const CACHE_CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
+// request configuration
+const REQUEST_TIMEOUT_MS = 30000; // 30 seconds
+const MAP_REQUEST_TIMEOUT_MS = 65000; // 65 seconds
+const MAX_RETRIES = 3;
+
+// geographic configuration
+const EARTH_RADIUS_METERS = 6371e3; // radius of Earth in meters
+const SEARCH_RADIUS_METERS = 5000; // 5km
+const MAX_BOUNDING_BOX_SPAN = 0.20; // ~20km
+const BOUNDING_BOX_PADDING = 0.001; // ~100m
+
+
+const Systembolag = require("../models/SystembolagSchema.js");
+const cache = new Map();
+
+const HTTP_ERROR_MESSAGES = {
+  400: "Bad request to map service. Please check your parameters.",
+  429: "Map service rate limit exceeded. Please try again later.",
+  502: "Map service is currently unavailable. Please try again later.",
+  503: "Map service is currently unavailable. Please try again later.",
+  504: "Map service timed out. Please try again."
+}
+
 
 /**
  * Gets cached map data or fetches and caches it.
@@ -62,7 +86,7 @@ function cleanupCache() {
 }
 
 // Run cleanup every 10 minutes
-setInterval(cleanupCache, 10 * 60 * 1000);
+setInterval(cleanupCache, CACHE_CLEANUP_INTERVAL_MS);
 
 /**
  * Retries a request function with exponential backoff for transient errors.
@@ -101,7 +125,6 @@ async function retryMapDataFetch(requestFunction, maxRetries = 3, delayMs = 1000
  * @returns {number} Distance between the two points in meters.
  */
 function getDistance(nodeA, nodeB) {
-  const R = 6371e3; // radius of earth in meters
   const latA = toRadians(nodeA.lat);
   const latB = toRadians(nodeB.lat);
   const deltaLat = toRadians(nodeB.lat - nodeA.lat);
@@ -111,7 +134,7 @@ function getDistance(nodeA, nodeB) {
             Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  return R * c; // distance in meters
+  return EARTH_RADIUS_METERS * c; // distance in meters
 }
 
 /**
@@ -205,7 +228,7 @@ function formatLocationName(location, locationType) {
  */
 function formatLocationData(locations, locationType) {
   return locations.map(location => {
-    const tags = location.tags || {}
+    const { tags = {}, center, id } = location;
     
     return {
       id: location.id,
@@ -214,10 +237,10 @@ function formatLocationData(locations, locationType) {
       streetNumber: tags['addr:housenumber'],
       postalCode: tags['addr:postcode'],
       city: tags['addr:city'] || location.city,
-      lat: location.lat || location.center?.lat || location.latitude,
-      lon: location.lon || location.center?.lon || location.longitude,
+      lat: location.lat ?? center?.lat ?? location.latitude,  // ?? returns right-hand side if left is null or undefined
+      lon: location.lon ?? center?.lon ?? location.longitude, // only works for null/undefined values
       openHours: tags.opening_hours,
-      accessible: tags.wheelchair || location.accessible,
+      accessible: tags.wheelchair ?? location.accessible,
       changingTable: location.changing_table,
       unisex: location.unisex,
       directions: location.directions,
@@ -245,6 +268,13 @@ async function saveLocationsToDb(locations) {
   await Systembolag.bulkWrite(operations)
 }
 
+function buildMapQuery(south, west, north, east) {
+  return `[out:json][timeout:60];
+    (way["highway"](${south},${west},${north},${east}););
+    (._;>;);
+    out body;`;
+}
+
 /**
  * Fetches map data (walkable paths) for routing between user and target locations.
  * Queries the Overpass API for highway data within the bounding box.
@@ -266,16 +296,13 @@ async function getLocationMapData(userLat, userLon, locations, locationType) {
 
   const cacheKey = `map:${south.toFixed(3)}:${north.toFixed(3)}:${west.toFixed(3)}:${east.toFixed(3)}`;  
   const graphData = await getMapData(cacheKey, async () => {
-    const query = `[out:json][timeout:60];
-      (way["highway"](${south},${west},${north},${east}););
-      (._;>;);
-      out body;`;
+    const query = buildMapQuery(south, west, north, east);
 
     const params = new URLSearchParams();
     params.append('data', query);
 
     const rawMapData = await retryMapDataFetch(
-      () => axios.post(baseMapURL, params, { timeout: 65000 })
+      () => axios.post(baseMapURL, params, { timeout: MAP_REQUEST_TIMEOUT_MS })
     );
     
     const elements = rawMapData.data?.elements;
@@ -307,8 +334,6 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   let west = userLon;
   let east = userLon;
 
-  const padding = 0.001; // roughly 100m
-
   locationCoordinates.forEach(location => {
     const lat = location.lat || (location.center && location.center.lat);
     const lon = location.lon || (location.center && location.center.lon);
@@ -322,29 +347,36 @@ function getBoundingBox(userLat, userLon, locationCoordinates) {
   });
 
   // limit max bounding box size to prevent massive queries
-  const maxSpan = 0.20; // roughly 20km
   const latSpan = north - south;
   const lonSpan = east - west;
   
-  if (latSpan > maxSpan || lonSpan > maxSpan) {
+  if (latSpan > MAX_BOUNDING_BOX_SPAN || lonSpan > MAX_BOUNDING_BOX_SPAN) {
     
     // recenter
     const centerLat = (north + south) / 2;
     const centerLon = (east + west) / 2;
 
     // set new bounds
-    south = centerLat - maxSpan / 2;
-    north = centerLat + maxSpan / 2;
-    west = centerLon - maxSpan / 2;
-    east = centerLon + maxSpan / 2;
+    south = centerLat - MAX_BOUNDING_BOX_SPAN / 2;
+    north = centerLat + MAX_BOUNDING_BOX_SPAN / 2;
+    west = centerLon - MAX_BOUNDING_BOX_SPAN / 2;
+    east = centerLon + MAX_BOUNDING_BOX_SPAN / 2;
   }
 
   return { 
-    south: south - padding, 
-    north: north + padding, 
-    west: west - padding, 
-    east: east + padding 
+    south: south - BOUNDING_BOX_PADDING, 
+    north: north + BOUNDING_BOX_PADDING, 
+    west: west - BOUNDING_BOX_PADDING, 
+    east: east + BOUNDING_BOX_PADDING 
   };
+}
+
+function buildSystembolagQuery(userLat, userLon) {
+  return `[out:json][timeout:25];
+    nwr
+    ["name"="Systembolaget"]
+    (around:${SEARCH_RADIUS_METERS},${userLat},${userLon});
+    out center;`;
 }
 
 /**
@@ -359,15 +391,11 @@ async function findSystembolag(userLat, userLon) {
   const cacheKey = getCacheKey('systembolag', userLat, userLon);
   
   return getMapData(cacheKey, async () => {
-    const query = `[out:json][timeout:25];
-      nwr
-      ["name"="Systembolaget"]
-      (around:5000,${userLat},${userLon});
-      out center;`;
+    const query = buildSystembolagQuery(userLat, userLon);
     const searchParams = new URLSearchParams({ data: query });
 
     const response = await retryMapDataFetch(
-      () => axios.post(baseMapURL, searchParams, { timeout: 25000 })
+      () => axios.post(baseMapURL, searchParams, { timeout: REQUEST_TIMEOUT_MS })
     );
     const elements = response.data?.elements;
 
@@ -457,19 +485,14 @@ router.get("/maps/coordinates", async (req, res, next) => {
     return res.json(mapData);
 
   } catch(err) {
-    switch (err.response?.status) {
-      case 400:
-        return res.status(400).json({ "message": "Bad request to map service. Please check your parameters." });
-      case 429:
-        return res.status(429).json({ "message": "Map service rate limit exceeded. Please try again later." });
-      case 502:
-      case 503:
-        return res.status(503).json({ "message": "Map service is currently unavailable. Please try again later." });
-      case 504:
-        return res.status(504).json({ "message": "Map service timed out. Please try again." });
+    const status = err.response?.status;
+    const errorMessage = HTTP_ERROR_MESSAGES[status];
+
+    if (errorMessage) {
+      return res.status(status).json({ "message": errorMessage });
     }
 
-    return next(err);
+    return res.status(500).json({ "message": "An unexpected error occurred while fetching map data." });
   };
 });
 

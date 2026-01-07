@@ -101,7 +101,7 @@
 <script>
 // Register view behavior
 
-import { drinkApi } from '@/Api'
+import { Api } from '@/Api'
 
 export default {
   name: 'Register',
@@ -149,7 +149,7 @@ export default {
         return
       }
       try {
-        const response = await drinkApi.post('/users', {
+        const response = await Api.post('/users', {
           email: this.email,
           ProfilePicture: '/profilePictures/default_user.jpg',
           userName: this.userName,
@@ -187,7 +187,7 @@ export default {
     async userVerification() {
       this.userExist = false
       try {
-        const response = await drinkApi('/users/')
+        const response = await Api('/users/')
         const data = response.data
         data.users.forEach(user => {
           console.log('Checking user email:', user.email)
