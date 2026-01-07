@@ -24,11 +24,11 @@ const cookieTtl = 1000 * 60 * 30; // 30 minutes
 
 // Connect to MongoDB
 mongoose.connect(mongoURI).catch(function(err) {
-    console.error(`Failed to connect to MongoDB with URI: ${mongoURI}`);
-    console.error(err.stack);
-    process.exit(1);
+  console.error(`Failed to connect to MongoDB with URI: ${mongoURI}`);
+  console.error(err.stack);
+  process.exit(1);
 }).then(function() {
-    console.log(`Connected to MongoDB with URI: ${mongoURI}`); // mistake when forward porting
+  console.log(`Connected to MongoDB with URI: ${mongoURI}`); // mistake when forward porting
 });
 
 // Create Express app
@@ -37,30 +37,30 @@ var app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'apekå', // In production, use .env variable for this
-    resave: false,
-    saveUninitialized: false,
+  secret: 'apekå', // In production, use .env variable for this
+  resave: false,
+  saveUninitialized: false,
     
-    // Cookie only sent over https, allow cookie to be sent between front and backend, 
-    // cookie expires after 30 mins.
-    cookie: { secure: true,
-        sameSite: 'none',
-        maxAge: cookieTtl
+  // Cookie only sent over https, allow cookie to be sent between front and backend, 
+  // cookie expires after 30 mins.
+  cookie: { secure: true,
+    sameSite: 'none',
+    maxAge: cookieTtl
 
-    },
-    store: MongoStore.create({ mongoUrl: mongoURI })
+  },
+  store: MongoStore.create({ mongoUrl: mongoURI })
 }));
 // HTTP request logger
 app.use(morgan('dev'));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options('*', cors({
-    origin: 'https://localhost:5173',
-    credentials: true
+  origin: 'https://localhost:5173',
+  credentials: true
 }));
 
 // Import routes
 app.get('/api', function(req, res) {
-    res.json({ 'message': 'Welcome to the APK Calc API' });
+  res.json({ 'message': 'Welcome to the APK Calc API' });
 });
 
 app.use(`/api/${apiVersion}`, drinkController);
@@ -71,7 +71,7 @@ app.use(`/api/${apiVersion}`, mapController);
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
-    res.status(404).json({ 'message': 'Not Found' });
+  res.status(404).json({ 'message': 'Not Found' });
 });
 
 // Configuration for serving frontend in production mode
@@ -86,36 +86,36 @@ app.use(express.static(client));
 var env = app.get('env');
 // eslint-disable-next-line no-unused-vars
 app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    var err_res = {
-        'message': err.message,
-        'error': {}
-    };
-    if (env === 'development') {
-        // Return sensitive stack trace only in dev mode
-        err_res['error'] = err.stack;
-    }
-    if (err.name === "ValidationError") {
-        const errors = Object.keys(err.errors).map( key => err.errors[key].message);
-        return res.status(400).json({"message": `Validation error: ${errors}`});
-    }
-    res.status(err.status || 500);
-    res.json(err_res);
+  console.error(err.stack);
+  var err_res = {
+    'message': err.message,
+    'error': {}
+  };
+  if (env === 'development') {
+    // Return sensitive stack trace only in dev mode
+    err_res['error'] = err.stack;
+  }
+  if (err.name === "ValidationError") {
+    const errors = Object.keys(err.errors).map( key => err.errors[key].message);
+    return res.status(400).json({"message": `Validation error: ${errors}`});
+  }
+  res.status(err.status || 500);
+  res.json(err_res);
 });
 
 try {
-    const httpsOptions = {
-        key: fs.readFileSync('localhost-key.pem'),
-        cert: fs.readFileSync('localhost.pem')
-    };
-    https.createServer(httpsOptions, app).listen(port, function(err) {
-        if (err) throw err;
-        console.log(`Express HTTPS server listening on port ${port}, in ${env} mode`);
-        console.log(`Backend: https://localhost:${port}/api/`);
-        console.log(`Frontend (production): https://localhost:${port}/`);
-    });
+  const httpsOptions = {
+    key: fs.readFileSync('localhost-key.pem'),
+    cert: fs.readFileSync('localhost.pem')
+  };
+  https.createServer(httpsOptions, app).listen(port, function(err) {
+    if (err) throw err;
+    console.log(`Express HTTPS server listening on port ${port}, in ${env} mode`);
+    console.log(`Backend: https://localhost:${port}/api/`);
+    console.log(`Frontend (production): https://localhost:${port}/`);
+  });
 } catch (err) {
-    console.error("Failed to start HTTPS server:", err);
+  console.error("Failed to start HTTPS server:", err);
 }
 
 

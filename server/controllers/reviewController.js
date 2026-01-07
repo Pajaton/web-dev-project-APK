@@ -11,11 +11,11 @@ var Drink = require ("../models/DrinkSchema")
  * @returns {Object} 200 - Object containing array of all reviews.
  */
 router.get("/reviews", async (req, res, next) => {
-    try {
-        const review = await Review.find();
+  try {
+    const review = await Review.find();
 
-        return res.json({ "review": review });
-    } catch(err) { next(err) };
+    return res.json({ "review": review });
+  } catch(err) { next(err) };
 });
 
 /**
@@ -26,16 +26,16 @@ router.get("/reviews", async (req, res, next) => {
  * @returns {Object} 404 - Review not found.
  */
 router.get("/reviews/:reviewId", async (req, res, next) => {
-    try {
-        const review = await Review
-            .findById(req.params.reviewId);
+  try {
+    const review = await Review
+      .findById(req.params.reviewId);
 
-        if (!review) {
-            return res.status(404).json({"message": "Review not found"});
-        }
+    if (!review) {
+      return res.status(404).json({"message": "Review not found"});
+    }
 
-        return res.json(review)
-    } catch(err) { next(err) };
+    return res.json(review)
+  } catch(err) { next(err) };
 });
 
 /**
@@ -46,19 +46,19 @@ router.get("/reviews/:reviewId", async (req, res, next) => {
  * @returns {Object} 404 - Review not found.
  */
 router.get("/drinks/:drinkId/reviews", async (req, res, next) => {
-    try {
-        const reviewForDrink = await Review
-            .find({"productID": req.params.drinkId})
-            .populate("userID", "userName")
-            .populate("productID", "name")
-            .select("-__v");
+  try {
+    const reviewForDrink = await Review
+      .find({"productID": req.params.drinkId})
+      .populate("userID", "userName")
+      .populate("productID", "name")
+      .select("-__v");
 
-        if (!reviewForDrink) {
-            return res.status(404).json({"message": "Review not found"});
-        }
+    if (!reviewForDrink) {
+      return res.status(404).json({"message": "Review not found"});
+    }
 
-        return res.json({reviewForDrink})
-    } catch(err) { next(err) };
+    return res.json({reviewForDrink})
+  } catch(err) { next(err) };
 });
 
 /**
@@ -69,16 +69,16 @@ router.get("/drinks/:drinkId/reviews", async (req, res, next) => {
  * @returns {Object} 404 - User has not made any reviews.
  */
 router.get("/users/:userId/reviews", async (req, res, next) => {
-    try {
-        const reviewedByUser = await Review
-            .find({"userID": req.params.userId});
+  try {
+    const reviewedByUser = await Review
+      .find({"userID": req.params.userId});
 
-        if (!reviewedByUser) {
-            return res.status(404).json({"message": "User has not made any reviews"});
-        }
+    if (!reviewedByUser) {
+      return res.status(404).json({"message": "User has not made any reviews"});
+    }
 
-        return res.json({"reviewedBy": reviewedByUser})
-    } catch(err) { next(err) };
+    return res.json({"reviewedBy": reviewedByUser})
+  } catch(err) { next(err) };
 });
 
 /**
@@ -90,21 +90,21 @@ router.get("/users/:userId/reviews", async (req, res, next) => {
  * @returns {Object} 404 - User has not reviewed this drink.
  */
 router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
-    try {
-        const drinkReviewedByUser = await Review
-            .find({
-                "userID": req.params.userId,
-                "productID": req.params.drinkId
-            })
-            .populate("userID")
-            .populate("productID");
+  try {
+    const drinkReviewedByUser = await Review
+      .find({
+        "userID": req.params.userId,
+        "productID": req.params.drinkId
+      })
+      .populate("userID")
+      .populate("productID");
 
-        if (!drinkReviewedByUser) {
-            return res.status(404).json({"message": "User has not reviewed this drink"});
-        }
+    if (!drinkReviewedByUser) {
+      return res.status(404).json({"message": "User has not reviewed this drink"});
+    }
 
-        return res.json({"reviews": drinkReviewedByUser})
-    } catch(err) { next(err) };
+    return res.json({"reviews": drinkReviewedByUser})
+  } catch(err) { next(err) };
 });
 
 /**
@@ -117,26 +117,26 @@ router.get("/users/:userId/drinks/:drinkId/reviews", async (req, res, next) => {
  * @returns {Object} 201 - The created review object.
  */
 router.post("/reviews", async (req, res, next) => {
-    try {
-        var newReview = new Review({
-            "userID": req.body.userID,
-            "productID": req.body.productID,
-            "rating": req.body.rating,
-            "comment": req.body.comment,
-        });
+  try {
+    var newReview = new Review({
+      "userID": req.body.userID,
+      "productID": req.body.productID,
+      "rating": req.body.rating,
+      "comment": req.body.comment,
+    });
 
-        await newReview.save();
-        await User.findByIdAndUpdate(
-            req.body.userID,
-            {$addToSet: {reviewsWritten: newReview._id} 
-        });
-        await Drink.findByIdAndUpdate(
-            req.body.productID,
-            {$addToSet: {hasReviews: newReview._id} 
-        });
+    await newReview.save();
+    await User.findByIdAndUpdate(
+      req.body.userID,
+      {$addToSet: {reviewsWritten: newReview._id} 
+    });
+    await Drink.findByIdAndUpdate(
+      req.body.productID,
+      {$addToSet: {hasReviews: newReview._id} 
+    });
 
-        return res.status(201).json(newReview);
-    } catch(err) { next(err) };
+    return res.status(201).json(newReview);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -151,26 +151,26 @@ router.post("/reviews", async (req, res, next) => {
  * @returns {Object} 404 - Review not found.
  */
 router.patch("/reviews/:reviewId", async (req, res, next) => {
-    // Find the review to update
-    try {
-        const updatedReview = await Review
-            .findById(req.params.reviewId);
+  // Find the review to update
+  try {
+    const updatedReview = await Review
+      .findById(req.params.reviewId);
 
-        if (!updatedReview) {
-            return res.status(404).json({"message": "Review not found"});
-        } 
+    if (!updatedReview) {
+      return res.status(404).json({"message": "Review not found"});
+    } 
 
-        // Update the review's fields if new values are provided
-        updatedReview.userID = (req.body.userID || updatedReview.userID);
-        updatedReview.productID = (req.body.productID || updatedReview.productID);
-        updatedReview.rating = (req.body.rating || updatedReview.rating);
-        updatedReview.comment = (req.body.comment || updatedReview.comment);
+    // Update the review's fields if new values are provided
+    updatedReview.userID = (req.body.userID || updatedReview.userID);
+    updatedReview.productID = (req.body.productID || updatedReview.productID);
+    updatedReview.rating = (req.body.rating || updatedReview.rating);
+    updatedReview.comment = (req.body.comment || updatedReview.comment);
 
-        // Save the updated review to the database
-        await updatedReview.save().catch(err => { next(err) });
+    // Save the updated review to the database
+    await updatedReview.save().catch(err => { next(err) });
 
-        return res.json(updatedReview);
-    } catch(err) { next(err) };
+    return res.json(updatedReview);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -185,25 +185,25 @@ router.patch("/reviews/:reviewId", async (req, res, next) => {
  * @returns {Object} 404 - Review not found.
  */
 router.put("/reviews/:reviewId", async (req, res, next) => {
-    // Find the review to update
-    try {
-        const updatedReview = await Review
-            .findById(req.params.reviewId);
+  // Find the review to update
+  try {
+    const updatedReview = await Review
+      .findById(req.params.reviewId);
 
-        if (!updatedReview) {
-            return res.status(404).json({"message": "Review not found"});
-        }
+    if (!updatedReview) {
+      return res.status(404).json({"message": "Review not found"});
+    }
 
-        // Update the review's fields if new values are provided
-        updatedReview.userID = req.body.userID;
-        updatedReview.productID = req.body.productID;
-        updatedReview.rating = req.body.rating;
-        updatedReview.comment = req.body.comment;
-        
-        await updatedReview.save().catch(err => { next(err) });
-        
-        return res.json(updatedReview);
-    } catch(err) { next(err) };
+    // Update the review's fields if new values are provided
+    updatedReview.userID = req.body.userID;
+    updatedReview.productID = req.body.productID;
+    updatedReview.rating = req.body.rating;
+    updatedReview.comment = req.body.comment;
+    
+    await updatedReview.save().catch(err => { next(err) });
+    
+    return res.json(updatedReview);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -214,27 +214,27 @@ router.put("/reviews/:reviewId", async (req, res, next) => {
  * @returns {Object} 404 - Review not found.
  */
 router.delete("/reviews/:reviewId", async (req, res, next) => {
-    try {
-        const reviewToDelete = await Review
-            .findByIdAndDelete(req.params.reviewId)
+  try {
+    const reviewToDelete = await Review
+      .findByIdAndDelete(req.params.reviewId)
 
-        if (!reviewToDelete) {
-            return res.status(404).json({"message": "Review not found"})
-        }
+    if (!reviewToDelete) {
+      return res.status(404).json({"message": "Review not found"})
+    }
 
-        await User.findByIdAndUpdate(
-            reviewToDelete.userID, { 
-                $pull: {
-                    reviewsWritten: reviewToDelete._id
-                }});
-        await Drink.findByIdAndUpdate(
-            reviewToDelete.productID, {
-                $pull: {
-                    hasReviews: reviewToDelete._id
-                }});
+    await User.findByIdAndUpdate(
+      reviewToDelete.userID, { 
+        $pull: {
+        reviewsWritten: reviewToDelete._id
+    }});
+    await Drink.findByIdAndUpdate(
+      reviewToDelete.productID, {
+        $pull: {
+        hasReviews: reviewToDelete._id
+    }});
 
-        return res.json(reviewToDelete);
-    } catch(err) { next(err) };
+    return res.json(reviewToDelete);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -244,25 +244,25 @@ router.delete("/reviews/:reviewId", async (req, res, next) => {
  * @returns {Object} 404 - No reviews found.
  */
 router.delete("/reviews", async (req, res, next) => {
-    try {
-        const reviewsToDelete = await Review
-            .deleteMany()
+  try {
+    const reviewsToDelete = await Review
+      .deleteMany()
 
-            await User.updateMany({}, {
-                $set: {
-                    reviewsWritten: []
-                }});
-            await Drink.updateMany({}, {
-                $set: {
-                    hasReviews: []
-                }});
+    await User.updateMany({}, {
+      $set: {
+        reviewsWritten: []
+    }});
+    await Drink.updateMany({}, {
+      $set: {
+        hasReviews: []
+    }});
 
-            if (reviewsToDelete.deletedCount == 0) {
-                return res.status(404).json({"message": "No reviews found"})
-            }
+    if (reviewsToDelete.deletedCount == 0) {
+      return res.status(404).json({"message": "No reviews found"})
+    }
             
-            return res.json(reviewsToDelete);
-    } catch(err) {next(err) };
+    return res.json(reviewsToDelete);
+  } catch(err) {next(err) };
 });
 
 module.exports = router;

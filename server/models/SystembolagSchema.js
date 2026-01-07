@@ -15,31 +15,31 @@ var Schema = mongoose.Schema;
  * @relationship User (N) - Users who have favorited this store.
  */
 var systembolagSchema = new Schema({
-    // Primary key
-    "systembolagID": {type: Number, unique: true},
+  // Primary key
+  "systembolagID": {type: Number, unique: true},
 
-    // Local attributes
-    "name": {type: String},
+  // Local attributes
+  "name": {type: String},
 
-    // The composite address field from the ER diasgram
-    "street": {type: String},
-    "streetNumber": {type: String},
-    "postalCode": {type: String},
-    "city": {type: String},
+  // The composite address field from the ER diasgram
+  "street": {type: String},
+  "streetNumber": {type: String},
+  "postalCode": {type: String},
+  "city": {type: String},
 
-    // Derived attributes
-    "lon": {type: Number},
-    "lat": {type: Number},
+  // Derived attributes
+  "lon": {type: Number},
+  "lat": {type: Number},
 
-    // Relationships
-    "hasInStock": [{
-        "type": Schema.Types.ObjectId,
-        "ref": "Drink"
-    }],
-    "isFavoriteOf": [{
-        "type": Schema.Types.ObjectId,
-        "ref": "User"
-    }],
+  // Relationships
+  "hasInStock": [{
+    "type": Schema.Types.ObjectId,
+    "ref": "Drink"
+  }],
+  "isFavoriteOf": [{
+    "type": Schema.Types.ObjectId,
+    "ref": "User"
+  }],
 })
 
 // Create a Mongoose model called "Systembolag" to interact with the "Systembolag" collection in the database
