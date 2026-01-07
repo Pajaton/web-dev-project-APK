@@ -50,6 +50,17 @@
 <script>
 import { Api } from '@/Api'
 
+/**
+ * @component MapDirections
+ * @description Interactive map component that displays user location,
+ * target locations (Systembolag/toilets), and calculates shortest paths using A* algorithm.
+ * Supports pan, zoom, and touch interactions.
+ * @emits {boolean} loading-change - Emitted when loading state changes.
+ * @emits {Object} target-location - Emitted when a target location is selected.
+ * @emits {Array} targets-loaded - Emitted when all target locations are loaded.
+ * @emits mounted - Emitted when component is mounted.
+ */
+
 // constants
 const EARTH_RADIUS_METERS = 6371e3
 const CANVAS_CONFIG = {
@@ -63,7 +74,14 @@ const CLICK_TOLERANCE_PX = 5 // max distance mouse can move and still register a
 
 const MAX_ITERATIONS = 100000 // prevent infinite loops in pathfinding
 
+/**
+ * @class MinHeap
+ * @description Priority queue implementation for A* pathfinding algorithm.
+ */
 class MinHeap {
+  /**
+   * @param {Object} estimatedCost - Reference to the estimated cost object for comparisons.
+   */
   constructor(estimatedCost) {
     this.heap = []
     this.estimatedCost = estimatedCost // reference
@@ -71,7 +89,10 @@ class MinHeap {
 
   get length() { return this.heap.length }
 
-  // return and remove min value
+  /**
+   * @description Removes and returns the minimum value from the heap.
+   * @returns {string|null} The node ID with the lowest cost, or null if empty.
+   */
   pop() {
     if (this.heap.length === 0) return null
     if (this.heap.length === 1) return this.heap.pop()
@@ -83,23 +104,36 @@ class MinHeap {
     return min
   }
 
-  // insert a new node
+  /**
+   * @description Inserts a new node into the heap.
+   * @param {string} nodeId - The ID of the node to insert.
+   */
   insert(nodeId) {
     this.heap.push(nodeId)
     this.bubbleUp()
   }
 
-  // checks if a node is already in the heap
+  /**
+   * @description Checks if a node is already in the heap.
+   * @param {string} nodeId - The ID of the node to check.
+   * @returns {boolean} True if the node exists in the heap.
+   */
   includes(nodeId) {
     return this.heap.includes(nodeId)
   }
 
-  // swaps a parent node with its child node
+  /**
+   * @description Swaps two nodes in the heap by their indices.
+   * @param {number} parentIndex - Index of the parent node.
+   * @param {number} index - Index of the child node.
+   */
   swap(parentIndex, index) {
     [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]]
   }
 
-  // moves node down in heap
+  /**
+   * @description Restores heap property by moving a node down.
+   */
   bubbleDown() {
     let index = 0
     let leftIndex = 1
@@ -126,7 +160,9 @@ class MinHeap {
     }
   }
 
-  // moves node up in heap
+  /**
+   * @description Restores heap property by moving a node up.
+   */
   bubbleUp() {
     let index = this.heap.length - 1
 
@@ -145,6 +181,7 @@ class MinHeap {
 
 export default {
   props: {
+    /** @type {string} The type of location to search for (e.g., 'systembolag', 'toilets'). */
     location: {
       type: String,
       default: 'location'
@@ -202,6 +239,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Main method to fetch map data and calculate route.
+     * Gets user coordinates, fetches nearby locations, and finds shortest path.
+     */
     async getLocation() {
       this.isLoading = true
       this.statusMessage = ''
@@ -296,9 +337,11 @@ export default {
       this.$emit('targets-loaded', this.mapData.targetLocations || [])
     },
 
-    // find user latitude and longitude via either GPS (if a gps receiver
-    // is installed on the device) or via network. Network is a lot less
-    // precise.
+    /**
+     * @description Gets user's current position via browser Geolocation API.
+     * Uses GPS if available, falls back to network-based location.
+     * @returns {Promise} Resolves when coordinates are obtained.
+     */
     getUserCoordinates() {
       return new Promise((resolve, reject) => {
         this.message = 'Waiting for user permission...'
@@ -330,7 +373,12 @@ export default {
       })
     },
 
-    // gets the id of the node to the passed coordinate (latitude, longitude)
+    /**
+     * @description Finds the nearest map node to given coordinates.
+     * @param {number} lat - Latitude coordinate.
+     * @param {number} lng - Longitude coordinate.
+     * @returns {string|null} The ID of the nearest node.
+     */
     getNearestNodeId(lat, lng) {
       let nearestNodeId = null
       let minDistance = Infinity
@@ -347,7 +395,11 @@ export default {
       return nearestNodeId
     },
 
-    // implemented shortest path algorithm with A*
+    /**
+     * @description Finds the shortest path using A* algorithm.
+     * @param {string} startId - The starting node ID (user's location).
+     * @returns {boolean} True if a path was found, false otherwise.
+     */
     findShortestPath(startId) {
       this.shortestPath = []
       this.pathSearchFailed = false
@@ -418,7 +470,12 @@ export default {
       return false
     },
 
-    // get the distance between node A and node B
+    /**
+     * @description Calculates distance between two nodes using Haversine formula.
+     * @param {Object} nodeA - First node with lat/lon properties.
+     * @param {Object} nodeB - Second node with lat/lon properties.
+     * @returns {number} Distance in meters.
+     */
     getDistance(nodeA, nodeB) {
       const toRadians = (degrees) => degrees * (Math.PI / 180)
       const latA = toRadians(nodeA.lat)
@@ -432,7 +489,12 @@ export default {
       return EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     },
 
-    // build the shortest path
+    /**
+     * @description Reconstructs the path from A* search results.
+     * @param {Object} cameFrom - Map of node IDs to their predecessor.
+     * @param {string} current - The destination node ID.
+     * @returns {Array<string>} Ordered array of node IDs forming the path.
+     */
     reconstructPath(cameFrom, current) {
       const totalPath = [current]
       while (current in cameFrom) {
@@ -442,7 +504,10 @@ export default {
       return totalPath
     },
 
-    // gets the node bounds
+    /**
+     * @description Calculates the geographic bounds of all nodes.
+     * @param {Object} nodes - Object containing all map nodes.
+     */
     calculateBounds(nodes) {
       const padding = 0.001 // ~100m padding
       let minLat = Infinity
@@ -462,7 +527,12 @@ export default {
       this.bounds = { minLat, maxLat, minLon, maxLon }
     },
 
-    // translates latitude and longitude coordinates into x and y values
+    /**
+     * @description Converts geographic coordinates to canvas pixel coordinates.
+     * @param {number} lat - Latitude coordinate.
+     * @param {number} lon - Longitude coordinate.
+     * @returns {Object} Object with x and y pixel coordinates.
+     */
     project(lat, lon) {
       const { minLat, maxLat, minLon, maxLon } = this.bounds
       if (maxLon === minLon || maxLat === minLat) return { x: 0, y: 0 }
@@ -475,7 +545,10 @@ export default {
       return { x, y }
     },
 
-    // renders all roads (not shortest path)
+    /**
+     * @description Pre-renders all road segments to an offscreen canvas.
+     * This improves performance by avoiding redrawing static elements.
+     */
     prerenderMapBackground() {
       if (!this.offscreenCanvas) {
         this.offscreenCanvas = new OffscreenCanvas(this.canvasFullWidth, this.canvasFullHeight)
@@ -519,6 +592,9 @@ export default {
       ctxOffscreen.stroke()
     },
 
+    /**
+     * @description Renders the complete map including background, path, and markers.
+     */
     renderMap() {
       if (!this.$refs.mapCanvas || !this.offscreenCanvas) return
 
@@ -557,7 +633,9 @@ export default {
       this.ctx.restore()
     },
 
-    // on fetched map, center view on user
+    /**
+     * @description Centers the map viewport on the user's current location.
+     */
     focusMapOnUserLocation() {
       if (!this.coordinates) return
 
@@ -570,7 +648,11 @@ export default {
       this.view.y = viewportCenterY - (userCoords.y * this.view.scale)
     },
 
-    // draws the shortest path
+    /**
+     * @description Draws the calculated shortest path on the canvas.
+     * @param {Object} nodes - Object containing all map nodes.
+     * @param {Array<string>} pathIds - Ordered array of node IDs forming the path.
+     */
     drawPath(nodes, pathIds) {
       this.ctx.beginPath()
       this.ctx.strokeStyle = '#FF9494'
@@ -593,6 +675,11 @@ export default {
       this.ctx.stroke()
     },
 
+    /**
+     * @description Draws a circular marker on the canvas for a location.
+     * @param {Object} node - Node object with lat/lon properties.
+     * @param {string} color - Fill color for the marker.
+     */
     drawMarker(node, color) {
       if (!node) return
       const proj = this.project(node.lat, node.lon)
@@ -607,16 +694,27 @@ export default {
       this.ctx.stroke()
     },
 
+    /**
+     * @description Handles mouse down event to start map dragging.
+     * @param {MouseEvent} event - The mouse event.
+     */
     handleMouseDown(event) {
       this.isDraggingMap = true
       this.dragStart.x = event.clientX
       this.dragStart.y = event.clientY
     },
 
+    /**
+     * @description Handles mouse up event to stop map dragging.
+     */
     handleMouseUp() {
       this.isDraggingMap = false
     },
 
+    /**
+     * @description Handles mouse move event for panning the map.
+     * @param {MouseEvent} event - The mouse event.
+     */
     handleMapPan(event) {
       if (!this.isDraggingMap) return
 
@@ -632,6 +730,11 @@ export default {
       requestAnimationFrame(this.renderMap)
     },
 
+    /**
+     * @description Handles zooming the map centered on cursor position.
+     * @param {MouseEvent|Object} event - Event with clientX/clientY coordinates.
+     * @param {number} zoomFactor - Factor to multiply current scale by.
+     */
     handleMapZoom(event, zoomFactor) {
       const newScale = Math.min(Math.max(this.view.scale * zoomFactor, ZOOM_LIMITS.min), ZOOM_LIMITS.max)
 
@@ -647,7 +750,10 @@ export default {
       requestAnimationFrame(this.renderMap)
     },
 
-    // relates to zooming the map
+    /**
+     * @description Handles mouse wheel scroll for zooming.
+     * @param {WheelEvent} event - The wheel event.
+     */
     handleScroll(event) {
       const zoomSensitivity = 0.001
       const zoomFactor = Math.exp(-event.deltaY * zoomSensitivity)
@@ -655,6 +761,10 @@ export default {
       this.handleMapZoom(event, zoomFactor)
     },
 
+    /**
+     * @description Handles touch move for panning and pinch-to-zoom.
+     * @param {TouchEvent} event - The touch event.
+     */
     handleTouchMove(event) {
       if (event.touches.length === 1 && this.isDraggingMap) {
         // Single touch - dragging
@@ -679,6 +789,10 @@ export default {
       }
     },
 
+    /**
+     * @description Handles click/tap on map to select a target location marker.
+     * @param {MouseEvent|Touch} event - The click or touch event.
+     */
     handleMapSelection(event) {
       const rect = this.$refs.mapCanvas.getBoundingClientRect()
       const eventX = event.clientX - rect.left
@@ -717,6 +831,10 @@ export default {
       })
     },
 
+    /**
+     * @description Handles mouse click, filtering out drag operations.
+     * @param {MouseEvent} event - The mouse event.
+     */
     handleMouseClick(event) {
       // prevent accidental clicks if moving mouse while clicking
       const distMoved = Math.hypot(
@@ -728,7 +846,10 @@ export default {
       this.handleMapSelection(event)
     },
 
-    // another way of selecting target location
+    /**
+     * @description Handles location selection from external card component.
+     * @param {Object} locationData - Location object with lat/lon properties.
+     */
     handleCardSelection(locationData) {
       if (!this.userNodeId || !this.mapData.nodes) return
 
@@ -746,12 +867,21 @@ export default {
       requestAnimationFrame(this.renderMap)
     },
 
+    /**
+     * @description Calculates distance between two touch points for pinch-to-zoom.
+     * @param {TouchList} touches - List of active touch points.
+     * @returns {number} Distance in pixels between the two touches.
+     */
     getTouchDistance(touches) {
       const dx = touches[0].clientX - touches[1].clientX
       const dy = touches[0].clientY - touches[1].clientY
       return Math.hypot(dx, dy)
     },
 
+    /**
+     * @description Handles touch start for drag or pinch-to-zoom initialization.
+     * @param {TouchEvent} event - The touch event.
+     */
     handleTouchStart(event) {
       if (event.touches.length === 1) {
         // One finger touch
@@ -767,6 +897,10 @@ export default {
       }
     },
 
+    /**
+     * @description Handles touch end, detecting taps vs drags.
+     * @param {TouchEvent} event - The touch event.
+     */
     handleTouchEnd(event) {
       if (event.changedTouches.length === 1) {
         const touch = event.changedTouches[0]
@@ -784,6 +918,9 @@ export default {
       this.lastTouchDistance = null
     },
 
+    /**
+     * @description Resizes the canvas to configured dimensions and re-renders.
+     */
     resizeCanvas() {
       const canvas = this.$refs.mapCanvas
       if (!canvas) return

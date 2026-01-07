@@ -24,10 +24,16 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @component NavBar
+ * @description Main navigation bar component with links to all pages.
+ * Handles user authentication state and login/logout functionality.
+ */
 export default {
   name: 'navbar',
   data() {
     return {
+      /** @type {string|null} The currently logged-in user's ID */
       currentUserId: null
     }
   },
@@ -41,6 +47,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Fetches the currently logged-in user from the session API.
+     * Updates currentUserId on success.
+     */
     fetchCurrentUser() {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
@@ -50,6 +60,11 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Handles login/logout button click.
+     * Redirects to login page if not logged in, otherwise logs out the user.
+     */
     async loginLogout() {
       if (!this.currentUserId) {
         this.$router.push('/login')
@@ -66,6 +81,11 @@ export default {
       await this.fetchCurrentUser()
       this.$router.push('/login')
     },
+
+    /**
+     * @description Navigates to the current user's profile page.
+     * Redirects to login if not authenticated.
+     */
     goToMyProfile() {
       if (!this.currentUserId) {
         this.$router.push('/login')

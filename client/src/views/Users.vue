@@ -33,6 +33,11 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @view Users
+ * @description Community page displaying a list of all registered users.
+ * Allows navigation to individual user profiles.
+ */
 export default {
   name: 'userProfile',
   data() {
@@ -42,6 +47,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Fetches the list of all registered users from the API.
+     */
     getUsers() {
       Api.get('/users/')
         .then(response => {

@@ -64,6 +64,11 @@
 import { Api } from '@/Api'
 import ToiletPanel from '@/components/ToiletMap.vue'
 
+/**
+ * @view UserProfile
+ * @description User profile page displaying user information, reviews,
+ * alcohol consumption tracking, and follow functionality.
+ */
 export default {
   name: 'users',
   components: { ToiletPanel },
@@ -90,6 +95,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Fetches the user's profile information and related data.
+     */
     getUserInfo() {
       Api.get('/users/' + this.id)
         .then(response => {
@@ -116,6 +124,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Fetches the list of users this user is following.
+     */
     getUserFollowingList() {
       Api.get(this.user._links.follows)
         .then(response => {
@@ -125,6 +137,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Fetches the user's favorite Systembolaget store.
+     */
     getFavoriteSystembolag() {
       Api.get(this.user._links.favoritesSystembolag)
         .then(response => {
@@ -139,9 +155,17 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Navigates to the profile edit page.
+     */
     goToEdit() {
       this.$router.push({ path: '/users/' + this.currentUserId + '/edit' })
     },
+
+    /**
+     * @description Fetches the currently logged-in user to check follow status.
+     */
     fetchCurrentUser() {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
@@ -152,6 +176,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Fetches all reviews written by this user with drink details.
+     */
     async getAllUserReviews() {
       this.reviewsByUser = []
       try {
@@ -175,6 +203,12 @@ export default {
         this.message = error
       }
     },
+
+    /**
+     * @description Calculates the average rating score for a drink.
+     * @param {string} drink - The drink's ID.
+     * @returns {number|string} The average score or 'No score' if no reviews.
+     */
     async getAverageScore(drink) {
       let avgScore = 0
       try {
@@ -198,21 +232,52 @@ export default {
       }
       return avgScore
     },
+
+    /**
+     * @description Handles profile picture load error by setting default image.
+     * @param {Event} event - The error event.
+     */
     profilePictureError(event) {
       event.target.src = this.imageUrl('default_user.jpg')
     },
+
+    /**
+     * @description Handles drink picture load error by setting default image.
+     * @param {Event} event - The error event.
+     */
     drinkPictureError(event) {
       event.target.src = this.imageUrlDrink('default_drink.jpg')
     },
+
+    /**
+     * @description Constructs the URL for a profile picture asset.
+     * @param {string} image - The image filename.
+     * @returns {string} The full URL to the image.
+     */
     imageUrl(image) {
       return new URL(`../assets/profilePictures/${image}`, import.meta.url).href
     },
+
+    /**
+     * @description Constructs the URL for a drink picture asset.
+     * @param {string} image - The image filename.
+     * @returns {string} The full URL to the image.
+     */
     imageUrlDrink(image) {
       return new URL(`../assets/drinkPictures/${image}`, import.meta.url).href
     },
+
+    /**
+     * @description Opens the alcohol entry popup form.
+     */
     openAddEntryPopup() {
       this.addEntryPopup = true
     },
+
+    /**
+     * @description Submits a new alcohol consumption entry.
+     * Shows toilet prompt if user has consumed over 2 liters since last prompt.
+     */
     submitAlcoholEntry() {
       if (this.alcVolume <= 0 || this.alcPercent < 0 || this.alcPercent > 100) return
       Api.post(`/users/${this.user._id}/alcoholConsumed`, {
@@ -239,6 +304,9 @@ export default {
         })
     },
 
+    /**
+     * @description Toggles the follow/unfollow status for this user.
+     */
     async toggleFollowUser() {
       try {
         if (!this.currentUserFollows) {

@@ -51,6 +51,11 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @view Login
+ * @description User login page with email and password authentication.
+ * Redirects to home page on successful login.
+ */
 export default {
   name: 'login',
   data() {
@@ -63,6 +68,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Authenticates the user with email and password.
+     * Redirects to home on success, shows toast on failure.
+     */
     async userVerification() {
       try {
         const res = await Api.post('/sessions', {
@@ -74,6 +83,10 @@ export default {
         this.show = true
       }
     },
+
+    /**
+     * @description Clears the login form fields and hides error toast.
+     */
     resetFields() {
       this.email = ''
       this.password = ''

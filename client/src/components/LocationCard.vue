@@ -29,16 +29,27 @@
 
 <script>
 import { Api } from '@/Api'
+
+/**
+ * @component LocationCard
+ * @description Displays a Systembolaget store location card with details,
+ * directions button, and favorite functionality.
+ * @emits {number|null} favorite-updated - Emitted when favorite status changes.
+ * @emits {Object} select-location - Emitted when user requests directions to this location.
+ */
 export default {
   props: {
+    /** @type {Object} The Systembolaget location object with name, address, hours, etc. */
     location: {
       type: Object,
       default: () => ({})
     },
+    /** @type {string|null} The current user's ID, null if not logged in. */
     userId: {
       type: String,
       default: null
     },
+    /** @type {number|null} The ID of the user's current favorite Systembolag. */
     currentFavoriteId: {
       type: Number,
       default: null
@@ -66,6 +77,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Toggles the favorite status of this Systembolaget store.
+     * Adds or removes from user's favorites via API call.
+     */
     async favoriteSystembolag() {
       try {
         if (!this.isFavorite) {
@@ -79,6 +94,10 @@ export default {
         this.message = error
       }
     },
+
+    /**
+     * @description Emits the location data to parent for map directions.
+     */
     setTargetLocation() {
       this.$emit('select-location', this.location)
     }

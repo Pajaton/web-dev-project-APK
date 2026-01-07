@@ -40,6 +40,11 @@
 import { Api } from '@/Api.js'
 import MapDirections from '@/components/MapDirections.vue'
 
+/**
+ * @view FindSystembolag
+ * @description Page for finding nearby Systembolaget stores with map directions.
+ * Displays an interactive map and list of nearby stores.
+ */
 export default {
   components: {
     MapDirections
@@ -60,6 +65,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Fetches the currently logged-in user's ID.
+     */
     async fetchCurrentUser() {
       try {
         const response = await Api.get('/sessions/currentlyLoggedin/')
@@ -68,12 +76,25 @@ export default {
         this.userId = null
       }
     },
+
+    /**
+     * @description Triggers the map to fetch user location and directions.
+     */
     getDirections() {
       this.$refs.mapDirections.getLocation()
     },
+
+    /**
+     * @description Handles location card selection and updates map.
+     * @param {Object} locationData - The selected location object.
+     */
     handleCardSelection(locationData) {
       this.$refs.mapDirections.handleCardSelection(locationData)
     },
+
+    /**
+     * @description Fetches the user's favorite Systembolaget store.
+     */
     async fetchFavSystembolag() {
       if (!this.userId) return
       try {
@@ -83,6 +104,11 @@ export default {
         console.error('Error fetching favorite Systembolag:', error)
       }
     },
+
+    /**
+     * @description Updates the favorite Systembolaget ID when changed.
+     * @param {number|null} newFavId - The new favorite store ID.
+     */
     handleFavoriteChange(newFavId) {
       this.favoriteSystembolagId = newFavId
     }
