@@ -17,11 +17,11 @@
         Get directions
       </b-button>
       <b-button
-          v-if="userId"
-          id="fav-button"
-          @click="favoriteSystembolag()"
-          :variant="isFavorite ? 'secondary' : 'primary'">
-          {{ isFavorite ? 'Unfavorite' : 'Favorite' }}
+        v-if="userId"
+        id="fav-button"
+        @click="favoriteSystembolag()"
+        :variant="isFavorite ? 'secondary' : 'primary'">
+        {{ isFavorite ? 'Unfavorite' : 'Favorite' }}
       </b-button>
     </b-card>
   </div>
@@ -62,7 +62,7 @@ export default {
   },
   data() {
     return {
-      message: '',
+      message: ''
     }
   },
   methods: {
