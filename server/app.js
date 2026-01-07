@@ -58,12 +58,6 @@ app.options('*', cors({
     credentials: true
 }));
 
-// 
-app.use(cors({
-    origin: 'https://localhost:5173',
-    credentials: true
-}));
-
 // Import routes
 app.get('/api', function(req, res) {
     res.json({ 'message': 'Welcome to the APK Calc API' });
