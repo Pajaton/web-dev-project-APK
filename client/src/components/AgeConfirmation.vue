@@ -19,12 +19,22 @@
 <script>
   import { Api } from '@/Api.js'
 
+  /**
+   * @component AgeConfirmation
+   * @description Displays a modal to confirm user is of legal drinking age (20+).
+   * Checks for existing user or guest sessions before showing the modal.
+   */
   export default {
     props: {
+      /** @type {Object} The active session object */
       activeSession: Object,
       default: () => ({})
     },
     methods: {
+      /**
+       * @description Checks if a logged-in user or guest session exists.
+       * Shows age confirmation modal if no valid session is found.
+       */
       async checkIfSessionExists() {
         try {
           // first check for logged in user
@@ -47,6 +57,10 @@
         }
       },
 
+      /**
+       * @description Confirms the user's age and creates a guest session.
+       * Hides the modal upon successful confirmation.
+       */
       async confirmAge() {
         try {
           await Api.post('/guest-sessions')
@@ -57,6 +71,9 @@
         }
       },
 
+      /**
+       * @description Redirects user away from the site if they deny being of legal age.
+       */
       denyAccess() {
         window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
       }

@@ -55,22 +55,40 @@
 <script>
 import MapDirections from './MapDirections.vue'
 
+/**
+ * @component ToiletMap
+ * @description Floating button component that opens an off-canvas panel
+ * with a map for finding nearby public toilets.
+ */
 export default {
   components: { MapDirections },
   data() {
     return {
+      /** @type {Object|null} The currently selected toilet location */
       targetToilet: null,
+      /** @type {boolean} Whether the off-canvas panel is visible */
       showPanel: false,
+      /** @type {boolean} Whether the panel has been opened at least once */
       hasOpened: false,
+      /** @type {boolean} Whether the map is currently loading */
       isLoading: false,
+      /** @type {boolean} Whether the map has finished initial load */
       mapLoaded: false
     }
   },
   methods: {
+    /**
+     * @description Opens the toilet map off-canvas panel.
+     */
     openPanel() {
       this.showPanel = true
       this.hasOpened = true
     },
+
+    /**
+     * @description Callback triggered when the MapDirections component mounts.
+     * Initiates location fetching on first open.
+     */
     onMapMounted() {
       if (!this.mapLoaded) {
         this.$nextTick(() => {
