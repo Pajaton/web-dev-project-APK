@@ -9,11 +9,11 @@ var Systembolag = require("../models/SystembolagSchema");
  * @returns {Object} 200 - Object containing array of all Systembolag stores.
  */
 router.get("/systembolag", async (req, res, next) => {
-    try {
-        const systembolag = await Systembolag.find();
+  try {
+    const systembolag = await Systembolag.find();
 
-        return res.json({ "systembolag": systembolag });
-    } catch(err) { next(err) };
+    return res.json({ "systembolag": systembolag });
+  } catch(err) { next(err) };
 });
 
 /**
@@ -23,17 +23,17 @@ router.get("/systembolag", async (req, res, next) => {
  * @returns {Object} 404 - No products found.
  */
 router.get("/systembolag/products", async (req, res, next) => {
-    try{
-        const products = await Systembolag
-            .find()
-            .select("hasStockOf");
+  try{
+    const products = await Systembolag
+      .find()
+      .select("hasStockOf");
 
-        if (!products) {
-            return res.status(404).json({"message": "No products found"});
-        }
+    if (!products) {
+      return res.status(404).json({"message": "No products found"});
+    }
 
-        return res.json({ "products": products });
-    } catch(err){ next(err) };
+    return res.json({ "products": products });
+  } catch(err){ next(err) };
 });
 
 /**
@@ -44,17 +44,17 @@ router.get("/systembolag/products", async (req, res, next) => {
  * @returns {Object} 404 - No products found at this store.
  */
 router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
-    try {
-        const drinksAtASystembolag = await Systembolag
-            .findById(req.params.systembolagId)
-            .populate("hasInStock"); // Removes dangling references by default
+  try {
+    const drinksAtASystembolag = await Systembolag
+      .findById(req.params.systembolagId)
+      .populate("hasInStock"); // Removes dangling references by default
 
-        if (!drinksAtASystembolag) {
-            return res.status(404).json({"message": "No products found at this store"});
-        }
+    if (!drinksAtASystembolag) {
+      return res.status(404).json({"message": "No products found at this store"});
+    }
 
-        return res.status(200).json({ "hasInStock": drinksAtASystembolag.hasInStock });        
-    }catch(err) { next(err) };
+    return res.status(200).json({ "hasInStock": drinksAtASystembolag.hasInStock });        
+  }catch(err) { next(err) };
 });
 
 /**
@@ -66,23 +66,23 @@ router.get("/systembolag/:systembolagId/products", async (req, res, next) => {
  * @returns {Object} 404 - Product not available at this Systembolag.
  */
 router.get("/systembolag/:systembolagId/products/:productId", async (req, res, next) => {
-    try {
-        const drinksInStockAtASystembolag = await Systembolag
-            .findById(req.params.systembolagId)
-            .populate({
-                "hasInStock": {
-                    match: {
-                        _id: req.params.productId
-                    }
-                }
-            });
-
-        if (!drinksInStockAtASystembolag) {
-            return res.status(404).json({"message": "The product is not available at this systembolag"});
+  try {
+    const drinksInStockAtASystembolag = await Systembolag
+      .findById(req.params.systembolagId)
+      .populate({
+        "hasInStock": {
+          match: {
+            _id: req.params.productId
+          }
         }
+      });
 
-        return res.json({ "hasInStock": drinksInStockAtASystembolag.hasInStock[0] });
-    } catch(err) { next(err) };
+    if (!drinksInStockAtASystembolag) {
+      return res.status(404).json({"message": "The product is not available at this systembolag"});
+    }
+
+    return res.json({ "hasInStock": drinksInStockAtASystembolag.hasInStock[0] });
+  } catch(err) { next(err) };
 });
 
 /**
@@ -93,18 +93,17 @@ router.get("/systembolag/:systembolagId/products/:productId", async (req, res, n
  * @returns {Object} 404 - No address found for this Systembolag.
  */
 router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
-    try {
-        const systembolagAddress = await Systembolag
-            .findById(req.params.systembolagId)
-            .select("street streetNumber postalCode city lon lat");
+  try {
+    const systembolagAddress = await Systembolag
+      .findById(req.params.systembolagId)
+      .select("street streetNumber postalCode city lon lat");
 
-        if(!systembolagAddress) {
-            return res.status(404).json({"message": "No adress found for this systembolag"});
-        }
+    if(!systembolagAddress) {
+      return res.status(404).json({"message": "No adress found for this systembolag"});
+    }
 
-        return res.json({ "address": systembolagAddress });        
-     } catch(err) { next(err) };
-
+    return res.json({ "address": systembolagAddress });        
+  } catch(err) { next(err) };
 });
 
 /**
@@ -115,16 +114,16 @@ router.get("/systembolag/:systembolagId/address", async (req, res, next) => {
  * @returns {Object} 404 - Systembolag not found.
  */
 router.get("/systembolag/:systembolagId", async (req, res, next) => {
-    try{
-        const mySystembolag = await Systembolag
-            .findById(req.params.systembolagId);
+  try{
+    const mySystembolag = await Systembolag
+      .findById(req.params.systembolagId);
 
-        if (!mySystembolag) {
-            return res.status(404).json({"message": "The systembolag was not found"});
-        }
+    if (!mySystembolag) {
+      return res.status(404).json({"message": "The systembolag was not found"});
+    }
 
-            return res.json(mySystembolag);
-    } catch(err) { next(err) };
+    return res.json(mySystembolag);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -141,21 +140,21 @@ router.get("/systembolag/:systembolagId", async (req, res, next) => {
  * @returns {Object} 201 - The created Systembolag store object.
  */
 router.post("/systembolag", async (req, res, next) => {
-    try {
-        var newSystembolag = new Systembolag({
-            "systembolagID": req.body.id,
-            "name": req.body.name,
-            "street": req.body.street,
-            "streetNumber": req.body.streetNumber,
-            "postalCode": req.body.postalCode,
-            "city": req.body.city,
-            "lon": req.body.lon,
-            "lat": req.body.lat
-        });
-        await newSystembolag.save();
+  try {
+    var newSystembolag = new Systembolag({
+      "systembolagID": req.body.id,
+      "name": req.body.name,
+      "street": req.body.street,
+      "streetNumber": req.body.streetNumber,
+      "postalCode": req.body.postalCode,
+      "city": req.body.city,
+      "lon": req.body.lon,
+      "lat": req.body.lat
+    });
+    await newSystembolag.save();
 
-        return res.status(201).json(newSystembolag);
-    } catch(err) { next(err) };
+    return res.status(201).json(newSystembolag);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -167,23 +166,23 @@ router.post("/systembolag", async (req, res, next) => {
  * @returns {Object} 404 - Systembolag not found.
  */
 router.post("/systembolag/:systembolagId/products", async (req, res, next) => {
-    try {
-        const systembolag = await Systembolag.findByIdAndUpdate(
-            req.params.systembolagId,
-            {
-                $addToSet: {
-                    hasInStock: req.body.productId
-                }
-            }, // add the productId to hasInStock array
-            { new: true } // return the updated document
-        );
-
-        if (!systembolag) {
-            return res.status(404).json({"message": "Systembolag was not found"});
+  try {
+    const systembolag = await Systembolag.findByIdAndUpdate(
+      req.params.systembolagId,
+      {
+        $addToSet: {
+          hasInStock: req.body.productId
         }
+      }, // add the productId to hasInStock array
+      { new: true } // return the updated document
+    );
 
-        return res.status(201).json(systembolag);
-    } catch(err) { next(err) };
+    if (!systembolag) {
+      return res.status(404).json({"message": "Systembolag was not found"});
+    }
+
+    return res.status(201).json(systembolag);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -202,29 +201,29 @@ router.post("/systembolag/:systembolagId/products", async (req, res, next) => {
  * @returns {Object} 404 - Systembolag not found.
  */
 router.patch("/systembolag/:systembolagId", async (req, res, next) => {
-    try {
-        const updatedSystembolag = await Systembolag
-            .findById(req.params.systembolagId);
+  try {
+    const updatedSystembolag = await Systembolag
+      .findById(req.params.systembolagId);
 
-        if (!updatedSystembolag) {
-            return res.status(404).json({"message": "Systembolag was not found"});
-        }    
+    if (!updatedSystembolag) {
+      return res.status(404).json({"message": "Systembolag was not found"});
+    }    
 
-        // Update only the fields provided in the request body
-        updatedSystembolag.systembolagID = (req.body.id || updatedSystembolag.systembolagID);
-        updatedSystembolag.name = (req.body.name || updatedSystembolag.name);
-        updatedSystembolag.street = (req.body.street || updatedSystembolag.street);
-        updatedSystembolag.streetNumber = (req.body.streetNumber || updatedSystembolag.streetNumber);
-        updatedSystembolag.postalCode = (req.body.postalCode || updatedSystembolag.postalCode);
-        updatedSystembolag.city = (req.body.city || updatedSystembolag.city);
-        updatedSystembolag.lon = (req.body.lon || updatedSystembolag.lon);
-        updatedSystembolag.lat = (req.body.lat || updatedSystembolag.lat);
+    // Update only the fields provided in the request body
+    updatedSystembolag.systembolagID = (req.body.id || updatedSystembolag.systembolagID);
+    updatedSystembolag.name = (req.body.name || updatedSystembolag.name);
+    updatedSystembolag.street = (req.body.street || updatedSystembolag.street);
+    updatedSystembolag.streetNumber = (req.body.streetNumber || updatedSystembolag.streetNumber);
+    updatedSystembolag.postalCode = (req.body.postalCode || updatedSystembolag.postalCode);
+    updatedSystembolag.city = (req.body.city || updatedSystembolag.city);
+    updatedSystembolag.lon = (req.body.lon || updatedSystembolag.lon);
+    updatedSystembolag.lat = (req.body.lat || updatedSystembolag.lat);
 
-        // Save the updated Systembolaget store to the database
-        await updatedSystembolag.save().catch(err => { next(err) });
+    // Save the updated Systembolaget store to the database
+    await updatedSystembolag.save().catch(err => { next(err) });
 
-        return res.json(updatedSystembolag);
-    } catch(err) { next(err) };
+    return res.json(updatedSystembolag);
+  } catch(err) { next(err) };
 });
 
 /**
@@ -235,16 +234,16 @@ router.patch("/systembolag/:systembolagId", async (req, res, next) => {
  * @returns {Object} 404 - Systembolag not found.
  */
 router.delete("/systembolag/:systembolagId", async (req, res, next) => {
-    try {
-        const deletedSystembolag = await Systembolag
-            .findByIdAndDelete(req.params.systembolagId);
+  try {
+    const deletedSystembolag = await Systembolag
+      .findByIdAndDelete(req.params.systembolagId);
 
-        if (!deletedSystembolag) {
-            return res.status(404).json({"message": "Systembolag was not found"});
-        }
+    if (!deletedSystembolag) {
+      return res.status(404).json({"message": "Systembolag was not found"});
+    }
         
-        return res.json(deletedSystembolag);
-    } catch(err) { next(err) };
+    return res.json(deletedSystembolag);
+  } catch(err) { next(err) };
 });
 
 module.exports = router;
