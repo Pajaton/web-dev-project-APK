@@ -191,6 +191,11 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @view APK
+ * @description Main drinks listing page with filtering, sorting, and review functionality.
+ * Displays all available drinks from Systembolaget with APK (alcohol per krona) calculations.
+ */
 export default {
   name: 'APK',
   data() {
@@ -225,6 +230,10 @@ export default {
     this.getDrinklist('')
   },
   methods: {
+    /**
+     * @description Fetches the list of drinks from the API with optional filters.
+     * @param {string} filterUrl - Query string with filter/sort parameters.
+     */
     getDrinklist(filterUrl) {
       Api.get('/drinks/' + filterUrl)
         .then(response => {
@@ -234,6 +243,11 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Fetches a single drink by its ID.
+     * @param {string} id - The drink's ID.
+     */
     getDrinkById(id) {
       Api.get('/drinks/' + id)
         .then(response => {
@@ -243,6 +257,11 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Builds a query string from selected filters and sort options.
+     * @returns {string} The constructed query string for the API request.
+     */
     buildQuery() {
       let query = ''
       if (this.selectedType.length) {
@@ -306,26 +325,53 @@ export default {
       }
       return query
     },
+
+    /**
+     * @description Applies the selected filters and fetches filtered drink list.
+     */
     submitFilter() {
       const query = this.buildQuery()
       this.getDrinklist(query)
     },
+
+    /**
+     * @description Applies the selected sort option and fetches sorted drink list.
+     */
     submitSort() {
       const query = this.buildQuery()
       this.getDrinklist(query)
     },
+
+    /**
+     * @description Capitalizes the first letter of a string.
+     * @param {string} str - The string to capitalize.
+     * @returns {string} The capitalized string.
+     */
     capitalizeFirst(str) {
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
     },
+
+    /**
+     * @description Opens the drink details popup and fetches average rating.
+     * @param {Object} drink - The drink object to display.
+     */
     async openDrinkPopup(drink) {
       this.showDrinkPopup = true
       this.getDrinkById(drink._id)
       this.avgRating = await this.getAverageScore(drink._id)
     },
+
+    /**
+     * @description Closes the drink details popup.
+     */
     closeDrinkPopup() {
       this.showDrinkPopup = false
       this.chosenDrink = null
     },
+
+    /**
+     * @description Opens the review popup for the current drink.
+     */
     openReviewPopup() {
       this.showReviewPopup = true
       this.showDrinkPopup = false
@@ -337,12 +383,24 @@ export default {
         this.rating = null
       }
     },
+
+    /**
+     * @description Closes the review popup.
+     */
     closeReviewPopup() {
       this.showReviewPopup = false
     },
+
+    /**
+     * @description Closes the all reviews popup.
+     */
     closeAllReviewsPopup() {
       this.showAllReviewsPopup = false
     },
+
+    /**
+     * @description Fetches the current user's existing review for the chosen drink.
+     */
     getReviewRating() {
       Api.get('/users/' + this.currentUserId + '/drinks/' + this.chosenDrink._id + '/reviews')
         .then(response => {
@@ -359,6 +417,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Submits a new review for the chosen drink.
+     */
     sendReviewRating() {
       Api.post('/reviews', {
         userID: this.currentUserId,
@@ -375,6 +437,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Updates an existing review for the chosen drink.
+     */
     updateReviewRating() {
       Api.put('/reviews/' + this.oldReview._id, {
         userID: this.currentUserId,
@@ -391,6 +457,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Deletes the current user's review for the chosen drink.
+     */
     deleteReview() {
       if (!this.oldReview) {
         return
@@ -406,6 +476,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Deletes all reviews (admin only).
+     */
     deleteAllReviews() {
       Api.delete('/reviews')
         .then(response => {
@@ -415,6 +489,10 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Fetches all reviews for the chosen drink and displays them.
+     */
     getAllReviewRating() {
       this.showAllReviewsPopup = true
       this.reviewsForChosenDrink = []
@@ -449,6 +527,12 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Calculates the average rating score for a drink.
+     * @param {string} drink - The drink's ID.
+     * @returns {number|string} The average score or 'No score' if no reviews.
+     */
     async getAverageScore(drink) {
       let avgScore = 0
       try {
@@ -472,6 +556,10 @@ export default {
       }
       return avgScore
     },
+
+    /**
+     * @description Fetches the currently logged-in user's ID and email.
+     */
     fetchCurrentUser() {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
@@ -482,9 +570,20 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Handles image load error by setting default drink picture.
+     * @param {Event} event - The error event.
+     */
     drinkPictureError(event) {
       event.target.src = this.imageUrl('default_drink.jpg')
     },
+
+    /**
+     * @description Constructs the URL for a drink image asset.
+     * @param {string} image - The image filename.
+     * @returns {string} The full URL to the image.
+     */
     imageUrl(image) {
       return new URL(`../assets/drinkPictures/${image}`, import.meta.url).href
     }

@@ -103,6 +103,11 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @view Register
+ * @description User registration page with form validation.
+ * Creates a new user account with email, password, and address information.
+ */
 export default {
   name: 'Register',
   computed: {
@@ -135,6 +140,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Displays an alert message with specified variant.
+     * @param {string} message - The message to display.
+     * @param {string} variant - Bootstrap variant (info, success, warning, danger).
+     */
     showAlert(message, variant = 'info') {
       this.message = ''
       this.$nextTick(() => {
@@ -142,6 +152,11 @@ export default {
         this.alertVariant = variant
       })
     },
+
+    /**
+     * @description Validates and registers a new user account.
+     * Checks for existing email before creating the account.
+     */
     async registerUser() {
       await this.userVerification()
       if (this.userExist) {
@@ -174,6 +189,10 @@ export default {
         this.showAlert('Registration failed, server is unavailable', 'danger')
       }
     },
+
+    /**
+     * @description Clears all registration form fields.
+     */
     resetFields() {
       this.email = ''
       this.userName = ''
@@ -184,6 +203,10 @@ export default {
       this.city = ''
       this.ageCheck = false
     },
+
+    /**
+     * @description Checks if the email already exists in the system.
+     */
     async userVerification() {
       this.userExist = false
       try {
@@ -200,6 +223,12 @@ export default {
         console.error('User verification failer:', error)
       }
     },
+
+    /**
+     * @description Validates that a value contains only numbers.
+     * @param {string} number - The value to validate.
+     * @returns {boolean} True if valid, false otherwise.
+     */
     numberState(number) {
       return /^\d*$/.test(number)
     }

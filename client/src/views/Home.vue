@@ -35,6 +35,11 @@
 // @ is an alias to /src
 import { Api } from '@/Api'
 
+/**
+ * @view Home
+ * @description Landing page with welcome message, feature carousel,
+ * and links to external resources.
+ */
 export default {
   name: 'home',
   data() {
@@ -43,6 +48,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Fetches a welcome message from the API.
+     */
     getMessage() {
       Api.get('/')
         .then(response => {
@@ -52,6 +60,12 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Constructs the URL for a home page image asset.
+     * @param {string} image - The image filename.
+     * @returns {string} The full URL to the image.
+     */
     imageUrl(image) {
       return new URL(`../assets/homePagePictures/${image}`, import.meta.url).href
     }

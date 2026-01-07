@@ -161,6 +161,11 @@
 
 import { Api } from '@/Api'
 
+/**
+ * @view EditUserProfile
+ * @description Profile editing page allowing users to update their personal information,
+ * change profile picture, and delete their account.
+ */
 export default {
   name: 'Register',
   mounted() {
@@ -222,6 +227,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * @description Displays an alert message with specified variant.
+     * @param {string} message - The message to display.
+     * @param {string} variant - Bootstrap variant (info, success, warning, danger).
+     */
     showAlert(message, variant = 'info') {
       this.message = ''
       this.$nextTick(() => {
@@ -229,6 +239,10 @@ export default {
         this.alertVariant = variant
       })
     },
+
+    /**
+     * @description Submits the updated user profile to the API.
+     */
     async editUser() {
       try {
         const response = await Api.patch('/users/' + this.currentUserId, {
@@ -255,6 +269,10 @@ export default {
         this.showAlert('Update failed, server is unavailable', 'danger')
       }
     },
+
+    /**
+     * @description Resets form fields to the current user's saved values.
+     */
     async resetFields() {
       try {
         const response = await Api.get('/users/' + this.currentUserId)
@@ -273,9 +291,18 @@ export default {
         this.showAlert('Registration failed, server is unavailable', 'danger')
       }
     },
+
+    /**
+     * @description Sets the selected profile picture.
+     * @param {string} picture - The filename of the selected picture.
+     */
     setProfilePicture(picture) {
       this.profilePicture = picture
     },
+
+    /**
+     * @description Deletes the current user's account and logs them out.
+     */
     async deleteUser() {
       try {
         await Api.delete('/sessions/' + this.currentUserId)
@@ -287,10 +314,18 @@ export default {
         this.message = error
       }
     },
+
+    /**
+     * @description Navigates to the home page after account deletion.
+     */
     async goHome() {
       this.modalShowConfirmation = false
       this.$router.push({ path: '/home' })
     },
+
+    /**
+     * @description Fetches the currently logged-in user and populates form fields.
+     */
     fetchCurrentUser() {
       Api.get('/sessions/currentlyLoggedin/')
         .then(response => {
@@ -301,13 +336,30 @@ export default {
           this.message = error
         })
     },
+
+    /**
+     * @description Handles profile picture load error by setting default image.
+     * @param {Event} event - The error event.
+     */
     profilePictureError(event) {
       event.target.src = 'default_user.jpg'
     },
+
+    /**
+     * @description Validates that a value contains only numbers.
+     * @param {string} number - The value to validate.
+     * @returns {boolean} True if valid or null, false otherwise.
+     */
     numberState(number) {
       if (number === null) return true
       return /^\d*$/.test(number)
     },
+
+    /**
+     * @description Constructs the URL for a profile picture asset.
+     * @param {string} image - The image filename.
+     * @returns {string} The full URL to the image.
+     */
     imageUrl(image) {
       return new URL(`../assets/profilePictures/${image}`, import.meta.url).href
     }
